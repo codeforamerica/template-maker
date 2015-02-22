@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <div ng-app="builder">
+    {% block subcontent %}{% endblock %}
+  </div>
+{% endblock %}
+
+{% block javascripts %}
+  <script src="{{ url_for('static', filename='lib/angular/angular.js') }}"></script>
+  <script src="{{ url_for('static', filename='lib/angular-route/angular-route.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/builder/app.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/builder/controllers/newBuilderCtrl.js') }}"></script>
+{% endblock %}

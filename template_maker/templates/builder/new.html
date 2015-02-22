@@ -1,0 +1,11 @@
+{% extends "builder/main.html" %}
+
+{% block subcontent %}
+
+<div class="container" ng-controller="newBuilderCtrl">
+  <input type="textarea" ng-model="test">
+  <hr>
+  {[ test ]}
+</div>
+
+{% endblock %}

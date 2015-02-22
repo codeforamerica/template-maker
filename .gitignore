@@ -1,5 +1,5 @@
 *.pyc
 .DS_Store
 
-bower_components
+lib
 node_modules

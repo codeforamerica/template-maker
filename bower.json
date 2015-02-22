@@ -1,0 +1,9 @@
+{
+  "name": "template-maker",
+  "version": "0.0.0",
+  "authors": [
+    "Ben Smithgall <ben.smithgall@gmail.com>"
+  ],
+  "license": "MIT",
+  "private": true
+}
