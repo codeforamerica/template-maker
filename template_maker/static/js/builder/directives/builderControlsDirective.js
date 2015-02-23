@@ -6,26 +6,29 @@
       function link(scope, elem, attrs) {
         scope.sections = [];
 
-        scope.addTitle = function() {
+        function addTitle() {
           scope.sections.push({
-            elem: 'input',
-            type: 'text',
-            _class: 'js-builder-title form-control',
-            placeholder: 'Enter a title here',
-            variables: [],
-            content: ''
+            elem: 'input', type: 'text', _class: 'js-builder-title form-control',
+            placeholder: 'Enter a title here', variables: [], content: ''
+          })
+        };
+
+        function addSection() {
+          scope.sections.push({
+            elem: 'textarea', type: 'textarea', _class: 'js-builder-section form-control',
+            paceholder: 'What is this section about?', variables: [], content: ''
           });
         };
 
+        addTitle();
+        addSection();
+
+        scope.addTitle = function() {
+          addTitle();
+        };
+
         scope.addSection = function() {
-          scope.sections.push({
-            elem: 'textarea',
-            type: 'textarea',
-            _class: 'js-builder-section form-control',
-            placeholder: 'What is this section about?',
-            variables: [],
-            content: ''
-          });
+          addSection();
         };
 
         scope.addVariables = function() {
