@@ -1,16 +1,10 @@
 (function() {
   'use strict';
 
-  builder.directive('builderControls', ['$timeout', '$compile', 
-    function($timeout, $compile) {
+  builder.directive('builderControls', ['$timeout', '$window', 
+    function($timeout, $window) {
       function link(scope, elem, attrs) {
         scope.sections = [];
-
-        function focusCursor(element) {
-          if (scope.setFocus === true) {
-            element[0].focus();
-          }
-        }
 
         scope.addTitle = function() {
           scope.sections.push({
@@ -30,7 +24,6 @@
             variables: [],
             content: ''
           });
-          focusCursor(elem);
         };
 
         scope.addVariables = function() {
@@ -40,6 +33,17 @@
         scope.saveTemplate = function() {
           scope.$emit('saveTemplate', scope.sections);
         }
+
+        // add a hook to the scroll action to stick the
+        // header to the top
+        angular.element($window).bind('scroll', function() {
+          var builderControlsElem = angular.element('.builder-controls');
+          if (this.pageYOffset >= 45) {
+            builderControlsElem.addClass('js-builder-controls-position-fixed');
+          } else {
+            builderControlsElem.removeClass('js-builder-controls-position-fixed');
+          }
+        })
 
       };
 

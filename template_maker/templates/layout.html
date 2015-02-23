@@ -29,7 +29,9 @@
 
   {% include 'includes/top_nav.html' %}
 
-  {% block content %}{% endblock %}
+  <div class="container full-height-container">
+    {% block content %}{% endblock %}
+  </div>
 
   <script src="{{ url_for('static', filename='lib/jquery/dist/jquery.js') }}"></script>
   <script src="{{ url_for('static', filename='lib/bootstrap/dist/js/bootstrap.js') }}"></script>
