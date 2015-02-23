@@ -1,9 +1,9 @@
-<div class="container builder-container">
+<div>
   <form>
     <div ng-repeat="section in sections" class="builder-content-block">
       <span class="pull-right glyphicon glyphicon-remove" ng-click="deleteElem($index)" aria-hidden="true"></span>
-      <input ng-if="section.elem == 'input'" type="{[section.type]}" class="{[section._class]}" ng-model="section.content" setfocus="$last">
-      <textarea ng-if="section.elem == 'textarea'" class="{[section._class]}" ng-model="section.content" setfocus="$last"></textarea>
+      <input ng-if="section.elem == 'input'" type="{[section.type]}" class="{[section._class]}" ng-model="section.content" setfocus="$last" placeholder="Enter your title here">
+      <textarea ng-if="section.elem == 'textarea'" class="{[section._class]}" ng-model="section.content" setfocus="$last" placeholder="What is this section about?" rows=10></textarea>
     </div>
   </form>
 </div>

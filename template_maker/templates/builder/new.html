@@ -2,13 +2,21 @@
 
 {% block subcontent %}
 
-<div class="container" ng-controller="newBuilderCtrl">
+<div class="container builder-container" ng-controller="newBuilderCtrl">
   <div class="row builder-controls">
     <builder-controls target="'.builder-content'"></builder-controls>
   </div>
   <form role="form">
-    <builder-content class="row builder-content"></builder-content>
+    <builder-content class="row builder-content">
+      <input type="text" class="js-builder-title form-control" setfocus="$last" placeholder="Enter your title here">
+      <textarea ng-if="section.elem == 'textarea'" class="{[section._class]}" ng-model="section.content" setfocus="$last" placeholder="What is this section about?" rows=10></textarea>
+    </builder-content>
   </form>
+  <div class="row builder-fix-bottom text-center">
+    <div class="container">
+      <a class="btn btn-success btn-sm" ng-click="saveTemplate()">Save Template</a>
+    </div>
+  </div>
 </div>
 
 {% endblock %}
