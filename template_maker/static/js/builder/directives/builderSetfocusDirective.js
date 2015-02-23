@@ -1,4 +1,8 @@
 (function() {
+  /*
+    Setfocus is a custom attribute directive that causes 
+    input fields to autofocus when they are added.
+  */
   'use strict';
 
   builder.directive('setfocus', [ function() {
