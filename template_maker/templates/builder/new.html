@@ -3,9 +3,12 @@
 {% block subcontent %}
 
 <div class="container" ng-controller="newBuilderCtrl">
-  <input type="textarea" ng-model="test">
-  <hr>
-  {[ test ]}
+  <div class="row builder-controls">
+    <builder-controls target="'.builder-content'"></builder-controls>
+  </div>
+  <form role="form">
+    <div class="row builder-content"></div>
+  </form>
 </div>
 
 {% endblock %}
