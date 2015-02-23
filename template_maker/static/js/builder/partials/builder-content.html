@@ -1,0 +1,9 @@
+<div class="container">
+  <form>
+    <div ng-repeat="section in sections">
+      <input ng-if="section.elem == 'input'" type="{[section.type]}" class="{[section._class]}" ng-model="section.content">
+      <textarea ng-if="section.elem == 'textarea'" class="{[section._class]}" ng-model="section.content"></textarea>
+      <span ng-click="deleteElem($index)"> x</span>
+    </div>
+  </form>
+</div>

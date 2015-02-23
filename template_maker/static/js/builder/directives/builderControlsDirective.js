@@ -3,31 +3,38 @@
 
   builder.directive('builderControls', ['$compile', function($compile) {
     function link(scope, elem, attrs) {
-
-      var contentElem = angular.element(scope.target);
+      scope.sections = [];
 
       scope.addTitle = function() {
-        var newScope = scope.$new();
-        contentElem.append($compile('<builder-title></builder-title>')(newScope));
-      }
+        scope.sections.push({
+          elem: 'input',
+          type: 'text',
+          _class: 'js-builder-title form-control',
+          variables: [],
+          content: ''
+        });
+      };
 
       scope.addSection = function() {
-        var newScope = scope.$new();
-        contentElem.append($compile('<builder-section></builder-section>')(newScope));
-      }
+        scope.sections.push({
+          elem: 'textarea',
+          type: 'textarea',
+          _class: 'js-builder-section form-control',
+          variables: [],
+          content: ''
+        });
+      };
 
       scope.addVariables = function() {
 
-      }
+      };
 
     };
 
     return {
       restrict: 'AE',
       templateUrl: '../static/js/builder/partials/builder-controls.html',
-      scope: {
-        target: '=',
-      },
+      transclude: true,
       link: link
     };
 
