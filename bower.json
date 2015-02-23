@@ -7,6 +7,8 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "pure": "~0.5.0"
+    "bootstrap": "~3.2.0",
+    "jQuery": "~2.1.0",
+    "angular": "~1.2.28"
   }
 }
