@@ -1,9 +1,9 @@
-<div class="container">
+<div class="container" id="section-container">
   <form>
     <div ng-repeat="section in sections">
-      <input ng-if="section.elem == 'input'" type="{[section.type]}" class="{[section._class]}" ng-model="section.content">
-      <textarea ng-if="section.elem == 'textarea'" class="{[section._class]}" ng-model="section.content"></textarea>
-      <span ng-click="deleteElem($index)"> x</span>
+      <span class="pull-right" ng-click="deleteElem($index)"> x</span>
+      <input ng-if="section.elem == 'input'" type="{[section.type]}" class="{[section._class]}" ng-model="section.content" setfocus="$last">
+      <textarea ng-if="section.elem == 'textarea'" class="{[section._class]}" ng-model="section.content" setfocus="$last"></textarea>
     </div>
   </form>
 </div>
