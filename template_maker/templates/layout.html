@@ -14,6 +14,10 @@
   <meta name="description" content="{% block meta_description %}{% endblock %}">
   <meta name="author" content="{% block meta_author %}{% endblock %}">
 
+  {% assets "css_all" %}
+  <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {% endassets %}
+
   <!-- Mobile viewport optimized: h5bp.com/viewport -->
   <meta name="viewport" content="width=device-width">
 
@@ -23,9 +27,16 @@
 <body>
 {% block body %}
 
-  {% block content %}{% endblock %}
+  {% include 'includes/top_nav.html' %}
 
-  {% block javascripts %}{% endblock %}
+  <div class="container full-height-container">
+    {% block content %}{% endblock %}
+  </div>
+
+  <script src="{{ url_for('static', filename='lib/jquery/dist/jquery.js') }}"></script>
+  <script src="{{ url_for('static', filename='lib/bootstrap/dist/js/bootstrap.js') }}"></script>
+  {% block javascripts %}
+  {% endblock %}
 
 {% endblock %}
 </body>

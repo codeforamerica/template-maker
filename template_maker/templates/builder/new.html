@@ -2,10 +2,20 @@
 
 {% block subcontent %}
 
-<div class="container" ng-controller="newBuilderCtrl">
-  <input type="textarea" ng-model="test">
-  <hr>
-  {[ test ]}
+<p class="lead text-center">Template Builder: Build a new template</p>
+
+<div class="container builder-container" ng-controller="newBuilderCtrl">
+  <div class="row builder-controls">
+    <builder-controls target="'.builder-content'"></builder-controls>
+  </div>
+  <form role="form">
+    <builder-content class="row builder-content"></builder-content>
+  </form>
+  <div class="row builder-fix-bottom text-center">
+    <div class="container">
+      <a class="btn btn-success btn-sm" ng-click="saveTemplate()">Save Template</a>
+    </div>
+  </div>
 </div>
 
 {% endblock %}
