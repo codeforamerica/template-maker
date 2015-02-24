@@ -5,16 +5,22 @@
   */
   'use strict';
 
-  builder.directive('setfocus', [ function() {
+  builder.directive('builderOptions', [ function() {
     return {
       restrict: 'A',
       scope: {
-        setfocus: '='
+        setfocus: '=',
+        editable: '='
       },
       link: function(scope, elem, attrs) {
+        if (scope.editable) {
+          elem[0].setAttribute('contenteditable', true);
+        };
+
         if (scope.setfocus === true) {
           elem[0].focus();
-        }
+        };
+
       }
     }
   }]);
