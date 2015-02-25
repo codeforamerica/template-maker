@@ -1,3 +1,6 @@
-<div ng-repeat="section in formattedContent">
-  <p ng-bind-html="section.content"></p>
+<div class="js-content-container">
+  <div ng-repeat="section in formattedContent">
+    <div class="js-content-section" ng-bind-html="section.content"></div>
+    <hr ng-hide="$last" />
+  </div>
 </div>

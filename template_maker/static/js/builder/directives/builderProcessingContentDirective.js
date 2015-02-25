@@ -8,11 +8,18 @@
   builder.directive('templateContent', ['$timeout', '$compile',
     function($timeout, $compile) {
       function link(scope, elem, attrs) {
+        /*
+          highlightVariables takes in contentText, finds all
+          text contained between the template symbol ({{ }}), generates
+          an array of distinct items, formats them to include a
+          <span> for the purpose of highlighting the variables,
+          and then replaces the text.
+          TOOD: There has to be a better way to do this.
+         */
         function highlightVariables(contentText) {
-          // TOOD: There has to be a better way to do this.
           var variableRegex = /({{ |{{).*?(}}| }})/g
           var toHighlight = contentText.match(variableRegex);
-          var toHighlightTmp = {}, 
+          var toHighlightTmp = {},
             highlightedTmp = {},
             highlightedFinal = [],
             toHighlightFinal = [];
@@ -38,16 +45,32 @@
             contentText = contentText.replace(re, highlightedFinal[i]);
           }
 
+          contentText = contentText.replace(/(\\n|\n)/g, '<br/>')
+
           return contentText;
-        }
+        };
+
+        /*
+          generateSectionHtml takes a section context,
+          applies the highlighting from the above method,
+          and surrouds the elem with the appropriate tag
+         */
+        function generateSectionHtml(section) {
+          var elem, _class;
+          if (section.type === 'title') { elem = 'h2', _class = 'js-content-title'; }
+          else if (section.type === 'section') { elem = 'p', 'js-content-section'; }
+
+          return '<' + elem + ' class="' + _class + '">' +
+            highlightVariables(section.content) +
+            '</' + elem + '>';
+        };
 
         scope.formattedContent = [];
-
         $timeout(function() {
           scope.content.forEach(function(section) {
             scope.formattedContent.push({
               type: section.type,
-              content: highlightVariables(section.content)
+              content: generateSectionHtml(section)
             })
           });
         });

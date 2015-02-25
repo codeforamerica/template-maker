@@ -2,16 +2,16 @@
   <form>
     <div ng-repeat="section in sections" class="builder-content-block">
       <span class="pull-right glyphicon glyphicon-remove" ng-click="deleteElem($index)" aria-hidden="true"></span>
-      <input 
-          ng-if="section.elem == 'input'" 
-          type="{[section.type]}" 
-          class="{[section._class]}" 
-          ng-model="section.content" 
+      <input
+          ng-if="section.elem == 'input'"
+          type="{[section.type]}"
+          class="{[section._class]}"
+          ng-model="section.content"
           builder-options setfocus="$last" placeholder="Enter your title here"
         >
-      <textarea 
-        ng-if="section.elem == 'textarea'" 
-        class="{[section._class]}" 
+      <textarea
+        ng-if="section.elem == 'textarea'"
+        class="{[section._class]}"
         ng-model="section.content"
         rows=6
         builder-options setfocus="$last">
