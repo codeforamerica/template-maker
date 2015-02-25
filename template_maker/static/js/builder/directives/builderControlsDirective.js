@@ -6,8 +6,8 @@
   */
   'use strict';
 
-  builder.directive('builderControls', ['$timeout', '$window', 
-    function($timeout, $window) {
+  builder.directive('builderControls', ['$timeout', '$window', 'builderSubmit',
+    function($timeout, $window, builderSubmit) {
       function link(scope, elem, attrs) {
         /*
           Initialize our page model. Sections will be an array of all
@@ -46,7 +46,12 @@
         scope.addSection = function() { addSection(); };
 
         scope.saveTemplate = function() { scope.$emit('saveTemplate', scope.sections); };
-        scope.processTemplate = function() { scope.$emit('processTemplate', scope.sections); };
+        scope.processTemplate = function() {
+          builderSubmit.saveDraft(scope.sections, true).then(function(templateId) {
+            $window.location.href = $window.location.origin +
+              '/build/edit/' + templateId + '/process';
+          });
+        };
 
         // This hooks onto scroll and locks the builder controls (the UI
         // elements to add an additional button) to the top of the page.

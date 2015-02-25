@@ -1,0 +1,19 @@
+{% extends "builder/main.html" %}
+
+{% block subcontent %}
+
+<div ng-controller="processBuilderCtrl">
+  <p class="lead text-center">Template Builder: Insert metadata about variables</p>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3">
+      </div>
+      <div class="col-md-9">
+        {[content]}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
