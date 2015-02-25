@@ -1,4 +1,4 @@
-var builder = angular.module('builder', []);
+var builder = angular.module('builder', ['ngSanitize']);
 
 builder.config(['$interpolateProvider', '$httpProvider',
   function($interpolateProvier, $httpProvider) {

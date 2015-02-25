@@ -19,14 +19,14 @@ def add_variables_to_template(template_id):
     if 'XMLHttpRequest' in request.headers.get('X-Requested-With', ''):
         return jsonify({'template': [
             {
-                'content': 'The quick brown {{ animal }} and gray {{ animal }} jump over the lazy {{ animal2 }} on {{ date }}.',
-                'variables': ['animal', 'animal2', 'date'],
-                'type': 'section',
+                'content': 'Test Sentence',
+                'type': 'title',
                 'template_id': 1
             },
             {
-                'content': 'Test Sentence',
-                'type': 'title',
+                'content': 'The quick brown {{ animal }} and gray {{ animal }} jump over the lazy {{ animal2 }} on {{ date }}.',
+                'variables': ['animal', 'animal2', 'date'],
+                'type': 'section',
                 'template_id': 1
             }
         ]})
