@@ -6,8 +6,8 @@
   */
   'use strict';
 
-  builder.directive('builderControls', ['$timeout', '$window', 'builderSubmit',
-    function($timeout, $window, builderSubmit) {
+  builder.directive('builderControls', ['$timeout', '$window', 'builderSubmit', 'messageBus',
+    function($timeout, $window, builderSubmit, builderMessageBus) {
       function link(scope, elem, attrs) {
         /*
           Initialize our page model. Sections will be an array of all
@@ -25,14 +25,14 @@
 
         function addTitle() {
           scope.sections.push({
-            elem: 'input', type: 'text', _class: 'js-builder-title form-control',
+            elem: 'input', type: 'title', _class: 'js-builder-title form-control',
             placeholder: 'Enter a title here', variables: [], content: ''
           })
         };
 
         function addSection() {
           scope.sections.push({
-            elem: 'textarea', type: 'textarea', _class: 'js-builder-section form-control',
+            elem: 'textarea', type: 'section', _class: 'js-builder-section form-control',
             placeholder: 'Enter a bit about your section here', variables: [], content: ''
           });
         };
@@ -56,6 +56,7 @@
 
           // send the POST the builderSubmit service
           builderSubmit.saveDraft(scope.sections, true).then(function(templateId) {
+            builderMessageBus.push(templateId);
             $window.location.href = $window.location.origin +
               '/build/edit/' + templateId + '/process';
           });

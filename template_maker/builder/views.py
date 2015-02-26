@@ -1,6 +1,6 @@
 import json
 import datetime
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, abort
 
 from template_maker.database import db
 from template_maker.builder.models import TemplateBase, TemplateText, TemplateVariables
@@ -22,38 +22,36 @@ def new_template():
 def add_variables_to_template(template_id):
     # check if request is made async by checking if the angular header is present
     if 'XMLHttpRequest' in request.headers.get('X-Requested-With', ''):
-        return jsonify({'template': [
-            {
-                'content': 'Test Sentence',
-                'variables': [],
-                'type': 'title',
-                'template_id': 1
-            },
-            {
-                'content': '''The quick brown {{ animal }} and gray {{ animal }} jump over the lazy {{ animal2 }} on {{ date }}.
+        template = db.session.execute(
+            '''
+            SELECT
+                a.id as template_id, b.id as template_text_id, b.text,
+                b.text_position, b.text_type, ARRAY_AGG(c.name)
+            FROM template_base a
+            INNER JOIN template_text b
+            ON a.id = b.template_id
+            LEFT JOIN template_variables c
+            ON a.id = c.template_id and b.id = c.template_text_id
+            WHERE a.id = :template_id
+            GROUP BY a.id, b.id, b.text, b.text_position, b.text_type
+            ORDER BY b.text_position, b.id ASC
+            ''',
+            { 'template_id': template_id }
+        ).fetchall()
 
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque accumsan eros nibh, vitae vulputate sem vehicula eu. Etiam eleifend sagittis tempus. Praesent vel mi orci. Vestibulum gravida fringilla sem, vel rutrum neque porttitor a. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu arcu congue libero blandit consequat vitae id nibh. Ut faucibus hendrerit risus, quis mattis neque ultricies at. Sed euismod urna vitae odio vulputate, a fermentum ex posuere.
+        output = []
 
-                Aliquam ultrices tincidunt lobortis. Suspendisse potenti. Nullam faucibus, libero quis sodales auctor, orci lectus fringilla purus, et maximus nunc justo in diam. Phasellus luctus nisl id volutpat mattis. Nullam dolor mi, malesuada semper tortor at, cursus molestie lacus. Mauris eleifend quis urna at eleifend. Aenean ultricies sapien et rhoncus egestas. Etiam tempus lectus vel purus sagittis, sit amet iaculis purus consectetur. Donec euismod et massa ut dapibus. Maecenas porttitor suscipit erat. Quisque in dapibus ante, nec tristique metus. Sed ut felis lorem. In hac habitasse platea dictumst.''',
-                'variables': ['animal', 'animal2', 'date'],
-                'type': 'section',
-                'template_id': 1
-            },
-            {
-                'content': 'Mommy made me munch my {{ candy }}. It was {{ taste }} and had lots of {{ ingrediant }}.',
-                'variables': ['candy', 'taste', 'ingrediant'],
-                'type': 'section',
-                'template_id': 1
-            },
-            {
-                'content': '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque accumsan eros nibh, vitae vulputate sem vehicula eu. Etiam eleifend sagittis tempus. Praesent vel mi orci. Vestibulum gravida fringilla sem, vel rutrum neque porttitor a. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu arcu congue libero blandit consequat vitae id nibh. Ut faucibus hendrerit risus, quis mattis neque ultricies at. Sed euismod urna vitae odio vulputate, a fermentum ex posuere.
+        for result in template:
+            variables = [] if result[5] == [None] else result[5]
+            output.append({
+                'content': result[2],
+                'variables': variables,
+                'type': result[4]
+            })
 
-                Aliquam ultrices tincidunt lobortis. Suspendisse potenti. Nullam faucibus, libero quis sodales auctor, orci lectus fringilla purus, et maximus nunc justo in diam. Phasellus luctus nisl id volutpat mattis. Nullam dolor mi, malesuada semper tortor at, cursus molestie lacus. Mauris eleifend quis urna at eleifend. Aenean ultricies sapien et rhoncus egestas. Etiam tempus lectus vel purus sagittis, sit amet iaculis purus consectetur. Donec euismod et massa ut dapibus. Maecenas porttitor suscipit erat. Quisque in dapibus ante, nec tristique metus. Sed ut felis lorem. In hac habitasse platea dictumst.''',
-                'variables': [],
-                'type': 'section',
-                'template_id': 1
-            }
-        ]})
+        return jsonify({
+            'template': output
+        })
 
     # if not, render the template
     return render_template('builder/process.html')
@@ -61,35 +59,38 @@ def add_variables_to_template(template_id):
 @blueprint.route('/new/save', methods=['POST'])
 def save_new_template():
 
-    # create our new TemplateBase object
-    now = datetime.datetime.utcnow()
-    sections = json.loads(request.data)
-    template_base = TemplateBase(
-        created_at = now,
-        updated_at = now
-        )
-    db.session.add(template_base)
-    db.session.commit()
-    template_base_id = template_base.id
-
-    for idx, section in enumerate(sections):
-        template_section = TemplateText(
-            text = section.get('content'),
-            text_position = idx,
-            text_type = section.get('type'),
-            template_id = template_base_id
-        )
-        db.session.add(template_section)
-        db.session.commit()
-        template_text_id = template_section.id
-
-        for variable in section.get('variables', []):
-            template_variables = TemplateVariables(
-                name = variable,
-                template_id = template_base_id,
-                template_text_id = template_text_id
+    try:
+        # create our new TemplateBase object
+        now = datetime.datetime.utcnow()
+        sections = json.loads(request.data)
+        template_base = TemplateBase(
+            created_at = now,
+            updated_at = now
             )
-            db.session.add(template_variables)
-            db.session.commit()
+        db.session.add(template_base)
+        db.session.commit()
+        template_base_id = template_base.id
 
-    return jsonify({'template_id': 1}), 201
+        for idx, section in enumerate(sections):
+            template_section = TemplateText(
+                text = section.get('content'),
+                text_position = idx,
+                text_type = section.get('type'),
+                template_id = template_base_id
+            )
+            db.session.add(template_section)
+            db.session.commit()
+            template_text_id = template_section.id
+
+            for variable in section.get('variables', []):
+                template_variables = TemplateVariables(
+                    name = variable,
+                    template_id = template_base_id,
+                    template_text_id = template_text_id
+                )
+                db.session.add(template_variables)
+                db.session.commit()
+
+        return jsonify({'template_id': template_base_id}), 201
+    except:
+        abort(403)
