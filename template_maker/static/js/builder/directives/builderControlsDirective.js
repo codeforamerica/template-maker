@@ -19,6 +19,8 @@
           data binding via ng-model (the content key)
 
         */
+        var variableRegex = /({{ |{{).*?(}}| }})/g;
+
         scope.sections = [];
 
         function addTitle() {
@@ -47,6 +49,12 @@
 
         scope.saveTemplate = function() { scope.$emit('saveTemplate', scope.sections); };
         scope.processTemplate = function() {
+          // add variables to the POST data
+          scope.sections.forEach(function(section) {
+            section.variables = section.content.match(variableRegex) || [];
+          });
+
+          // send the POST the builderSubmit service
           builderSubmit.saveDraft(scope.sections, true).then(function(templateId) {
             $window.location.href = $window.location.origin +
               '/build/edit/' + templateId + '/process';

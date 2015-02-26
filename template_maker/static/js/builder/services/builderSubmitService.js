@@ -2,7 +2,7 @@
   /*
     The builderSubmit service handles $http posting to
     the flask backend. It properly resolves data back when
-    promises are resolved.    
+    promises are resolved.
   */
   'use strict';
 

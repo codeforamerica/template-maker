@@ -1,4 +1,9 @@
+import json
+import datetime
 from flask import Blueprint, render_template, request, jsonify
+
+from template_maker.database import db
+from template_maker.builder.models import TemplateBase, TemplateText, TemplateVariables
 
 blueprint = Blueprint(
     'builder', __name__, url_prefix='/build',
@@ -46,7 +51,7 @@ def add_variables_to_template(template_id):
                 Aliquam ultrices tincidunt lobortis. Suspendisse potenti. Nullam faucibus, libero quis sodales auctor, orci lectus fringilla purus, et maximus nunc justo in diam. Phasellus luctus nisl id volutpat mattis. Nullam dolor mi, malesuada semper tortor at, cursus molestie lacus. Mauris eleifend quis urna at eleifend. Aenean ultricies sapien et rhoncus egestas. Etiam tempus lectus vel purus sagittis, sit amet iaculis purus consectetur. Donec euismod et massa ut dapibus. Maecenas porttitor suscipit erat. Quisque in dapibus ante, nec tristique metus. Sed ut felis lorem. In hac habitasse platea dictumst.''',
                 'variables': [],
                 'type': 'section',
-                'template_id': 1            
+                'template_id': 1
             }
         ]})
 
@@ -55,4 +60,36 @@ def add_variables_to_template(template_id):
 
 @blueprint.route('/new/save', methods=['POST'])
 def save_new_template():
-    return jsonify({'template_id': 1})
+
+    # create our new TemplateBase object
+    now = datetime.datetime.utcnow()
+    sections = json.loads(request.data)
+    template_base = TemplateBase(
+        created_at = now,
+        updated_at = now
+        )
+    db.session.add(template_base)
+    db.session.commit()
+    template_base_id = template_base.id
+
+    for idx, section in enumerate(sections):
+        template_section = TemplateText(
+            text = section.get('content'),
+            text_position = idx,
+            text_type = section.get('type'),
+            template_id = template_base_id
+        )
+        db.session.add(template_section)
+        db.session.commit()
+        template_text_id = template_section.id
+
+        for variable in section.get('variables', []):
+            template_variables = TemplateVariables(
+                name = variable,
+                template_id = template_base_id,
+                template_text_id = template_text_id
+            )
+            db.session.add(template_variables)
+            db.session.commit()
+
+    return jsonify({'template_id': 1}), 201
