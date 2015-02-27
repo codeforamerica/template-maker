@@ -12,7 +12,15 @@ blueprint = Blueprint(
 
 @blueprint.route('/')
 def list_templates():
-    return render_template('builder/list.html')
+    '''
+    Returns a list of all the templates.
+
+    Because there is no interacton on this page, it uses
+    Flask entirely
+    '''
+    templates = TemplateBase.query.all()
+    print templates
+    return render_template('builder/list.html', templates=templates)
 
 @blueprint.route('/new')
 def new_template():
@@ -54,11 +62,13 @@ def add_variables_to_template(template_id):
         })
 
     # if not, render the template
-    return render_template('builder/process.html')
+    elif TemplateBase.query.get(template_id):
+        return render_template('builder/process.html')
+    else:
+        return render_template('404.html')
 
 @blueprint.route('/new/save', methods=['POST'])
 def save_new_template():
-
     try:
         # create our new TemplateBase object
         now = datetime.datetime.utcnow()

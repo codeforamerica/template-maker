@@ -7,6 +7,7 @@ class DevConfig(Config):
     ENV = 'dev'
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'postgresql://localhost/template_maker')
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
 
 class ProdConfig(Config):
     ENV = 'prod'

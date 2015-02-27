@@ -1,1 +1,29 @@
 {% extends "layout.html" %}
+
+{% block content %}
+
+<table class="table table-striped table-sm table-bordered">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Another Category</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for template in templates %}
+    <tr>
+      <td>{{ template.id }}</td>
+      <td>This is the name of the template</td>
+      <td>This is some categories and stuff</td>
+      <td>
+        <a class="btn btn-primary btn-sm" href="#">Edit Text</a>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('builder.add_variables_to_template', template_id=template.id) }}">Edit Variables</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
