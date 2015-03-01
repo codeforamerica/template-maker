@@ -41,6 +41,10 @@ module.exports = function(grunt) {
           '<%= templateMaker.test %>/unit/**/*.js',
         ]
       },
+      simple: {
+        singleRun: true,
+        reporters: ['spec']
+      },
       single: {
         singleRun: true,
         reporters: ['spec', 'coverage'],
@@ -75,7 +79,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('test:unit', [
-    'karma:coverage'
+    'karma:single'
   ]);
 
 }
