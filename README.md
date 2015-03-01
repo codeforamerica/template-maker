@@ -35,9 +35,37 @@ NOTE: If this is the first time that you are working with template-maker, be sur
 
 template-maker uses [`npm`](https://github.com/codeforamerica/howto/blob/master/Node.js.md) and [`bower`](http://bower.io/) to manage its front-end dependencies. Ensure you have `npm` and `node` installed (see the howto link for more information), and then run
 
-    bower install
+    $ npm install
+    $ bower install
 
 to install the necessary libraries. Because template-maker uses `flask-assets` to actually package and serve assets, you don't need to do anything else, just run the python server as above!
+
+
+### Running Tests
+
+The test suite is split into two parts -- python test and javascript tests.
+
+##### Running the python tests
+
+Python tests are still in the works, and when they are implemented, this document will be updated with additional instructions.
+
+##### Running the javascript tests
+
+The template-maker uses [karma](http://karma-runner.github.io/0.12/index.html) as a test runner and [mocha](http://mochajs.org/) as a testing framework, [chai](http://chaijs.com/) for assertions, and occasionally [sinon](http://sinonjs.org/) for stubbing. The tests run in a [phantom.js](http://phantomjs.org/) headless browser. All test dependencies should have been installed when `npm install` was run above.
+
+Tests are controlled by the `Gruntfile` in the top-level directory. The simplest way to run the tests is to simply run
+
+    $ grunt test:unit
+
+This will run the tests and output a basic coverage report to the console. There are some additional options for running tests as well:
+
+If you want to continuously be running tests in the background, you can use
+
+    $ grunt karma:continuous
+
+You can also generate more detailed html coverage reports (avalable to view in the coverage-js directory) by running
+
+    $ grunt karma:coverage
 
 ### Who made it?
 

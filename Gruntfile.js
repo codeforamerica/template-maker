@@ -43,13 +43,39 @@ module.exports = function(grunt) {
       },
       single: {
         singleRun: true,
+        reporters: ['spec', 'coverage'],
+        preprocessors: {
+          '<%= templateMaker.js %>/**/*.js': ['coverage']
+        },
+        coverageReporter: {
+          reporters: [
+            { type: 'text' }
+          ]
+        }
+      },
+      continuous: {
+        autowatch: true,
+        singleRun: false,
         reporters: ['spec']
+      },
+      coverage: {
+        singleRun: true,
+        reporters: ['spec', 'coverage'],
+        preprocessors: {
+          '<%= templateMaker.js %>/**/*.js': ['coverage']
+        },
+        coverageReporter: {
+          reporters: [
+            { type: 'html', dir: 'coverage-js' }
+          ]
+        }
       }
     }
 
   });
 
   grunt.registerTask('test:unit', [
-    'karma:single'
+    'karma:coverage'
   ]);
+
 }

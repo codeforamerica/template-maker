@@ -6,3 +6,5 @@ node_modules
 
 .webassets-cache
 css
+
+coverage-js
