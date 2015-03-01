@@ -5,7 +5,6 @@ utilities.
 from sqlalchemy.orm import relationship
 
 from .extensions import db
-from .compat import basestring
 
 # Alias common SQLAlchemy names
 Column = db.Column

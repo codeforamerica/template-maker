@@ -3,6 +3,11 @@ from flask import Flask
 from template_maker.settings import DevConfig, ProdConfig
 from template_maker.assets import assets
 from template_maker import builder
+from template_maker.extensions import (
+    db,
+    migrate,
+    debug_toolbar
+)
 
 def create_app(config_object=DevConfig):
     app = Flask(__name__)
@@ -17,4 +22,7 @@ def register_blueprints(app):
 
 def register_extensions(app):
     assets.init_app(app)
+    db.init_app(app)
+    migrate.init_app(app, db)
+    debug_toolbar.init_app(app)
     return None

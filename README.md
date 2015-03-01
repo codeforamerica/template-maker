@@ -22,10 +22,14 @@ Then run the following commands to bootstrap your environment:
     cd template-maker
     # install python dependencies
     pip install -r requirements.txt
+    # upgrade your database to the latest version
+    python manage.py db upgrade
     # run the server
     python manage.py server
 
-As of now, Flask is not storing any information in a database, but this will change soon, and this page will be updated with additional instructions.
+NOTE: If this is the first time that you are working with template-maker, be sure to run the following command (before starting your server) to stamp your database and allow for future migrations:
+
+    python manage.py db stamp head
 
 ##### Developing the Angular frontend
 

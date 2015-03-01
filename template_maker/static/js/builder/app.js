@@ -1,8 +1,11 @@
-var builder = angular.module('builder', []);
+var builder = angular.module('builder', ['ngSanitize']);
 
-builder.config(['$interpolateProvider',
-  function($interpolateProvier) {
+builder.config(['$interpolateProvider', '$httpProvider',
+  function($interpolateProvier, $httpProvider) {
     $interpolateProvier.startSymbol('{[');
     $interpolateProvier.endSymbol(']}');
+
+    // add X-Requested-With header to all angular requests
+    $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
   }
 ]);

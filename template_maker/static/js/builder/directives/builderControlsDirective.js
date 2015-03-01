@@ -6,8 +6,8 @@
   */
   'use strict';
 
-  builder.directive('builderControls', ['$timeout', '$window', 
-    function($timeout, $window) {
+  builder.directive('builderControls', ['$timeout', '$window', 'builderSubmit', 'messageBus',
+    function($timeout, $window, builderSubmit, builderMessageBus) {
       function link(scope, elem, attrs) {
         /*
           Initialize our page model. Sections will be an array of all
@@ -19,19 +19,21 @@
           data binding via ng-model (the content key)
 
         */
+        var variableRegex = /({{ |{{).*?(}}| }})/g;
+
         scope.sections = [];
 
         function addTitle() {
           scope.sections.push({
-            elem: 'input', type: 'text', _class: 'js-builder-title form-control',
+            elem: 'input', type: 'title', _class: 'js-builder-title form-control',
             placeholder: 'Enter a title here', variables: [], content: ''
           })
         };
 
         function addSection() {
           scope.sections.push({
-            elem: 'textarea', type: 'textarea', _class: 'js-builder-section form-control',
-            paceholder: 'What is this section about?', variables: [], content: ''
+            elem: 'textarea', type: 'section', _class: 'js-builder-section form-control',
+            placeholder: 'Enter a bit about your section here', variables: [], content: ''
           });
         };
 
@@ -45,13 +47,20 @@
         scope.addTitle = function() { addTitle(); };
         scope.addSection = function() { addSection(); };
 
-        scope.addVariables = function() {
+        scope.saveTemplate = function() { scope.$emit('saveTemplate', scope.sections); };
+        scope.processTemplate = function() {
+          // add variables to the POST data
+          scope.sections.forEach(function(section) {
+            section.variables = section.content.match(variableRegex) || [];
+          });
 
+          // send the POST the builderSubmit service
+          builderSubmit.saveDraft(scope.sections, true).then(function(templateId) {
+            builderMessageBus.push(templateId);
+            $window.location.href = $window.location.origin +
+              '/build/edit/' + templateId + '/process';
+          });
         };
-
-        scope.saveTemplate = function() {
-          scope.$emit('saveTemplate', scope.sections);
-        }
 
         // This hooks onto scroll and locks the builder controls (the UI
         // elements to add an additional button) to the top of the page.

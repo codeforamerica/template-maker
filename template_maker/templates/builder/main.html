@@ -10,9 +10,16 @@
 
 {% block javascripts %}
   <script src="{{ url_for('static', filename='lib/angular/angular.js') }}"></script>
+  <script src="{{ url_for('static', filename='lib/angular-sanitize/angular-sanitize.js') }}"></script>
   <script src="{{ url_for('static', filename='js/builder/app.js') }}"></script>
   <script src="{{ url_for('static', filename='js/builder/controllers/newBuilderCtrl.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/builder/controllers/processBuilderCtrl.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/builder/services/builderSubmitService.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/builder/services/builderGetDataService.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/builder/services/messageBus.js') }}"></script>
   <script src="{{ url_for('static', filename='js/builder/directives/builderControlsDirective.js') }}"></script>
   <script src="{{ url_for('static', filename='js/builder/directives/builderContentDirective.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/builder/directives/builderSetfocusDirective.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/builder/directives/builderOptionsDirective.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/builder/directives/builderProcessingContentDirective.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/builder/directives/builderProcessingVariablesDirective.js') }}"></script>
 {% endblock %}
