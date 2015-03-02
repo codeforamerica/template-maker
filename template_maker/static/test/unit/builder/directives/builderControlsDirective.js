@@ -8,24 +8,22 @@
     beforeEach(module('builder'));
 
     describe('builderControlsDirective', function() {
-      var $q, $httpBackend, $scope, $compile, $window, builderSubmit, el, deferred;
+      var $httpBackend, $scope, $compile, builderSubmit, messageBus, el, redirStub;
 
-      beforeEach(inject(function(_$q_, _$httpBackend_, _$rootScope_, _$compile_, _$window_, _builderSubmit_) {
-        $q = _$q_;
+      beforeEach(inject(function(_$httpBackend_, _$rootScope_, _$compile_, _builderSubmit_, _messageBus_, _builderLocationHandler_) {
         $scope = _$rootScope_;
         $httpBackend = _$httpBackend_;
         $compile = _$compile_;
-        $window = {location: {href: 0}};
 
-        deferred = $q.defer()
-        // submitStub = sinon.stub(builderSubmit, 'saveDraft').returns(deferred.promise);
+        messageBus = _messageBus_;
+        redirStub = sinon.stub(_builderLocationHandler_, 'redirect');
         builderSubmit = _builderSubmit_
 
         el = angular.element('<builder-controls></builder-controls');
         $compile(el)($scope);
 
         $httpBackend.expectGET('../static/js/builder/partials/builder-controls.html').
-          respond(200, '<div></div>');
+          respond(200, '<div style="height:100px" class="builder-controls"></div>');
         $httpBackend.flush();
         // expect it to always initialize with the title and section
         expect($scope.sections).to.have.length(2);
@@ -74,15 +72,21 @@
           $httpBackend.flush()
         });
 
-        it.skip('should call the builderSubmit service to submit the job', function() {
-          // TODO: Look up proper procedure for testing $window
+        it('should call the builderSubmit service to submit the job', function() {
           $httpBackend.expectPOST('/build/new/save').respond(200, {template_id: 1});
           $httpBackend.flush();
+          expect(redirStub.callCount).to.equal(1);
+          assert(redirStub.calledWith('/build/edit/1/process'));
+        });
+
+        it('should push the templateId into the messageBus', function() {
+          $httpBackend.expectPOST('/build/new/save').respond(200, {template_id: 2});
+          $httpBackend.flush();
+          expect(messageBus.pop()).to.equal(2);
         });
       });
 
       it.skip('should add and remove classes based on scroll position', function() {
-        // TODO: Look up the proper way to simulate a scroll event on $window
 
       });
 
