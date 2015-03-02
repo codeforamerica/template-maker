@@ -8,9 +8,9 @@
   builder.directive('templateVariables', [ (function() {
     function link(scope, elem, attrs) {
       scope.dataTypes = [
-        { 'type': 'int', 'display': 'Number'},
-        { 'type': 'str', 'display': 'Text'},
-        { 'type': 'date', 'display': 'Date'}
+        { 'type': 'int', 'display': 'Number' },
+        { 'type': 'str', 'display': 'Text' },
+        { 'type': 'date', 'display': 'Date' }
       ];
     }
 
