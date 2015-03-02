@@ -13,9 +13,6 @@
         editable: '='
       },
       link: function(scope, elem, attrs) {
-        if (scope.editable) {
-          elem[0].setAttribute('contenteditable', true);
-        };
 
         if (scope.setfocus === true) {
           elem[0].focus();

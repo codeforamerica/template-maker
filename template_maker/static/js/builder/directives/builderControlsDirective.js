@@ -6,8 +6,8 @@
   */
   'use strict';
 
-  builder.directive('builderControls', ['$timeout', '$window', 'builderSubmit', 'messageBus',
-    function($timeout, $window, builderSubmit, builderMessageBus) {
+  builder.directive('builderControls', ['$timeout', '$window', 'builderSubmit', 'messageBus', 'builderLocationHandler',
+    function($timeout, $window, builderSubmit, builderMessageBus, builderLocationHandler) {
       function link(scope, elem, attrs) {
         /*
           Initialize our page model. Sections will be an array of all
@@ -19,6 +19,8 @@
           data binding via ng-model (the content key)
 
         */
+        var w = angular.element($window);
+
         var variableRegex = /({{ |{{).*?(}}| }})/g;
 
         scope.sections = [];
@@ -57,15 +59,15 @@
           // send the POST the builderSubmit service
           builderSubmit.saveDraft(scope.sections, true).then(function(templateId) {
             builderMessageBus.push(templateId);
-            $window.location.href = $window.location.origin +
-              '/build/edit/' + templateId + '/process';
+            var newUrl = '/build/edit/' + templateId + '/process';
+            builderLocationHandler.redirect(newUrl);
           });
         };
 
         // This hooks onto scroll and locks the builder controls (the UI
         // elements to add an additional button) to the top of the page.
         // TODO: Figure out a better way to do this.
-        angular.element($window).bind('scroll', function() {
+        w.bind('scroll', function() {
           var builderControlsElem = angular.element('.builder-controls');
           if (this.pageYOffset >= 20) {
             builderControlsElem.addClass('js-builder-controls-position-fixed');
