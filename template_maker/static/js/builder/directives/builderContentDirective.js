@@ -16,7 +16,7 @@
 
     return {
       restrict: 'AE',
-      templateUrl: '../static/js/builder/partials/builder-content.html',
+      templateUrl: '../../static/js/builder/partials/builder-content.html',
       // This directive is interacting with another directive in the same
       // controller scope, so we set the transclude to true here.
       transclude: true,

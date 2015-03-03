@@ -57,8 +57,39 @@ def configure_variables(template_id):
     else:
         return render_template('404.html')
 
+@blueprint.route('/data/templates/<int:template_id>')
+def get_template_sections(template_id):
+    if TemplateBase.query.get(template_id):
+        template = db.session.execute(
+            '''
+            SELECT
+                a.id as template_id, b.id as template_text_id, b.text,
+                b.text_position, b.text_type
+            FROM template_base a
+            INNER JOIN template_text b
+            on a.id = b.template_id
+            WHERE a.id = :template_id
+            ORDER BY b.text_position, b.id ASC
+            ''',
+            { 'template_id': template_id }
+        ).fetchall()
+
+        output = []
+
+        for section in template:
+            output.append({
+                'type': section[4],
+                'content': section[2]
+            })
+
+        return jsonify({'sections': output})
+    else:
+        return jsonify({
+            'template': 'ERROR: Template Not Found'
+        }), 404
+
 @blueprint.route('/data/templates/<int:template_id>/process')
-def add_variables_to_template(template_id):
+def get_template_sections_and_variables(template_id):
     # check if request is made async by checking if the angular header is present
     if TemplateBase.query.get(template_id):
         template = db.session.execute(

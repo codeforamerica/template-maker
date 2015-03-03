@@ -5,7 +5,7 @@
   */
   'use strict';
 
-  builder.controller('newBuilderCtrl',['$scope', '$window',
+  builder.controller('builderTextCtrl',['$scope', '$window',
     function($scope, $window) {
 
       $scope.$on('saveTemplate', function(event, contents) {
