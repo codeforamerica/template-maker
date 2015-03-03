@@ -13,6 +13,8 @@ class TemplateBase(Model):
     id = Column(db.Integer, primary_key=True)
     created_at = Column(db.DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(db.DateTime, default=datetime.datetime.utcnow)
+    template_text = db.relationship('TemplateText', cascade='all,delete', lazy='dynamic')
+    template_variables = db.relationship('TemplateVariables', cascade='all,delete', lazy='dynamic')
     # created_by = ReferenceCol('users')
 
     def __init__(self, created_at, updated_at):
@@ -27,6 +29,7 @@ class TemplateText(Model):
     text_position = Column(db.Integer)
     text_type = Column(db.String(255))
     template_id = ReferenceCol('template_base')
+    template_variables = db.relationship('TemplateVariables', cascade='all,delete', lazy='dynamic')
 
     def __init__(self, text, text_position, text_type, template_id):
         self.text = text

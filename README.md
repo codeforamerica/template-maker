@@ -31,6 +31,11 @@ NOTE: If this is the first time that you are working with template-maker, be sur
 
     python manage.py db stamp head
 
+If installing requirements from pip breaks on `psycopg2`, make sure that your `$PATH` includes your Postgres installation's `bin/` directory. For example, if you installed [postgres.app](http://postgresapp.com/), try this:
+
+    export PATH=$PATH:/Applications/Postgres.app/Contents/Versions/9.4/bin/
+    pip install -r requirements.txt
+
 ##### Developing the Angular frontend
 
 template-maker uses [`npm`](https://github.com/codeforamerica/howto/blob/master/Node.js.md) and [`bower`](http://bower.io/) to manage its front-end dependencies. Ensure you have `npm` and `node` installed (see the howto link for more information), and then run

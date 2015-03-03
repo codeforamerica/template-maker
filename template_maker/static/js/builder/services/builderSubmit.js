@@ -21,10 +21,23 @@
               deferred.resolve(data.template_id)
             }
           }).error(function(data, status, headers) {
-            deferred.resolve(console.log('failure! ', data));
+            deferred.reject(console.log('failure! ', data));
           });
 
         // return the promise object
+        return deferred.promise;
+      };
+
+      this.deleteTemplate = function(templateId) {
+        var deferred = $q.defer();
+
+        $http.delete('/build/edit/' + templateId).
+          success(function() {
+            deferred.resolve(templateId);
+          }).error(function() {
+            deferred.reject(templateId);
+          });
+
         return deferred.promise;
       };
     }
