@@ -1,7 +1,10 @@
 (function() {
   /*
-
-  */
+   The builderGetData service is responsible for basic
+   async data fetching: the getData method takes a URL
+   and returns a promise, which resolves with whatever
+   is returned from the server
+   */
   'use strict';
 
   builder.service('builderGetData', ['$q', '$http',

@@ -8,6 +8,15 @@ from template_maker.database import (
 from template_maker.user.models import User
 
 class TemplateBase(Model):
+    '''
+    Basic metadata about a template
+
+    Fields:
+    - created_at: when the template was created
+    - updated_at: when the template metadata was last updated
+    - title: the displayed title or name of the template
+    - description: a freetext description of the template
+    '''
 
     __tablename__ = 'template_base'
     id = Column(db.Integer, primary_key=True)
@@ -26,6 +35,15 @@ class TemplateBase(Model):
         self.description = description
 
 class TemplateText(Model):
+    '''
+    The sections and text associated with each template
+
+    Fields:
+    - text: The actual text of each section
+    - text_position: The position of the section in this particular template
+    - text_type: What type of text the section is (title, for example)
+    - template_id: Foreign Key back to the TemplateBase model
+    '''
 
     __tablename__ = 'template_text'
     id = Column(db.Integer, primary_key=True)
@@ -42,6 +60,14 @@ class TemplateText(Model):
         self.template_id = template_id
 
 class TemplateVariables(Model):
+    '''
+    The variables associated with each section
+
+    Fields:
+    - name: The actual name of the variable
+    - template_id: Foreign Key back to the TemplateBase model
+    - template_text_id: Foreign Key back to the TemplateText model
+    '''
 
     __tablename__ = 'template_variables'
     id = Column(db.Integer, primary_key=True)

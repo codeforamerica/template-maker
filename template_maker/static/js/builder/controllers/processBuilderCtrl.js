@@ -1,7 +1,9 @@
 (function() {
   /*
-
-  */
+   The processBuilderCtrl is the controller that surrounds
+   the variable editing portion of the template generation
+   process
+   */
   'use strict';
 
   builder.controller('processBuilderCtrl', ['$scope', '$location', 'builderGetData', 'messageBus',

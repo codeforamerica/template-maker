@@ -1,6 +1,6 @@
 (function() {
   /*
-    The builderSubmit service handles $http posting to
+    The builderSubmit service handles basic $http submissions
     the flask backend. It properly resolves data back when
     promises are resolved.
   */

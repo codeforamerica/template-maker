@@ -78,9 +78,12 @@ def edit_template(template_id):
         else:
             render_template('404.html')
     elif request.method == 'PUT':
-        sections = json.loads(request.data)
-        set_template_content(sections, template_id)
-        return jsonify({'template_id': template_id}), 200
+        try:
+            sections = json.loads(request.data)
+            set_template_content(sections, template_id)
+            return jsonify({'template_id': template_id}), 200
+        except:
+            abort(403)
     elif request.method == 'DELETE':
         try:
             db.session.delete(template_base)
@@ -89,15 +92,34 @@ def edit_template(template_id):
         except:
             abort(403)
 
-@blueprint.route('/edit/<int:template_id>/process')
+@blueprint.route('/edit/<int:template_id>/process', methods=['GET', 'PUT'])
 def configure_variables(template_id):
-    if TemplateBase.query.get(template_id):
-        return render_template('builder/process.html')
-    else:
-        return render_template('404.html')
+    '''
+    Route for customizing the variable types
+
+    GET - Gets the template's base and text 
+          properties and returns a 202 or 404
+    PUT - Updates the template's variable types (still TODO)
+    '''
+    if request.method == 'GET':
+        if TemplateBase.query.get(template_id):
+            return render_template('builder/process.html')
+        else:
+            return render_template('404.html')
+
+# GET-only "data" routes for client-side interactions
 
 @blueprint.route('/data/templates/<int:template_id>')
 def get_template_sections(template_id):
+    '''
+    Gets the text of the sections for the template
+
+    Returns a JSON dictionary formatted as follows: {
+        'sections': A list of sections with their text,
+                    in the proper order that they should be
+                    arranged on the page
+    }
+    '''
     if TemplateBase.query.get(template_id):
         template = db.session.execute(
             '''
@@ -108,7 +130,7 @@ def get_template_sections(template_id):
             INNER JOIN template_text b
             on a.id = b.template_id
             WHERE a.id = :template_id
-            ORDER BY b.text_position, b.id ASC
+            ORDER BY b.text_position ASC
             ''',
             { 'template_id': template_id }
         ).fetchall()
@@ -124,11 +146,21 @@ def get_template_sections(template_id):
         return jsonify({'sections': output})
     else:
         return jsonify({
-            'template': 'ERROR: Template Not Found'
+            'sections': 'ERROR: Template does not exist for these sections'
         }), 404
 
 @blueprint.route('/data/templates/<int:template_id>/process')
 def get_template_sections_and_variables(template_id):
+    '''
+    Gets the text and variables for each section
+
+    Returns a JSON dictionary formatted as follows: {
+        'template': A list of sections with the "type"
+                    of section (title or content), the
+                    text of the section, and a list of
+                    the variables in that section
+    }
+    '''
     # check if request is made async by checking if the angular header is present
     if TemplateBase.query.get(template_id):
         template = db.session.execute(
@@ -165,41 +197,3 @@ def get_template_sections_and_variables(template_id):
         return jsonify({
             'template': 'ERROR: Template Not Found'
         }), 404
-
-@blueprint.route('/tmp', methods=['POST'])
-def update_template_text():
-    try:
-        # create our new TemplateBase object
-        now = datetime.datetime.utcnow()
-        sections = json.loads(request.data)
-        template_base = TemplateBase(
-            created_at = now,
-            updated_at = now
-            )
-        db.session.add(template_base)
-        db.session.commit()
-        template_base_id = template_base.id
-
-        for idx, section in enumerate(sections):
-            template_section = TemplateText(
-                text = section.get('content'),
-                text_position = idx,
-                text_type = section.get('type'),
-                template_id = template_base_id
-            )
-            db.session.add(template_section)
-            db.session.commit()
-            template_text_id = template_section.id
-
-            for variable in section.get('variables', []):
-                template_variables = TemplateVariables(
-                    name = variable,
-                    template_id = template_base_id,
-                    template_text_id = template_text_id
-                )
-                db.session.add(template_variables)
-                db.session.commit()
-
-        return jsonify({'template_id': template_base_id}), 201
-    except:
-        abort(403)
