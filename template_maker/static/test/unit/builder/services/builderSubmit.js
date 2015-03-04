@@ -9,8 +9,7 @@
 
     describe('builderSubmit', function() {
       var builderSubmit, $httpBackend,
-        endpoint = '/build/new/save',
-        deleteEndpoint = '/build/edit/1';
+        endpoint = '/build/edit/1';
 
       beforeEach(inject(function(_builderSubmit_, _$httpBackend_) {
         builderSubmit = _builderSubmit_;
@@ -24,7 +23,7 @@
 
       describe('#saveDraft', function() {
         beforeEach(function() {
-          var promise = builderSubmit.saveDraft([], true);
+          var promise = builderSubmit.saveDraft([], 1);
 
           expect(promise).to.have.property('then');
           expect(promise).to.have.property('catch');
@@ -32,12 +31,12 @@
         });
 
         it('should successfully resolve if process is true', function() {
-          $httpBackend.expectPOST(endpoint).respond(201, 4);
+          $httpBackend.expectPUT(endpoint).respond(200, 1);
           $httpBackend.flush();
         });
 
         it('should reject properly', function() {
-          $httpBackend.expectPOST(endpoint).respond(400, 'error!');
+          $httpBackend.expectPUT(endpoint).respond(400, 'error!');
           $httpBackend.flush();
         });
       });
@@ -52,12 +51,12 @@
         });
 
         it('should successfully delete', function() {
-          $httpBackend.expectDELETE(deleteEndpoint).respond(201, 4);
+          $httpBackend.expectDELETE(endpoint).respond(201, 4);
           $httpBackend.flush();
         });
 
         it('should reject', function() {
-          $httpBackend.expectDELETE(deleteEndpoint).respond(400, 'error!');
+          $httpBackend.expectDELETE(endpoint).respond(400, 'error!');
           $httpBackend.flush();
         });   
       })

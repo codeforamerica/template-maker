@@ -17,7 +17,6 @@
           more information that should be used (its type). Additionally,
           there is placeholder text and a specific destination for two-way
           data binding via ng-model (the content key)
-
         */
         var w = angular.element($window);
         var variableRegex = /({{ |{{).*?(}}| }})/g;
@@ -25,7 +24,6 @@
         var templateId = urlParts[urlParts.length - 1];
 
         scope.sections = [];
-
 
         function addTitle(content) {
           scope.sections.push({
@@ -42,19 +40,19 @@
         };
 
         builderGetData.getData('/build/data/templates/' + templateId).then(function(data){
-          scope.sections = [];
-          data.sections.forEach(function(section) {
-            if (section.type === 'title') { addTitle(section.content) }
-            else if (section.type === 'section') { addSection(section.content) };
-          })
-        })
+          // We are going to seed the page with a blank title and a blank
+          // section by default if there are no existing sections
+          if (data.sections.length === 0) {
+            addTitle('');
+            addSection('');          
+          } else {
+            data.sections.forEach(function(section) {
+              if (section.type === 'title') { addTitle(section.content) }
+              else if (section.type === 'section') { addSection(section.content) };
+            });
+          }
+        });
 
-        // We are going to seed the page with a blank title and a blank
-        // section by default
-        if (scope.sections.length === 0) {
-          addTitle('');
-          addSection('');          
-        }
 
         // Handle click events from the template to add additional titles
         // and larger sections
@@ -69,7 +67,7 @@
           });
 
           // send the POST the builderSubmit service
-          builderSubmit.saveDraft(scope.sections, true).then(function(templateId) {
+          builderSubmit.saveDraft(scope.sections, templateId).then(function(templateId) {
             builderMessageBus.push(templateId);
             var newUrl = '/build/edit/' + templateId + '/process';
             builderLocationHandler.redirect(newUrl);

@@ -13,13 +13,17 @@ class TemplateBase(Model):
     id = Column(db.Integer, primary_key=True)
     created_at = Column(db.DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(db.DateTime, default=datetime.datetime.utcnow)
+    title = Column(db.String(255))
+    description = Column(db.Text)
     template_text = db.relationship('TemplateText', cascade='all,delete', lazy='dynamic')
     template_variables = db.relationship('TemplateVariables', cascade='all,delete', lazy='dynamic')
     # created_by = ReferenceCol('users')
 
-    def __init__(self, created_at, updated_at):
+    def __init__(self, created_at, updated_at, title, description):
         self.created_at = created_at
         self.updated_at = updated_at
+        self.title = title
+        self.description = description
 
 class TemplateText(Model):
 
@@ -31,7 +35,7 @@ class TemplateText(Model):
     template_id = ReferenceCol('template_base')
     template_variables = db.relationship('TemplateVariables', cascade='all,delete', lazy='dynamic')
 
-    def __init__(self, text, text_position, text_type, template_id):
+    def __init__(self, text=None, text_position=None, text_type=None, template_id=None):
         self.text = text
         self.text_position = text_position
         self.text_type = text_type
@@ -45,7 +49,7 @@ class TemplateVariables(Model):
     template_id = ReferenceCol('template_base')
     template_text_id = ReferenceCol('template_text')
 
-    def __init__(self, name, template_id, template_text_id):
+    def __init__(self, name=None, template_id=None, template_text_id=None):
         self.name = name
         self.template_id = template_id
         self.template_text_id = template_text_id

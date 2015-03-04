@@ -30,10 +30,9 @@
           respond(200, '<div style="height:100px" class="builder-controls"></div>');
         $httpBackend.flush();
 
-        // expect it to always initialize with the title and section
-        expect($scope.sections).to.have.length(2);
-        // reset $scope.sections
-        $scope.sections = [];
+        // expect it to always initialize empty
+        expect($scope.sections).to.have.length(0);
+
       }));
 
       afterEach(function() {
@@ -57,6 +56,16 @@
 
       it('should add the proper sections when retreiving data from the getData service', function() {
         var data = { sections: [ { type: 'title', content: '' }, { type: 'section', content: '' } ] };
+        expect($scope.sections).to.have.length(0);
+        deferred.resolve(data);
+        $scope.$digest();
+        expect($scope.sections).to.have.length(2);
+        expect($scope.sections[0]['type']).to.equal('title');
+        expect($scope.sections[1]['type']).to.equal('section');
+      });
+
+      it('should automatically add a title and a section when getData returns an empty array', function() {
+        var data = { sections: [] };
         expect($scope.sections).to.have.length(0);
         deferred.resolve(data);
         $scope.$digest();

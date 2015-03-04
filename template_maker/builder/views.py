@@ -1,9 +1,19 @@
 import json
 import datetime
-from flask import Blueprint, render_template, request, jsonify, abort, Response
+from flask import (
+    Blueprint,
+    request,
+    Response,
+    jsonify,
+    render_template,
+    redirect,
+    abort
+)
 
 from template_maker.database import db
 from template_maker.builder.models import TemplateBase, TemplateText, TemplateVariables
+from template_maker.builder.forms import TemplateBaseForm
+from template_maker.builder.util import set_template_content
 
 blueprint = Blueprint(
     'builder', __name__, url_prefix='/build',
@@ -19,16 +29,38 @@ def list_templates():
     Flask entirely
     '''
     templates = TemplateBase.query.all()
-    return render_template('builder/list.html', templates=templates)
+    output = []
+    for template in templates:
+        output.append({
+            'id': template.id,
+            'title': template.title,
+            'description': template.description,
+            'num_vars': template.template_variables.count()
+        })
 
-@blueprint.route('/new')
+    return render_template('builder/list.html', templates=output)
+
+@blueprint.route('/new', methods=['GET', 'POST'])
 def new_template():
     '''
     Returns the page for building a new template.
     '''
-    return render_template('builder/new.html')
+    form = TemplateBaseForm()
+    if form.validate_on_submit():
+        now = datetime.datetime.utcnow()
+        template_base = TemplateBase(
+            created_at = now,
+            updated_at = now,
+            title = request.form.get('title'),
+            description = request.form.get('description')
+        )
+        db.session.add(template_base)
+        db.session.commit()
+        template_base_id = template_base.id
+        return redirect('build/edit/{template_id}'.format(template_id=template_base_id))
+    return render_template('builder/new.html', form=form)
 
-@blueprint.route('/edit/<int:template_id>', methods=['GET', 'DELETE'])
+@blueprint.route('/edit/<int:template_id>', methods=['GET', 'PUT', 'DELETE'])
 def edit_template(template_id):
     '''
     Route for interacting with base templates
@@ -45,10 +77,17 @@ def edit_template(template_id):
             return render_template('builder/edit.html')
         else:
             render_template('404.html')
+    elif request.method == 'PUT':
+        sections = json.loads(request.data)
+        set_template_content(sections, template_id)
+        return jsonify({'template_id': template_id}), 200
     elif request.method == 'DELETE':
-        db.session.delete(template_base)
-        db.session.commit()
-        return Response(status=204)
+        try:
+            db.session.delete(template_base)
+            db.session.commit()
+            return Response(status=204)
+        except:
+            abort(403)
 
 @blueprint.route('/edit/<int:template_id>/process')
 def configure_variables(template_id):
@@ -127,8 +166,8 @@ def get_template_sections_and_variables(template_id):
             'template': 'ERROR: Template Not Found'
         }), 404
 
-@blueprint.route('/new/save', methods=['POST'])
-def save_new_template():
+@blueprint.route('/tmp', methods=['POST'])
+def update_template_text():
     try:
         # create our new TemplateBase object
         now = datetime.datetime.utcnow()

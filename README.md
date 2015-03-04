@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/codeforamerica/template-maker.svg?branch=master)](https://travis-ci.org/codeforamerica/template-maker)
+
 # template-maker
 
 The template maker is a Flask app that allows you to generate templates and then use those templates to generate documents.
