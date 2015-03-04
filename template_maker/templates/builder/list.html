@@ -1,1 +1,32 @@
-{% extends "layout.html" %}
+{% extends "builder/main.html" %}
+
+{% block subcontent %}
+
+<div ng-controller="templateListCtrl">
+  <table class="table table-striped table-sm table-bordered">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for template in templates %}
+      <tr id="template-{{ template.id }}">
+        <td>{{ template.title }}</td>
+        <td>{{ template.description|truncate(120) }}</td>
+        <td>
+          <a class="btn btn-primary btn-sm" href="{{ url_for('builder.edit_template', template_id=template.id) }}">Edit Text</a>
+          {% if template.num_vars > 0 %}
+          <a class="btn btn-success btn-sm" href="{{ url_for('builder.configure_variables', template_id=template.id) }}">Edit Variables</a>
+          {% endif %}
+          <a class="btn btn-danger btn-sm" ng-click="deleteTemplate({{ template.id }})">Delete Template</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

@@ -24,7 +24,7 @@
         // expect there to be no children
         expect(el.children()).to.have.length(0);
         // make a mock request and return a simple mocked-up template
-        $httpBackend.expectGET('../static/js/builder/partials/builder-content.html').
+        $httpBackend.expectGET('../../static/js/builder/partials/builder-content.html').
           respond(200, '<div ng-repeat="section in sections"><p>{[section]}</p></div>');
         $httpBackend.flush();
       }));

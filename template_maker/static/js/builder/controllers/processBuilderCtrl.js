@@ -1,7 +1,9 @@
 (function() {
   /*
-
-  */
+   The processBuilderCtrl is the controller that surrounds
+   the variable editing portion of the template generation
+   process
+   */
   'use strict';
 
   builder.controller('processBuilderCtrl', ['$scope', '$location', 'builderGetData', 'messageBus',
@@ -14,7 +16,7 @@
         $scope.templateId = urlParts[urlParts.length - 2];
       }
 
-      builderGetData.getData('/build/edit/' + $scope.templateId + '/process').then(function(data) {
+      builderGetData.getData('/build/data/templates/' + $scope.templateId + '/process').then(function(data) {
         $scope.content = data.template;
         // extract and flatten the variable names from each section
         $scope.variables = data.template.map(function(datum) {

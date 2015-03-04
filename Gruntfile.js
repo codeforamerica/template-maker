@@ -9,7 +9,13 @@ module.exports = function(grunt) {
     templateMaker: {
       js: './template_maker/static/js',
       lib: './template_maker/static/lib',
-      test: './template_maker/static/test'
+      test: './template_maker/static/test',
+      thresholds: {
+        statements: 90,
+        branches: 60,
+        functions: 85,
+        lines: 90
+      }
     },
 
     karma: {
@@ -27,7 +33,8 @@ module.exports = function(grunt) {
           'karma-mocha',
           'karma-phantomjs-launcher',
           'karma-sinon',
-          'karma-spec-reporter'
+          'karma-spec-reporter',
+          'karma-threshold-reporter'
         ],
         files: [
           // framework files
@@ -47,14 +54,18 @@ module.exports = function(grunt) {
       },
       single: {
         singleRun: true,
-        reporters: ['spec', 'coverage'],
+        reporters: ['spec', 'coverage', 'threshold'],
+        thresholdReporter: {
+          statements: '<%= templateMaker.thresholds.statements %>',
+          branches: '<%= templateMaker.thresholds.branches %>',
+          functions: '<%= templateMaker.thresholds.functions %>',
+          lines: '<%= templateMaker.thresholds.lines %>',
+        },
         preprocessors: {
           '<%= templateMaker.js %>/**/*.js': ['coverage']
         },
         coverageReporter: {
-          reporters: [
-            { type: 'text' }
-          ]
+          reporters: []
         }
       },
       continuous: {
@@ -64,7 +75,13 @@ module.exports = function(grunt) {
       },
       coverage: {
         singleRun: true,
-        reporters: ['spec', 'coverage'],
+        reporters: ['spec', 'coverage', 'threshold'],
+        thresholdReporter: {
+          statements: '<%= templateMaker.thresholds.statements %>',
+          branches: '<%= templateMaker.thresholds.branches %>',
+          functions: '<%= templateMaker.thresholds.functions %>',
+          lines: '<%= templateMaker.thresholds.lines %>',
+        },
         preprocessors: {
           '<%= templateMaker.js %>/**/*.js': ['coverage']
         },

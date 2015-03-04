@@ -1,24 +1,21 @@
-{% extends "builder/main.html" %}
+{% extends "layout.html" %}
 
-{% block subcontent %}
+{% import "macros.html" as macros %}
 
-<div ng-controller="newBuilderCtrl">
-  <p class="lead text-center">Template Builder: Build a new template</p>
+{% block content %}
 
-  <div class="container builder-container">
-    <div class="row builder-controls">
-      <builder-controls></builder-controls>
-    </div>
-    <form role="form">
-      <builder-content class="row builder-content"></builder-content>
-    </form>
-    <div class="row builder-fix-bottom text-center">
-      <div class="container">
-        <a class="btn btn-success btn-sm" ng-click="saveTemplate()">Save Draft</a>
-        <a class="btn btn-primary btn-sm" ng-click="processTemplate()">Process Template</a>
-      </div>
-    </div>
-  </div>
-</div>
+<h2>Create a Template</h2>
+
+<form class="form" role="form" method="POST" action="/build/new">
+  {{ form.csrf_token }}
+  <label for="title">Template Title</label>
+  {{ macros.with_errors(form.title, class_="form-control") }}
+  <label for="description">Template Description</label>
+  {{ macros.with_errors(form.description, class_="form-control") }}
+
+  <hr />
+  <input type="submit" class="btn btn-success" value="Submit!">
+
+</form>
 
 {% endblock %}

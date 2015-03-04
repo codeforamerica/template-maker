@@ -8,9 +8,10 @@
     beforeEach(module('builder'));
 
     describe('builderControlsDirective', function() {
-      var $httpBackend, $scope, $compile, builderSubmit, messageBus, el, redirStub;
+      var $q, $httpBackend, $scope, $compile, builderSubmit, messageBus, el, redirStub, getDataStub, deferred;
 
-      beforeEach(inject(function(_$httpBackend_, _$rootScope_, _$compile_, _builderSubmit_, _messageBus_, _builderLocationHandler_) {
+      beforeEach(inject(function(_$q_, _$httpBackend_, _$rootScope_, _$compile_, _builderSubmit_, _messageBus_, _builderLocationHandler_, builderGetData) {
+        $q = _$q_;
         $scope = _$rootScope_;
         $httpBackend = _$httpBackend_;
         $compile = _$compile_;
@@ -19,16 +20,19 @@
         redirStub = sinon.stub(_builderLocationHandler_, 'redirect');
         builderSubmit = _builderSubmit_
 
+        deferred = $q.defer()
+        getDataStub = sinon.stub(builderGetData, 'getData').returns(deferred.promise);
+
         el = angular.element('<builder-controls></builder-controls');
         $compile(el)($scope);
 
-        $httpBackend.expectGET('../static/js/builder/partials/builder-controls.html').
+        $httpBackend.expectGET('../../static/js/builder/partials/builder-controls.html').
           respond(200, '<div style="height:100px" class="builder-controls"></div>');
         $httpBackend.flush();
-        // expect it to always initialize with the title and section
-        expect($scope.sections).to.have.length(2);
-        // reset $scope.sections
-        $scope.sections = [];
+
+        // expect it to always initialize empty
+        expect($scope.sections).to.have.length(0);
+
       }));
 
       afterEach(function() {
@@ -49,6 +53,26 @@
         expect($scope.sections).to.have.length(1);
         expect($scope.sections[0]['type']).to.equal('section');
       });
+
+      it('should add the proper sections when retreiving data from the getData service', function() {
+        var data = { sections: [ { type: 'title', content: '' }, { type: 'section', content: '' } ] };
+        expect($scope.sections).to.have.length(0);
+        deferred.resolve(data);
+        $scope.$digest();
+        expect($scope.sections).to.have.length(2);
+        expect($scope.sections[0]['type']).to.equal('title');
+        expect($scope.sections[1]['type']).to.equal('section');
+      });
+
+      it('should automatically add a title and a section when getData returns an empty array', function() {
+        var data = { sections: [] };
+        expect($scope.sections).to.have.length(0);
+        deferred.resolve(data);
+        $scope.$digest();
+        expect($scope.sections).to.have.length(2);
+        expect($scope.sections[0]['type']).to.equal('title');
+        expect($scope.sections[1]['type']).to.equal('section');
+      })
 
       it('should emit the saveTemplate signal on template save', function() {
         $scope.$emit = sinon.spy();

@@ -6,8 +6,8 @@
   */
   'use strict';
 
-  builder.directive('builderControls', ['$timeout', '$window', 'builderSubmit', 'messageBus', 'builderLocationHandler',
-    function($timeout, $window, builderSubmit, builderMessageBus, builderLocationHandler) {
+  builder.directive('builderControls', ['$timeout', '$window', '$location', 'builderSubmit', 'messageBus', 'builderLocationHandler', 'builderGetData',
+    function($timeout, $window, $location, builderSubmit, builderMessageBus, builderLocationHandler, builderGetData) {
       function link(scope, elem, attrs) {
         /*
           Initialize our page model. Sections will be an array of all
@@ -17,37 +17,47 @@
           more information that should be used (its type). Additionally,
           there is placeholder text and a specific destination for two-way
           data binding via ng-model (the content key)
-
         */
         var w = angular.element($window);
-
         var variableRegex = /({{ |{{).*?(}}| }})/g;
+        var urlParts = $location.absUrl().split('/');
+        var templateId = urlParts[urlParts.length - 1];
 
         scope.sections = [];
 
-        function addTitle() {
+        function addTitle(content) {
           scope.sections.push({
             elem: 'input', type: 'title', _class: 'js-builder-title form-control',
-            placeholder: 'Enter a title here', variables: [], content: ''
+            placeholder: 'Enter a title here', variables: [], content: content
           })
         };
 
-        function addSection() {
+        function addSection(content) {
           scope.sections.push({
             elem: 'textarea', type: 'section', _class: 'js-builder-section form-control',
-            placeholder: 'Enter a bit about your section here', variables: [], content: ''
+            placeholder: 'Enter a bit about your section here', variables: [], content: content
           });
         };
 
-        // We are going to seed the page with a blank title and a blank
-        // section by default
-        addTitle();
-        addSection();
+        builderGetData.getData('/build/data/templates/' + templateId).then(function(data){
+          // We are going to seed the page with a blank title and a blank
+          // section by default if there are no existing sections
+          if (data.sections.length === 0) {
+            addTitle('');
+            addSection('');          
+          } else {
+            data.sections.forEach(function(section) {
+              if (section.type === 'title') { addTitle(section.content) }
+              else if (section.type === 'section') { addSection(section.content) };
+            });
+          }
+        });
+
 
         // Handle click events from the template to add additional titles
         // and larger sections
-        scope.addTitle = function() { addTitle(); };
-        scope.addSection = function() { addSection(); };
+        scope.addTitle = function() { addTitle(''); };
+        scope.addSection = function() { addSection(''); };
 
         scope.saveTemplate = function() { scope.$emit('saveTemplate', scope.sections); };
         scope.processTemplate = function() {
@@ -57,7 +67,7 @@
           });
 
           // send the POST the builderSubmit service
-          builderSubmit.saveDraft(scope.sections, true).then(function(templateId) {
+          builderSubmit.saveDraft(scope.sections, templateId).then(function(templateId) {
             builderMessageBus.push(templateId);
             var newUrl = '/build/edit/' + templateId + '/process';
             builderLocationHandler.redirect(newUrl);
@@ -80,7 +90,7 @@
 
       return {
         restrict: 'AE',
-        templateUrl: '../static/js/builder/partials/builder-controls.html',
+        templateUrl: '../../static/js/builder/partials/builder-controls.html',
         // This directive is interacting with another directive in the same
         // controller scope, so we set the transclude to true here.
         transclude: true,

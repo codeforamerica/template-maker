@@ -8,13 +8,13 @@
     // inject the builder module
     beforeEach(module('builder'));
 
-    describe('newBuilderCtrl', function() {
+    describe('builderTextCtrl', function() {
       var $scope, $rootScope, $controller, alert;
       beforeEach(inject(function(_$rootScope_, _$controller_) {
         $rootScope = _$rootScope_.$new()
         $scope = $rootScope.$new();
 
-        var controller = _$controller_('newBuilderCtrl', {
+        var controller = _$controller_('builderTextCtrl', {
           $scope: $scope,
           alert: sinon.spy()
         });
