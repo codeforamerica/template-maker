@@ -34,7 +34,7 @@ def set_template_content(sections, template_id):
         template_section.template_id = template_id
         # if it is a new section add it, otherwise update it
         if template_section.id is None:
-            db.session.add(template)
+            db.session.add(template_section)
         db.session.commit()
         
         template_text_id = template_section.id
