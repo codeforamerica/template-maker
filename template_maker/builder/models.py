@@ -3,7 +3,7 @@ from template_maker.database import (
     Column,
     Model,
     db,
-    ReferenceCol
+    ReferenceCol,
 )
 from template_maker.user.models import User
 
@@ -26,6 +26,7 @@ class TemplateBase(Model):
     description = Column(db.Text)
     template_text = db.relationship('TemplateText', cascade='all,delete', lazy='dynamic')
     template_variables = db.relationship('TemplateVariables', cascade='all,delete', lazy='dynamic')
+    published = Column(db.Boolean, default=False)
     # created_by = ReferenceCol('users')
 
     def __init__(self, created_at, updated_at, title, description):
@@ -59,6 +60,18 @@ class TemplateText(Model):
         self.text_type = text_type
         self.template_id = template_id
 
+class VariableType(Model):
+    '''
+    The types associated with different variables. We use a FK
+    constraint to make sure it's one of the approved tyes
+
+    Fields:
+    - types: The name of the type in question
+    '''
+    __tablename__ = 'variable_types'
+    id = Column(db.Integer, primary_key=True)
+    types = Column(db.Text)
+
 class TemplateVariables(Model):
     '''
     The variables associated with each section
@@ -72,6 +85,7 @@ class TemplateVariables(Model):
     __tablename__ = 'template_variables'
     id = Column(db.Integer, primary_key=True)
     name = Column(db.Text)
+    type = Column(db.Integer, db.ForeignKey('variable_types.id'))
     template_id = ReferenceCol('template_base')
     template_text_id = ReferenceCol('template_text')
 

@@ -2,10 +2,21 @@
   <legend class="text-muted">Variables</legend>
   <div class="js-variable-sections" ng-repeat="section in variables">
     <div class="js-variable-boxes" ng-repeat="variable in section">
-      <p class="text-muted legend-small">{[variable.variable]}</p>
-      <select class="form-control input-sm" ng-options="type.display for type in dataTypes" ng-model="variable.type">
-        <option value="">Select option</option>
-      </select>
+      <div ng-if="variable.error">
+        <p class="text-muted legend-small">
+          <span class="alert-text">{[variable.variable]}</span> <br>
+          <small>You must select a type!</small>
+        </p>
+        <select class="form-control input-sm" ng-options="type.display for type in dataTypes" ng-model="variable.type">
+          <option value="">Select option</option>
+        </select>
+      </div>
+      <div ng-if="!variable.error">
+        <p class="text-muted legend-small">{[variable.variable]}</p>
+        <select class="form-control input-sm" ng-options="type.display for type in dataTypes" ng-model="variable.type">
+          <option value="">Select option</option>
+        </select>
+      </div>
     </div>
     <div ng-hide="$last||$first">
       <hr />

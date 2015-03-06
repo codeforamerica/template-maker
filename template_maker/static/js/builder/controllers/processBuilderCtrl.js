@@ -6,8 +6,8 @@
    */
   'use strict';
 
-  builder.controller('processBuilderCtrl', ['$scope', '$location', 'builderGetData', 'messageBus',
-    function($scope, $location, builderGetData, messageBus) {
+  builder.controller('processBuilderCtrl', ['$scope', '$location', 'builderGetData', 'messageBus', 'builderSubmit', 'builderLocationHandler',
+    function($scope, $location, builderGetData, messageBus, builderSubmit, builderLocationHandler) {
       // try to get the id from the messages
       // otherwise get it from the url
       $scope.templateId = messageBus.pop();
@@ -23,12 +23,44 @@
           return datum.variables.map(function(variable) {
             return {
               variable: variable,
-              type: ''
+              type: '',
+              error: false
             };
           });
         });
       });
 
-    }
-  ]);
+      $scope.publishTemplate = function() {
+        var numErrors = 0;
+        $scope.variables.forEach(function(section) {
+          section.forEach(function(variable) {
+            if (variable.type === '' || variable.type === null) {
+              numErrors += 1;
+              variable.error = true;
+            } else {
+              variable.error = false;
+            }
+
+          });
+        });
+
+        if (numErrors > 0) {
+          return;
+        }
+
+        if (numErrors === 0) {
+          $scope.variables = $scope.variables.map(function(section) {
+              return section.map(function(variable) {
+                return {
+                  variable: variable.variable,
+                  type: variable.type.type,
+                };
+              });
+            })
+          builderSubmit.publishTemplate($scope.variables, $scope.templateId).then(function(data) {
+            builderLocationHandler.redirect('/generate')
+          });
+        }
+      }
+  }]);
 })();

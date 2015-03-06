@@ -1,5 +1,16 @@
 from template_maker.database import db
-from template_maker.builder.models import TemplateBase, TemplateText, TemplateVariables
+from template_maker.builder.models import (
+    TemplateBase,
+    TemplateText,
+    TemplateVariables
+)
+
+TYPE_MAPS = {
+    'unicode': 1,
+    'date': 2,
+    'int': 3,
+    'float': 4
+}
 
 def set_template_content(sections, template_id):
     '''
@@ -60,3 +71,25 @@ def set_template_content(sections, template_id):
             if variable.id is None:
                 db.session.add(variable)
             db.session.commit()
+
+def set_variable_types(sections, template_id):
+    '''
+    If our forms are all valid set the template types and then
+    finally trigger the publication event
+    '''
+    template_sections = TemplateText.query.\
+        filter(TemplateText.template_id==template_id).\
+        order_by(TemplateText.id).all()
+
+    for idx, section in enumerate(sections):
+        template_section = template_sections[idx]
+
+        template_variables = TemplateVariables.query.\
+            filter(TemplateVariables.template_text_id==template_section.id).\
+            order_by(TemplateVariables.id).all()
+
+        for var_idx, template_variable in enumerate(section):
+            variable = template_variables[var_idx]
+            variable.type = TYPE_MAPS[template_variable.get('type')]
+            db.session.commit()
+

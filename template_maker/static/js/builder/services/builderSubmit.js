@@ -47,6 +47,19 @@
 
         return deferred.promise;
       };
+
+      this.publishTemplate = function(sections, templateId) {
+        var deferred = $q.defer();
+
+        $http.post('/build/edit/' + templateId + '/publish', sections).
+          success(function(data, status, headers) {
+            deferred.resolve(data);
+          }).error(function(data, status, headers) {
+            deferred.reject(data);
+          });
+
+        return deferred.promise;
+      }
     }
   ]);
 })();

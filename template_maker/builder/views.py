@@ -13,7 +13,7 @@ from flask import (
 from template_maker.database import db
 from template_maker.builder.models import TemplateBase, TemplateText, TemplateVariables
 from template_maker.builder.forms import TemplateBaseForm
-from template_maker.builder.util import set_template_content
+from template_maker.builder.util import set_template_content, set_variable_types
 
 blueprint = Blueprint(
     'builder', __name__, url_prefix='/build',
@@ -106,6 +106,29 @@ def configure_variables(template_id):
             return render_template('builder/process.html')
         else:
             return render_template('404.html')
+
+@blueprint.route('/edit/<int:template_id>/publish', methods=['POST'])
+def publish_template(template_id):
+    '''
+    Route for taking documents from the BUILDER and turning them into TEMPLATES
+
+    POST - Data contains sections and variables. Publish freezes the current
+    version of the template into new database tables, allowing the builder documents
+    to be edited and create new templates later on.
+    '''
+    data = json.loads(request.data)
+    # ensure all of the variables have types
+    if not all([item.get('type') for sublist in data for item in sublist]):
+        abort(403)
+    else:
+        # set the variable types
+        set_variable_types(data, template_id)
+        # set the publish flag to be true
+        template = TemplateBase.query.get(template_id)
+        template.published = True
+        db.session.commit()
+        return jsonify({'template_id': template_id}), 200
+
 
 # GET-only "data" routes for client-side interactions
 

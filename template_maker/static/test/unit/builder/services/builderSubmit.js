@@ -9,7 +9,8 @@
 
     describe('builderSubmit', function() {
       var builderSubmit, $httpBackend,
-        endpoint = '/build/edit/1';
+        endpoint = '/build/edit/1',
+        publishEndpoint = '/build/edit/1/publish';
 
       beforeEach(inject(function(_builderSubmit_, _$httpBackend_) {
         builderSubmit = _builderSubmit_;
@@ -35,7 +36,7 @@
           $httpBackend.flush();
         });
 
-        it('should reject properly', function() {
+        it('should successfully handle rejections', function() {
           $httpBackend.expectPUT(endpoint).respond(400, 'error!');
           $httpBackend.flush();
         });
@@ -55,10 +56,30 @@
           $httpBackend.flush();
         });
 
-        it('should reject', function() {
+        it('should successfully handle rejections', function() {
           $httpBackend.expectDELETE(endpoint).respond(400, 'error!');
           $httpBackend.flush();
         });   
+      });
+
+      describe('#publishTemplate', function() {
+        beforeEach(function() {
+          var promise = builderSubmit.publishTemplate([], 1);
+
+          expect(promise).to.have.property('then');
+          expect(promise).to.have.property('catch');
+          expect(promise).to.have.property('finally');
+        });
+
+        it('should successfully publish', function() {
+          $httpBackend.expectPOST(publishEndpoint).respond(200, 1);
+          $httpBackend.flush()
+        });
+
+        it('should successfully handle rejections', function() {
+          $httpBackend.expectPOST(publishEndpoint).respond(400);
+          $httpBackend.flush()
+        })
       })
     });
   });

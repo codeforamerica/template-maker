@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div>
+  <table class="table table-striped table-sm table-bordered">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for template in templates %}
+      <tr id="template-{{ template.id }}">
+        <td>{{ template.title }}</td>
+        <td>{{ template.description|truncate(120) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
