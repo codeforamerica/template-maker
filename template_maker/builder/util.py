@@ -1,91 +1,52 @@
 from template_maker.database import db
 from template_maker.builder.models import (
-    TemplateBase,
-    TemplateText,
-    TemplateVariables
+    TemplateBase, TemplateSection, TextSection,
+    FixedTextSection, TemplateVariables
 )
 
-TYPE_MAPS = {
-    'unicode': 1,
-    'date': 2,
-    'int': 3,
-    'float': 4
+VARIABLE_TYPE_MAPS = {
+    'unicode': 1, 'date': 2,'int': 3, 'float': 4
 }
 
-def set_template_content(sections, template_id):
+SECTION_TYPE_MAPS = {
+    'text': TextSection, 'fixed_text': FixedTextSection,
+}
+
+def create_new_section(section, template_id):
     '''
-    Updates TemplateText and TemplateVariables models associated with
+    Creates a new section based on the section_type sent by the request
+    '''
+    section = SECTION_TYPE_MAPS.get(section.get('type'))(
+        section.get('title'),
+        section.get('description'),
+        template_id
+    )
+    db.session.add(section)
+    db.session.commit()
+    return section.id
+
+
+def update_section(section, template_id):
+    '''
+    Updates TemplateSection and TemplateVariables models associated with
     a particular template_id
     '''
-    # first, get all sections associated with the template
-    template_sections = TemplateText.query.\
-        filter(TemplateText.template_id==template_id).\
-        order_by(TemplateText.id).all()
-
-    # if we have more old sections than new sections, delete the excess
-    # old sections
-    if len(template_sections) > len(sections):
-        TemplateText.query.filter(
-            TemplateText.id.in_(
-                [i.id for i in template_sections[len(sections):]]
-            )
-        ).delete(synchronize_session=False)
-        db.session.commit()
-
-    for idx, section in enumerate(sections):
-        # get the template's text section
-        template_section = template_sections[idx] \
-            if len(template_sections) > 0 and idx < len(template_sections) \
-            else TemplateText()
-
-        # update the section's text fields
-        template_section.text = section.get('content', '')
-        template_section.text_position = idx
-        template_section.text_type = section.get('type')
-        template_section.template_id = template_id
-        # if it is a new section add it, otherwise update it
-        if template_section.id is None:
-            db.session.add(template_section)
-        db.session.commit()
-        
-        template_text_id = template_section.id
-
-        # repeat the same process for variables
-        template_variables = TemplateVariables.query.\
-            filter(TemplateVariables.template_text_id==template_text_id).\
-            order_by(TemplateVariables.id).all()
-
-        if len(template_variables) > len(section.get('variables', [])):
-            TemplateVariables.query.filter(
-                TemplateVariables.id.in_(
-                    [i.id for i in template_variables[len(section.get('variables')):]]
-                )
-            ).delete(synchronize_session=False)
-            db.session.commit()
-
-        for var_idx, template_variable in enumerate(section.get('variables', [])):
-            variable = template_variables[var_idx] if len(template_variables) > 0 and var_idx < len(template_variables) else TemplateVariables()
-            variable.name = template_variable
-            variable.template_id = template_id,
-            variable.template_text_id = template_text_id
-            if variable.id is None:
-                db.session.add(variable)
-            db.session.commit()
+    import pdb; pdb.set_trace()
 
 def set_variable_types(sections, template_id):
     '''
     If our forms are all valid set the template types and then
     finally trigger the publication event
     '''
-    template_sections = TemplateText.query.\
-        filter(TemplateText.template_id==template_id).\
-        order_by(TemplateText.id).all()
+    template_sections = TemplateSection.query.\
+        filter(TemplateSection.template_id==template_id).\
+        order_by(TemplateSection.id).all()
 
     for idx, section in enumerate(sections):
         template_section = template_sections[idx]
 
         template_variables = TemplateVariables.query.\
-            filter(TemplateVariables.template_text_id==template_section.id).\
+            filter(TemplateVariables.template_section_id==template_section.id).\
             order_by(TemplateVariables.id).all()
 
         for var_idx, template_variable in enumerate(section):
@@ -93,3 +54,40 @@ def set_variable_types(sections, template_id):
             variable.type = TYPE_MAPS[template_variable.get('type')]
             db.session.commit()
 
+
+def get_template_sections(template_id):
+    '''
+    Gets the text of the sections for the template
+
+    Returns a list of sections with their text,
+    in the proper order that they should be
+    arranged on the page
+    }
+    '''
+    if TemplateBase.query.get(template_id):
+        template = db.session.execute(
+            '''
+            SELECT
+                a.id as template_id, b.id as template_section_id, b.title,
+                b.section_type, b.position
+            FROM template_base a
+            INNER JOIN template_section b
+            on a.id = b.template_id
+            WHERE a.id = :template_id
+            ORDER BY b.position ASC
+            ''',
+            { 'template_id': template_id }
+        ).fetchall()
+
+        output = []
+
+        for section in template:
+            output.append({
+                'id': section[1],
+                'title': section[2],
+                'type': section[3],
+            })
+
+        return output
+    else:
+        return None

@@ -2,21 +2,19 @@
 
 {% block subcontent %}
 
-<div ng-controller="builderTextCtrl">
-  <p class="lead text-center">Template Builder: Create your template's content</p>
-
-  <div class="container builder-container">
-    <div class="row builder-controls">
-      <builder-controls></builder-controls>
+<div>
+  <div class="row">
+    <div class="col-sm-3">
+      <h3>{{ template.title }}</h3>
+      <hr>
+      {% include 'builder/section-sidebar.html' %}
     </div>
-    <form role="form">
-      <builder-content class="row builder-content"></builder-content>
-    </form>
-    <div class="row builder-fix-bottom text-center">
-      <div class="container">
-        <a class="btn btn-success btn-sm" ng-click="saveTemplate()">Save Draft</a>
-        <a class="btn btn-primary btn-sm" ng-click="processTemplate()">Process Template</a>
-      </div>
+    <div class="col-sm-9">
+      {% if edit_section %}
+        <p>Test!</p>
+      {% else %}
+        {% include 'builder/new-section.html' %}
+      {% endif %}
     </div>
   </div>
 </div>

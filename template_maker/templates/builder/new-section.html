@@ -1,0 +1,15 @@
+{% import "macros.html" as macros %}
+
+<div class="new-section">
+  <form class="form" method="POST" action="{{ url_for('builder.edit_template', template_id=template.id) }}">
+    {{ new_section_form.csrf_token }}
+    <label for="title">Section Title</label>
+    {{ macros.with_errors(new_section_form.title, class_="form-control") }}
+    <label for="description">Section Description</label>
+    {{ macros.with_errors(new_section_form.description, class_="form-control") }}
+    <label for="type">Section Type</label>
+    {{ macros.with_errors(new_section_form.type, class_="form-control") }}
+
+    <input type="submit" class="btn btn-success" value="Submit!">
+  </form>
+</div>

@@ -9,7 +9,7 @@ from flask import (
 )
 
 from template_maker.database import db
-from template_maker.builder.models import TemplateBase, TemplateText, TemplateVariables
+from template_maker.builder.models import TemplateBase
 
 blueprint = Blueprint(
     'generator', __name__, url_prefix='/generate',
