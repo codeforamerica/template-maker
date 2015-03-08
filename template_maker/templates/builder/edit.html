@@ -10,8 +10,12 @@
       {% include 'builder/section-sidebar.html' %}
     </div>
     <div class="col-sm-9">
-      {% if edit_section %}
-        <p>Test!</p>
+      {% if section %}
+        {% if section.section_type == 'text' %}
+          {% include 'builder/sections/text-section.html' %}
+        {% elif section.section_type == 'fixed_text' %}
+          {% include 'builder/sections/text-section.html' %}
+        {% endif %}
       {% else %}
         {% include 'builder/new-section.html' %}
       {% endif %}
@@ -19,4 +23,20 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block javascripts %}
+  {% if section %}
+    {% if section.section_type == 'text' or section.section_type == 'fixed_text' %}
+      <script src="//cdn.ckeditor.com/4.4.5/basic/ckeditor.js"></script>
+      <script type="text/javascript">
+        $(document).ready(function() {
+          CKEDITOR.replace('widget');
+          {% if section.text %}
+          CKEDITOR.instances.widget.setData('{{ section.text | safe }}');
+          {% endif %}
+        });
+      </script>
+    {% endif %}
+  {% endif %}
 {% endblock %}

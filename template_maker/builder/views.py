@@ -1,18 +1,13 @@
 import json
 import datetime
 from flask import (
-    Blueprint,
-    request,
-    Response,
-    jsonify,
-    render_template,
-    redirect,
-    abort
+    Blueprint, request, Response, jsonify,
+    render_template, redirect, abort, url_for
 )
 
 from template_maker.database import db
 from template_maker.builder.models import TemplateBase, TemplateSection, TemplateVariables
-from template_maker.builder.forms import TemplateBaseForm, TemplateSectionForm
+from template_maker.builder.forms import TemplateBaseForm, TemplateSectionForm, TemplateSectionTextForm
 from template_maker.builder.util import (
     create_new_section, update_section,
     get_template_sections
@@ -22,6 +17,11 @@ blueprint = Blueprint(
     'builder', __name__, url_prefix='/build',
     template_folder='../templates'
 )
+
+SECTION_FORM_MAP = {
+    'text': TemplateSectionTextForm,
+    'fixed_text': TemplateSectionTextForm
+}
 
 # GET-only "data" routes for client-side interactions
 
@@ -101,7 +101,14 @@ def edit_template(template_id):
         render_template('404.html')
 
     new_section_form = TemplateSectionForm()
-    if request.method == 'GET':
+
+    if new_section_form.validate_on_submit():
+        new_section = request.form
+        new_section_id = create_new_section(new_section, template_id)
+        return redirect(
+            url_for('builder.edit_section', template_id=template_id, section_id=new_section_id)
+        )
+    else:
         sections = get_template_sections(template_id)
         return render_template(
             'builder/edit.html', template=template_base,
@@ -109,15 +116,7 @@ def edit_template(template_id):
             edit_section=False
         )
 
-    elif request.method == 'POST':
-        new_section = request.form
-        new_section_id = create_new_section(new_section, template_id)
-        import pdb; pdb.set_trace();
-        return redirect(
-            url_for('builder.edit_section', template_id=template_id, section_id=new_section_id)
-        )
-
-@blueprint.route('/<int:template_id>/section/<int:section_id>', methods=['GET', 'PUT', 'DELETE'])
+@blueprint.route('/<int:template_id>/section/<int:section_id>', methods=['GET', 'POST', 'DELETE'])
 def edit_section(template_id, section_id):
     '''
     Route for interacting with individual sections
@@ -128,15 +127,23 @@ def edit_section(template_id, section_id):
     '''
     template_base = TemplateBase.query.get(template_id)
     section = TemplateSection.query.get(section_id)
-
     if template_base is None or section is None:
         render_template('404.html')
 
-    if request.method == 'GET':
-        sections = get_template_sections(template_id)
+    sections = get_template_sections(template_id)
+    form = SECTION_FORM_MAP[section.section_type]()
+
+    if form.validate_on_submit():
+        update_section(section, template_id, request.form)
+        return redirect(url_for(
+            'builder.edit_section', template_id=template_id,
+            section_id=section_id
+        ))
+    else:
         return render_template(
             'builder/edit.html', template=template_base,
-            sections=sections, edit_section=section_id
+            sections=sections, section=section,
+            form=form
         )
 
 @blueprint.route('/edit/<int:template_id>/publish', methods=['POST'])

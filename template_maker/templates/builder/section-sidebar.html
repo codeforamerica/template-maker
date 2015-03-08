@@ -6,5 +6,8 @@
   </a>
   <hr>
   {% endfor %}
+  <div class="text-center">
+    <a class="btn btn-primary" href="{{ url_for('builder.edit_template', template_id=template.id) }}">Add Section</a>
+  </div>
   {% endif %}
 </div>
