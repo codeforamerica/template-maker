@@ -2,5 +2,5 @@ language: python
 python:
 - '2.7'
 install: pip install -r requirements.txt
-script: PYTHONPATH=. nosetests test/ -v --with-coverage --cover-package=wextractor
+script: PYTHONPATH=. nosetests template_maker_test/ -v --with-coverage --cover-package=template_maker
   --cover-erase
