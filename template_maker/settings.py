@@ -1,7 +1,7 @@
 import os
 
 class Config(object):
-    SECRET_KEY = os.environ.get('WEXPLORER_SECRET', 'template-maker') # todo: change me
+    SECRET_KEY = os.environ.get('TEMPLATE_MAKER_SECRET', 'template-maker') # todo: change me
 
 class DevConfig(Config):
     ENV = 'dev'
@@ -13,3 +13,9 @@ class ProdConfig(Config):
     ENV = 'prod'
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+
+class TestingConfig(Config):
+    ENV = 'test'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    WTF_CSRF_ENABLED = False
+    TESTING = True

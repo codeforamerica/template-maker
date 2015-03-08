@@ -1,4 +1,3 @@
-import datetime
 from template_maker.database import (
     Column,
     Model,
@@ -20,8 +19,8 @@ class TemplateBase(Model):
 
     __tablename__ = 'template_base'
     id = Column(db.Integer, primary_key=True)
-    created_at = Column(db.DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(db.DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(db.DateTime)
+    updated_at = Column(db.DateTime)
     title = Column(db.String(255))
     description = Column(db.Text)
     template_text = db.relationship('TemplateSection', cascade='all,delete', lazy='dynamic')

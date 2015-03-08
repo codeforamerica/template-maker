@@ -62,7 +62,9 @@ def new_template():
         db.session.add(template_base)
         db.session.commit()
         template_base_id = template_base.id
-        return redirect('build/{template_id}/section/new'.format(template_id=template_base_id))
+        return redirect(
+            url_for('builder.edit_template', template_id=template_base_id)
+        )
     return render_template('builder/new.html', form=form)
 
 @blueprint.route('/<int:template_id>/edit', methods=['GET', 'PUT', 'DELETE'])
@@ -112,7 +114,7 @@ def edit_template(template_id):
         new_section_id = create_new_section(new_section, template_id)
         import pdb; pdb.set_trace();
         return redirect(
-            url_for('edit_section', template_id=template_id, section_id=new_section_id)
+            url_for('builder.edit_section', template_id=template_id, section_id=new_section_id)
         )
 
 @blueprint.route('/<int:template_id>/section/<int:section_id>', methods=['GET', 'PUT', 'DELETE'])
