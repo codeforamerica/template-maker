@@ -28,7 +28,7 @@
 {% block javascripts %}
   {% if section %}
     {% if section.section_type == 'text' or section.section_type == 'fixed_text' %}
-      <script src="//cdn.ckeditor.com/4.4.5/basic/ckeditor.js"></script>
+      <script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
       <script type="text/javascript">
         $(document).ready(function() {
           CKEDITOR.replace('widget');

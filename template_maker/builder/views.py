@@ -10,7 +10,7 @@ from template_maker.builder.models import TemplateBase, TemplateSection, Templat
 from template_maker.builder.forms import TemplateBaseForm, TemplateSectionForm, TemplateSectionTextForm
 from template_maker.builder.util import (
     create_new_section, update_section,
-    get_template_sections
+    get_template_sections, get_template_variables
 )
 
 blueprint = Blueprint(
@@ -98,7 +98,7 @@ def edit_template(template_id):
     template_base = TemplateBase.query.get(template_id)
 
     if template_base is None:
-        render_template('404.html')
+        return render_template('404.html')
 
     new_section_form = TemplateSectionForm()
 
@@ -128,7 +128,7 @@ def edit_section(template_id, section_id):
     template_base = TemplateBase.query.get(template_id)
     section = TemplateSection.query.get(section_id)
     if template_base is None or section is None:
-        render_template('404.html')
+        return render_template('404.html')
 
     sections = get_template_sections(template_id)
     form = SECTION_FORM_MAP[section.section_type]()
@@ -145,6 +145,19 @@ def edit_section(template_id, section_id):
             sections=sections, section=section,
             form=form
         )
+
+@blueprint.route('/<int:template_id>/configure', methods=['GET', 'POST'])
+def configure_variables(template_id):
+    template_base = TemplateBase.query.get(template_id)
+    if template_base is None:
+        return render_template('404.html')
+
+    sections = get_template_sections(template_id)
+    variables = get_template_variables(template_id)
+    return render_template(
+        'builder/configure.html', template=template_base,
+        sections=sections, variables=variables
+    )
 
 @blueprint.route('/edit/<int:template_id>/publish', methods=['POST'])
 def publish_template(template_id):

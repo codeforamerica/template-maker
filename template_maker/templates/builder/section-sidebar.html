@@ -1,13 +1,16 @@
 <div class="builder-section-sidebar">
   {% if sections %}
   {% for section in sections %}
-  <a href="{{ url_for('builder.edit_section', template_id=template.id, section_id=section.id) }}">
-    {{ section.title }}
-  </a>
+  <div>
+    <a href="{{ url_for('builder.edit_section', template_id=template.id, section_id=section.id) }}">
+      {{ section.title }}
+    </a>
+  </div>
   <hr>
   {% endfor %}
   <div class="text-center">
-    <a class="btn btn-primary" href="{{ url_for('builder.edit_template', template_id=template.id) }}">Add Section</a>
+    <a class="btn btn-default btn-sm" href="{{ url_for('builder.edit_template', template_id=template.id) }}">Add Section</a>
+    <a class="btn btn-default btn-sm" href="{{ url_for('builder.configure_variables', template_id=template.id) }}">Configure Variables</a>
   </div>
   {% endif %}
 </div>

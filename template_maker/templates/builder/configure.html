@@ -1,0 +1,18 @@
+{% extends "builder/main.html" %}
+
+{% block subcontent %}
+
+<div>
+  <div class="row">
+    <div class="col-sm-3">
+      <h3>{{ template.title }}</h3>
+      <hr>
+      {% include 'builder/section-sidebar.html' %}
+    </div>
+    <div class="col-sm-9">
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

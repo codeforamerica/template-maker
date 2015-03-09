@@ -1,3 +1,4 @@
+import re
 from template_maker.database import db
 from template_maker.builder.models import (
     TemplateBase, TemplateSection, TextSection,
@@ -12,6 +13,8 @@ SECTION_TYPE_MAPS = {
     'text': TextSection, 'fixed_text': FixedTextSection,
 }
 
+VARIABLE_RE = re.compile('(\[\[ |\[\[).*?(\]\]| \]\])')
+
 def create_new_section(section, template_id):
     '''
     Creates a new section based on the section_type sent by the request
@@ -25,45 +28,49 @@ def create_new_section(section, template_id):
     db.session.commit()
     return new_section.id
 
-
 def update_section(section, template_id, form_input):
     '''
     Updates TemplateSection and TemplateVariables models associated with
     a particular template_id
     '''
-    if section.section_type in ['text', 'fixed_text']:
+    if section.section_type == 'fixed_text':
         # TODO: Sanitize HTML input
         section.text = form_input.get('widget')
         db.session.commit()
-    return section.id
+    elif section.section_type == 'text':
+        html = form_input.get('widget')
+        section.text = html
+        # save the text
+        db.session.commit()
+        # find all variables, using the regex set above
+        input_variables = [i.group() for i in re.finditer(VARIABLE_RE, html)]
+        # get any existing variables
+        current_variables = get_section_variables(section.id)
 
-def set_variable_types(sections, template_id):
-    '''
-    If our forms are all valid set the template types and then
-    finally trigger the publication event
-    '''
-    template_sections = TemplateSection.query.\
-        filter(TemplateSection.template_id==template_id).\
-        order_by(TemplateSection.id).all()
+        # if there are more old variables than new ones, delete the excess
+        if len(current_variables) > len(input_variables):
+            TemplateVariables.query.filter(
+                TemplateVariables.id.in_(
+                    [i.id for i in current_variables[len(input_variables):]]
+                )
+            ).delete(synchronize_session=False)
 
-    for idx, section in enumerate(sections):
-        template_section = template_sections[idx]
-
-        template_variables = TemplateVariables.query.\
-            filter(TemplateVariables.template_section_id==template_section.id).\
-            order_by(TemplateVariables.id).all()
-
-        for var_idx, template_variable in enumerate(section):
-            variable = template_variables[var_idx]
-            variable.type = TYPE_MAPS[template_variable.get('type')]
+        # overwrite the old variables with the new ones
+        for var_idx, variable in enumerate(input_variables):
+            _variable = current_variables[var_idx] if len(current_variables) > 0 and var_idx < len(current_variables) else TemplateVariables()
+            _variable.name = variable
+            _variable.template_id = template_id
+            _variable.section_id = section.id
+            db.session.add(_variable)
             db.session.commit()
 
+    return section.id
 
 def get_template_sections(template_id):
     '''
     Gets the text of the sections for the template
 
-    Returns a list of sections with their text,
+    Returns a list of sections with their metadata,
     in the proper order that they should be
     arranged on the page
     }
@@ -95,3 +102,23 @@ def get_template_sections(template_id):
         return output
     else:
         return None
+
+def get_template_variables(template_id):
+    '''
+    Gets the variables associated with each template
+
+    Returns a list of variables associated with the template
+    along with the sections that they are tied to
+    '''
+    return []
+
+def get_section_variables(section_id):
+    '''
+    Gets the variables associated with each section
+
+    Returns a list of TemplateVariables associated
+    with the input section_id
+    '''
+    return TemplateVariables.query.filter(
+        TemplateVariables.section_id==section_id
+    ).order_by(TemplateVariables.id).all()
