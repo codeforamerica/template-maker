@@ -61,10 +61,18 @@ def update_section(section, template_id, form_input):
             _variable.name = variable
             _variable.template_id = template_id
             _variable.section_id = section.id
-            db.session.add(_variable)
+            if not _variable.id:
+                db.session.add(_variable)
             db.session.commit()
 
     return section.id
+
+def update_variables(template_variables, variables, template_id):
+    variables_dict = variables.to_dict()
+    for variable in template_variables:
+        variable.type = VARIABLE_TYPE_MAPS[variables_dict[variable.name]]
+        db.session.commit()
+    return
 
 def get_template_sections(template_id):
     '''
@@ -110,7 +118,9 @@ def get_template_variables(template_id):
     Returns a list of variables associated with the template
     along with the sections that they are tied to
     '''
-    return []
+    return TemplateVariables.query.filter(
+        TemplateVariables.template_id==template_id
+    ).order_by(TemplateVariables.id).all()
 
 def get_section_variables(section_id):
     '''

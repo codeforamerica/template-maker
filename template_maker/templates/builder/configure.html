@@ -1,4 +1,5 @@
 {% extends "builder/main.html" %}
+{% import "macros.html" as macros %}
 
 {% block subcontent %}
 
@@ -7,10 +8,17 @@
     <div class="col-sm-3">
       <h3>{{ template.title }}</h3>
       <hr>
-      {% include 'builder/section-sidebar.html' %}
+      {% include 'builder/sections/section-sidebar.html' %}
     </div>
     <div class="col-sm-9">
-
+      <form class="form" method="POST" action="{{ url_for('builder.configure_variables', template_id=template.id) }}">
+        {{ form.csrf_token }}
+        {% for field in form if not field.id == 'csrf_token' %}
+          {{ field.label }}
+          {{ macros.with_errors(field, class_="form-control") }}
+        {% endfor %}
+        <input class="btn btn-success" type="submit" value="Submit">
+      </endfor>
     </div>
   </div>
 </div>

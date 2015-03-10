@@ -35,3 +35,12 @@ class TemplateSectionTextForm(Form):
     WYSIWYG Editor for the TextSection and FixedTextSection Models
     '''
     widget = CKTextAreaField()
+
+class VariableForm(Form):
+    '''
+    Since the number of variable differ from template to template, we
+    just pass a blank form to get CSRF protection. In the view, we
+    use dynamic form generation as laid out here:
+    https://groups.google.com/forum/#!topic/wtforms/cJl3aqzZieA
+    '''
+    pass

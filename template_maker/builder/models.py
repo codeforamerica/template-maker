@@ -106,7 +106,7 @@ class FixedTextSection(TemplateSection):
 # A list of all implemented section types for a new section CHOICES field
 IMPLEMENTED_SECTIONS = [cls.choice_type for cls in vars()['TemplateSection'].__subclasses__()]
 
-class VariableType(Model):
+class VariableTypes(Model):
     '''
     The types associated with different variables. We use a FK
     constraint to make sure it's one of the approved tyes

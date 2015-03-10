@@ -7,7 +7,7 @@
     <div class="col-sm-3">
       <h3>{{ template.title }}</h3>
       <hr>
-      {% include 'builder/section-sidebar.html' %}
+      {% include 'builder/sections/section-sidebar.html' %}
     </div>
     <div class="col-sm-9">
       {% if section %}
@@ -17,7 +17,7 @@
           {% include 'builder/sections/text-section.html' %}
         {% endif %}
       {% else %}
-        {% include 'builder/new-section.html' %}
+        {% include 'builder/sections/new-section.html' %}
       {% endif %}
     </div>
   </div>
