@@ -1,0 +1,31 @@
+{% extends "generator/main.html" %}
+{% import "macros.html" as macros %}
+
+{% block subcontent %}
+
+<div class="row" id="js-rivets-template">
+  <div class="col-sm-4">
+    {{ form.csrf_token }}
+    {% for field in form if not field.id == 'csrf_token' %}
+      {{ field.label }}
+      {{ macros.with_errors(field, class_="form-control", **{'rv-value': field.rv_data_input }) }}
+    {% endfor %}
+  </div>
+  <div class="col-sm-8">
+    {% include "generator/preview-template.html" %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ url_for('static', filename='lib/rivets/dist/rivets.bundled.min.js') }}"></script>
+<script>
+  var template = {
+  {% for variable in variables %}
+    {{ variable.rv_data_input | safe }}: '',
+  {% endfor %}
+  };
+  rivets.bind(document.getElementById('js-rivets-template'), {template: template});
+</script>
+{% endblock %}

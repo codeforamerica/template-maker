@@ -70,24 +70,23 @@ def new_template():
         )
     return render_template('builder/new.html', form=form)
 
-@blueprint.route('/<int:template_id>/edit', methods=['GET', 'PUT', 'DELETE'])
-def delete_template():
+@blueprint.route('/<int:template_id>/edit'), methods=['GET', 'PUT', 'DELETE'])
+def edit_template_metadata(template_id):
     '''
     Route for managing individual template objects
 
+    methods can be request-level or come from the request args
     GET - TODO
     PUT - TODO
     DELETE - Deletes the template (and cascades to delete
     template text and associated variables) and returns a 204
     or returns a 403
     '''
-    if request.method == 'DELETE':
-        try:
-            db.session.delete(template_base)
-            db.session.commit()
-            return Response(status=204)
-        except:
-            abort(403)
+    template_base = TemplateBase.query.get(template_id)
+    if request.args.get('method') == 'DELETE':
+        db.session.delete(template_base)
+        db.session.commit()
+        return redirect(url_for('builder.list_templates'))
 
 @blueprint.route('/<int:template_id>/section/new', methods=['GET', 'POST'])
 def edit_template(template_id):
@@ -130,7 +129,7 @@ def edit_section(template_id, section_id):
     '''
     template_base = TemplateBase.query.get(template_id)
     section = TemplateSection.query.get(section_id)
-    if template_base is None or section is None:
+    if template_base is None or section is None or section.template_id != template_id:
         return render_template('404.html')
 
     sections = get_template_sections(template_id)
