@@ -2,23 +2,41 @@
 
 {% block subcontent %}
 
-<div ng-controller="builderTextCtrl">
-  <p class="lead text-center">Template Builder: Create your template's content</p>
-
-  <div class="container builder-container">
-    <div class="row builder-controls">
-      <builder-controls></builder-controls>
+<div>
+  <div class="row">
+    <div class="col-sm-3">
+      <h3>{{ template.title }}</h3>
+      <hr>
+      {% include 'builder/sections/section-sidebar.html' %}
     </div>
-    <form role="form">
-      <builder-content class="row builder-content"></builder-content>
-    </form>
-    <div class="row builder-fix-bottom text-center">
-      <div class="container">
-        <a class="btn btn-success btn-sm" ng-click="saveTemplate()">Save Draft</a>
-        <a class="btn btn-primary btn-sm" ng-click="processTemplate()">Process Template</a>
-      </div>
+    <div class="col-sm-9">
+      {% if section %}
+        {% if section.section_type == 'text' %}
+          {% include 'builder/sections/text-section.html' %}
+        {% elif section.section_type == 'fixed_text' %}
+          {% include 'builder/sections/text-section.html' %}
+        {% endif %}
+      {% else %}
+        {% include 'builder/sections/new-section.html' %}
+      {% endif %}
     </div>
   </div>
 </div>
 
+{% endblock %}
+
+{% block javascripts %}
+  {% if section %}
+    {% if section.section_type == 'text' or section.section_type == 'fixed_text' %}
+      <script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
+      <script type="text/javascript">
+        $(document).ready(function() {
+          CKEDITOR.replace('widget');
+          {% if section.text %}
+          CKEDITOR.instances.widget.setData('{{ section.text | safe }}');
+          {% endif %}
+        });
+      </script>
+    {% endif %}
+  {% endif %}
 {% endblock %}
