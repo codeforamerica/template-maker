@@ -80,7 +80,7 @@ def build_document(template_id):
     form = F()
     for field in form.__iter__():
         # set the rv_data_input value on the form field as well as on the variable
-        setattr(variable, 'rv_data_input', 'template.variable_' + strip_tags(field.name))
+        setattr(field, 'rv_data_input', 'template.variable_' + strip_tags(field.name))
 
     return render_template('generator/build-document.html', sections=sections, variables=variables, form=form)
 
