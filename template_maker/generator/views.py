@@ -66,15 +66,21 @@ def build_document(template_id):
 
     for section in sections:
         if section.section_type == 'text':
+            # if we have a text section, we need to prep the page for the rivets
+            # two-way data binding
             variables = get_section_variables(section.id)
             for variable in variables:
+                # add a data_input value onto the variable
                 variable.rv_data_input = 'variable_' + strip_tags(variable.name)
+                # format the section text
                 section.text = create_rivets_bindings(variable, section)
+                # set up the form
                 setattr(F, variable.name, TextField(variable.name))
 
     form = F()
-    for variable in form.__iter__():
-        setattr(variable, 'rv_data_input', 'template.variable_' + strip_tags(variable.name))
+    for field in form.__iter__():
+        # set the rv_data_input value on the form field as well as on the variable
+        setattr(variable, 'rv_data_input', 'template.variable_' + strip_tags(field.name))
 
     return render_template('generator/build-document.html', sections=sections, variables=variables, form=form)
 

@@ -70,7 +70,7 @@ def new_template():
         )
     return render_template('builder/new.html', form=form)
 
-@blueprint.route('/<int:template_id>/edit'), methods=['GET', 'PUT', 'DELETE'])
+@blueprint.route('/<int:template_id>/edit', methods=['GET', 'PUT', 'DELETE'])
 def edit_template_metadata(template_id):
     '''
     Route for managing individual template objects
