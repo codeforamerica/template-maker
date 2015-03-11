@@ -81,33 +81,9 @@ def get_template_sections(template_id):
     Returns a list of sections with their metadata,
     in the proper order that they should be
     arranged on the page
-    }
     '''
     if TemplateBase.query.get(template_id):
-        template = db.session.execute(
-            '''
-            SELECT
-                a.id as template_id, b.id as template_section_id, b.title,
-                b.section_type, b.position
-            FROM template_base a
-            INNER JOIN template_section b
-            on a.id = b.template_id
-            WHERE a.id = :template_id
-            ORDER BY b.position ASC
-            ''',
-            { 'template_id': template_id }
-        ).fetchall()
-
-        output = []
-
-        for section in template:
-            output.append({
-                'id': section[1],
-                'title': section[2],
-                'type': section[3],
-            })
-
-        return output
+        return TemplateSection.query.filter(TemplateSection.template_id==template_id).all()
     else:
         return None
 

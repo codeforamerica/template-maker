@@ -5,12 +5,9 @@
 
 <div>
   <div class="row">
-    <div class="col-sm-3">
+
+    <div class="col-sm-4">
       <h3>{{ template.title }}</h3>
-      <hr>
-      {% include 'builder/sections/section-sidebar.html' %}
-    </div>
-    <div class="col-sm-9">
       <form class="form" method="POST" action="{{ url_for('builder.configure_variables', template_id=template.id) }}">
         {{ form.csrf_token }}
         {% for field in form if not field.id == 'csrf_token' %}
@@ -18,9 +15,14 @@
           {{ macros.with_errors(field, class_="form-control") }}
         {% endfor %}
         <input class="btn btn-success" type="submit" value="Submit">
-      </endfor>
+      </form>
+    </div>
+
+    <div class="col-sm-8">
+      {% include "builder/preview-template.html" %}
     </div>
   </div>
+
 </div>
 
 {% endblock %}

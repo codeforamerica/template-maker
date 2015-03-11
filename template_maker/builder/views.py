@@ -192,17 +192,11 @@ def publish_template(template_id):
     to be edited and create new templates later on.
     '''
     if request.method == 'GET':
-        return render_template('builder/preview.html')
+        sections = get_template_sections(template_id)
+        return render_template('builder/preview.html', sections=sections, template_id=template_id)
     elif request.method == 'POST':
-        data = json.loads(request.data)
-        # ensure all of the variables have types
-        if not all([item.get('type') for sublist in data for item in sublist]):
-            abort(403)
-        else:
-            # set the variable types
-            set_variable_types(data, template_id)
-            # set the publish flag to be true
-            template = TemplateBase.query.get(template_id)
-            template.published = True
-            db.session.commit()
-            return redirect(url_for('generator.list_templates'))
+        # set the publish flag to be true
+        template = TemplateBase.query.get(template_id)
+        template.published = True
+        db.session.commit()
+        return redirect(url_for('generator.list_templates'))

@@ -1,1 +1,15 @@
 {% extends "builder/main.html" %}
+
+{% block subcontent %}
+
+<div class="row">
+  {% include "builder/preview-template.html" %}
+
+  <form method="POST" action="{{ url_for('builder.publish_template', template_id=template_id) }}">
+    <div class="text-center">
+      <input type="submit" value="Publish" class="btn btn-success" />
+    </div>
+  </form>
+</div>
+
+{% endblock %}
