@@ -64,8 +64,17 @@ $(function() {
             var shell = createVariableShell()
             froala.insertHTML(shell);
 
+            $('#myModal').modal('show');
+            $('#myModal').on('hide.bs.modal', function(e) {
+              var modal = $(this);
+
+              froala.insertHTML('[[' + modal.find('.modal-variable-type').val() + ':' +
+                modal.find('.modal-variable-name').val() + ']]');
+
+            });
+
           }
         }
       }
-    })
+    });
 });
