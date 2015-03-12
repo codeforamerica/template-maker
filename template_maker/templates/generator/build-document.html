@@ -19,6 +19,7 @@
 {% endblock %}
 
 {% block javascripts %}
+<script src="{{ url_for('static', filename='lib/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
 <script src="{{ url_for('static', filename='lib/rivets/dist/rivets.bundled.min.js') }}"></script>
 <script>
   var template = {
@@ -27,5 +28,13 @@
   {% endfor %}
   };
   rivets.bind(document.getElementById('js-rivets-template'), {template: template});
+  $('.datepicker').datepicker({
+    todayHighlight: true,
+    format: 'yyyy-mm-dd',
+    autoclose: true
+  }).on('hide', function(e) {
+    // manually bind the selected date to rivets
+    template[$(this).attr('rv-value').split('.')[1]] = e.format();
+  });
 </script>
 {% endblock %}

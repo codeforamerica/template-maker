@@ -12,12 +12,13 @@ from flask import (
 
 from template_maker.database import db
 from template_maker.builder.models import TemplateBase
-from wtforms import TextField
+from wtforms import TextField, IntegerField, FloatField
 from template_maker.builder.forms import VariableForm
+from template_maker.generator.forms import DatePickerField
 from template_maker.builder.util import get_template_sections, get_section_variables
 
 TYPE_VARIABLES_MAP = {
-    1: 'unicode', 2: 'date', 3: 'int', 4: 'float'
+    1: TextField, 2: DatePickerField, 3: IntegerField, 4: FloatField
 }
 
 blueprint = Blueprint(
@@ -75,7 +76,7 @@ def build_document(template_id):
                 # format the section text
                 section.text = create_rivets_bindings(variable, section)
                 # set up the form
-                setattr(F, variable.name, TextField(variable.name))
+                setattr(F, variable.name, TYPE_VARIABLES_MAP[variable.type](variable.name))
 
     form = F()
     for field in form.__iter__():
