@@ -1,46 +1,5 @@
 $(function() {
 
-  var variableId = 1;
-
-  function createVariableHtml(modal) {
-    var _type = modal.find('.modal-variable-type').val();
-    var _name = modal.find('.modal-variable-name').val();
-
-    modal.find('.modal-variable-name').val('');
-
-    return '[[' + _type + ':' + _name + ']]';
-  }
-
-  function createVariableShell(modal) {
-    var shell = '<span contenteditable=false class="fr-variable"' +
-    'id="variable-' + variableId + '">' + '[[]]</span>';
-    console.log(shell);
-    return shell;
-  }
-
-  function insertVariable() {
-    // open the modal
-    $('#myModal').modal('show');
-  }
-
-  // insert the shell on shown
-  $('#myModal').on('shown.bs.modal', function(e) {
-
-  });
-
-  // insert the actual variable on save
-  $('#myModal').find('.modal-add-variable').on('click', function(e) {
-    var modal = $('#myModal');
-    $('#variable-' + variableId).html(createVariableHtml(modal));
-    variableId++;
-  });
-
-  // remove the shell on close
-  $('#myModal').on('hide.bs.modal', function(e) {
-    $('#variable-' + variableId).remove();
-  });
-
-
   $('#widget')
     .html($('#sectionText').html())
     .editable({
@@ -61,20 +20,53 @@ $(function() {
             var froala = this;
             insertVariable()
 
-            var shell = createVariableShell()
-            froala.insertHTML(shell);
-
-            $('#myModal').modal('show');
-            $('#myModal').on('hide.bs.modal', function(e) {
-              var modal = $(this);
-
-              froala.insertHTML('[[' + modal.find('.modal-variable-type').val() + ':' +
-                modal.find('.modal-variable-name').val() + ']]');
-
-            });
-
+            froala.insertHTML(createVariableShell());
           }
         }
       }
     });
+
+  // get the minimum variable id which should one more than the total number
+  // of variables on the page right now
+  variableId = $($('#widget').editable('getHTML')).find('.fr-variable').length + 1;
+
+  function createVariableHtml(modal) {
+    var _type = modal.find('.modal-variable-type').val();
+    var _name = modal.find('.modal-variable-name').val();
+
+    modal.find('.modal-variable-name').val('');
+
+    return '[[' + _type + ':' + _name + ']]';
+  }
+
+  function createVariableId(variableId, isElem) {
+    // returns a hash if there is an elem, no hash if there isn't
+    var variableIdRoot = 'template-variable-' + variableId;
+    return isElem ? '#' + variableIdRoot : variableIdRoot;
+  }
+
+  function createVariableShell(modal) {
+    var shell = '<span contenteditable=false class="fr-variable"' +
+    'id="' + createVariableId(variableId, false) + '">' + '[[]]</span>';
+    return shell;
+  }
+
+  function insertVariable() {
+    // open the modal
+    $('#myModal').modal('show');
+  }
+
+  // insert the actual variable on save
+  $('#myModal').find('.modal-add-variable').on('click', function(e) {
+    var modal = $('#myModal');
+    $(createVariableId(variableId, true)).html(createVariableHtml(modal));
+    variableId++;
+  });
+
+  // remove the shell on close
+  $('#myModal').on('hide.bs.modal', function(e) {
+    $(createVariableId(variableId, true)).remove();
+  });
+
+
 });
