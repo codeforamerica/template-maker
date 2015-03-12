@@ -18,4 +18,3 @@ class TestBuilder(BaseTestCase):
         response = self.client.get('/build/')
         assert response.status_code == 200
         self.assertEquals(len(self.get_context_variable('templates')), 1)
-

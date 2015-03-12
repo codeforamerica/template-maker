@@ -1,3 +1,25 @@
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Add a new variable</h4>
+      </div>
+      <div class="modal-body">
+        <form class="form">
+          <p>Variable Name: <input class="input modal-variable-name" value="" type="text"></p>
+          <p>Variable Type: <input class="input modal-variable-type" value="" type="text"></p>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Add Variable</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <form class="form" role="form" method="POST" action="{{ url_for('builder.edit_section', template_id=template.id, section_id=section.id) }}">
   {{ form.csrf_token }}
   {{ form.widget }}
