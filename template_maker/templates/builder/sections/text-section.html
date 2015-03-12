@@ -7,14 +7,28 @@
         <h4 class="modal-title" id="myModalLabel">Add a new variable</h4>
       </div>
       <div class="modal-body">
-        <form class="form">
-          <p>Variable Name: <input class="input modal-variable-name" value="" type="text"></p>
-          <p>Variable Type: <input class="input modal-variable-type" value="" type="text"></p>
+        <form class="form form-horizontal">
+          <div class="form-group">
+            <label for="modalVariableName" class="col-sm-2 control-label">Name</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control modal-variable-name" id="modalVariableName" placeholder="Enter a name for your variable">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="Type" class="col-sm-2 control-label">Type</label>
+            <div class="col-sm-10">
+              <select class="form-control modal-variable-type">
+                <option>Text</option>
+                <option>Date</option>
+                <option>Number</option>
+              </select>
+            </div>
+          </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" data-dismiss="modal">Add Variable</button>
+        <button type="button" class="btn btn-primary modal-add-variable" data-dismiss="modal">Add Variable</button>
       </div>
     </div>
   </div>
