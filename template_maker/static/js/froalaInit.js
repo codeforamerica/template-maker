@@ -68,5 +68,51 @@ $(function() {
     $(createVariableId(variableId, true)).remove();
   });
 
+  var clicking = false, _el;
+
+  $('.fr-variable').on('mousedown.froalaCustom.moveVariable', function(e){
+    _el = e.target;
+    clicking = true;
+  });
+
+  $('.froala-view').on('mouseup.froalaCustom.moveVariable', function(e){
+    clicking = false;
+  });
+
+  $('.froala-view').on('mousemove.froalaCustom.moveVariable', function(e){
+    e.preventDefault();
+    if (clicking === false || !_el) return;
+
+    var range, textRange, x = e.clientX, y = e.clientY;
+
+    //remove the old pin
+    _el = _el.parentNode.removeChild(_el);
+
+    // Try the standards-based way first
+    if (document.caretPositionFromPoint) {
+      var pos = document.caretPositionFromPoint(x, y);
+      range = document.createRange();
+      range.setStart(pos.offsetNode, pos.offset);
+      range.collapse();
+    }
+    // Next, the WebKit way
+    else if (document.caretRangeFromPoint) {
+      range = document.caretRangeFromPoint(x, y);
+    }
+    // Finally, the IE way
+    else if (document.body.createTextRange) {
+      textRange = document.body.createTextRange();
+      textRange.moveToPoint(x, y);
+      var spanId = "temp_" + ("" + Math.random()).slice(2);
+      textRange.pasteHTML('<span id="' + spanId + '">&nbsp;</span>');
+      var span = document.getElementById(spanId);
+        //place the new pin
+        span.parentNode.replaceChild(el, span);
+      }
+    if (range) {
+      //place the new pin
+      range.insertNode(_el);
+    }
+  });
 
 });
