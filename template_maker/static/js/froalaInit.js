@@ -63,10 +63,21 @@ $(function() {
     variableId++;
   });
 
+  $('.fr-variable').on('dblclick', function(e) {
+    editVariable(e.target);
+  });
+
   // remove the shell on close
   $('#myModal').on('hide.bs.modal', function(e) {
     $(createVariableId(variableId, true)).remove();
   });
+
+  function editVariable(target) {
+    $('.modal-variable-name').val(
+      $(target).html().split(':')[1].slice(0, -2)
+    );
+    $('#myModal').modal('show');
+  }
 
   var clicking = false, _el;
 
@@ -78,6 +89,12 @@ $(function() {
   $('.froala-view').on('mouseup.froalaCustom.moveVariable', function(e){
     clicking = false;
   });
+
+  $(document).on('mouseup.froalaCustom.moveVariable', function(e) {
+    clicking = false;
+  });
+
+  $('fr-variable').on('')
 
   $('.froala-view').on('mousemove.froalaCustom.moveVariable', function(e){
     e.preventDefault();
@@ -106,9 +123,9 @@ $(function() {
       var spanId = "temp_" + ("" + Math.random()).slice(2);
       textRange.pasteHTML('<span id="' + spanId + '">&nbsp;</span>');
       var span = document.getElementById(spanId);
-        //place the new pin
-        span.parentNode.replaceChild(el, span);
-      }
+      //place the new pin
+      span.parentNode.replaceChild(_el, span);
+    }
     if (range) {
       //place the new pin
       range.insertNode(_el);
