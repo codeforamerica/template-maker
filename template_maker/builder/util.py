@@ -13,7 +13,7 @@ SECTION_TYPE_MAPS = {
     'text': TextSection, 'fixed_text': FixedTextSection,
 }
 
-VARIABLE_RE = re.compile('(\[\[ |\[\[).*?(\]\]| \]\])')
+VARIABLE_RE = re.compile('(\[\[ |\[\[).*?\|\|.*?(\]\]| \]\])')
 
 def create_new_section(section, template_id):
     '''
@@ -27,6 +27,16 @@ def create_new_section(section, template_id):
     db.session.add(new_section)
     db.session.commit()
     return new_section.id
+
+def parse_variable_text(variable):
+    '''
+    Takes a variable of the form [[TYPE:NAME]] and
+    returns the type and the name
+    '''
+    no_tags = variable.lstrip('[[').rstrip(']]')
+    var_type = no_tags.split('||')[0].lower()
+    var_name = '[[' + no_tags.split('||')[1] + ']]'
+    return var_type, var_name
 
 def update_section(section, template_id, form_input):
     '''
@@ -44,6 +54,7 @@ def update_section(section, template_id, form_input):
         db.session.commit()
         # find all variables, using the regex set above
         input_variables = [i.group() for i in re.finditer(VARIABLE_RE, html)]
+        import pdb; pdb.set_trace()
         # get any existing variables
         current_variables = get_section_variables(section.id)
 
@@ -58,9 +69,11 @@ def update_section(section, template_id, form_input):
         # overwrite the old variables with the new ones
         for var_idx, variable in enumerate(input_variables):
             _variable = current_variables[var_idx] if len(current_variables) > 0 and var_idx < len(current_variables) else TemplateVariables()
-            _variable.name = variable
+            var_type, var_name = parse_variable_text(variable)
+            _variable.name = var_name
             _variable.template_id = template_id
             _variable.section_id = section.id
+            _variable.type = VARIABLE_TYPE_MAPS[var_type]
             if not _variable.id:
                 db.session.add(_variable)
             db.session.commit()

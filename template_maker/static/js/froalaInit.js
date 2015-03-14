@@ -37,7 +37,7 @@ $(function() {
     modal.find('.modal-variable-name').val('');
     modal.find('.modal-variable-type').val('Text');
 
-    return '[[' + _type + ':' + _name + ']]';
+    return '[[' + _type + '||' + _name + ']]';
   }
 
   function createVariableId(variableId, isElem) {
