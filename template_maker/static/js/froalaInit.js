@@ -35,6 +35,7 @@ $(function() {
     var _name = modal.find('.modal-variable-name').val();
 
     modal.find('.modal-variable-name').val('');
+    modal.find('.modal-variable-type').val('Text');
 
     return '[[' + _type + ':' + _name + ']]';
   }
@@ -46,47 +47,73 @@ $(function() {
   }
 
   function createVariableShell(modal) {
-    var shell = '<span contenteditable=false class="fr-variable"' +
-    'id="' + createVariableId(variableId, false) + '">' + '[[]]</span>';
+    // create a shell to insert the variable into
+    var shell = '<span contenteditable=false class="fr-variable" data-fr-verified="true"' +
+    'id="' + createVariableId(variableId, false) + '">' + '</span>';
     return shell;
   }
 
   function insertVariable() {
     // open the modal
-    $('#myModal').modal('show');
+    $('#variableModal').modal('show');
   }
 
   // insert the actual variable on save
-  $('#myModal').find('.modal-add-variable').on('click', function(e) {
-    var modal = $('#myModal');
-    $(createVariableId(variableId, true)).html(createVariableHtml(modal));
-    variableId++;
+  $('#variableModal').find('.modal-add-variable').on('click', function(e) {
+    var modal = $('#variableModal');
+    // figure out if we are inserting a new variable or modifying an old one
+    var curVariable = $('.modal-variable-name').attr('data-variable-cur-id') ?
+      $('.modal-variable-name').attr('data-variable-cur-id').split('-')[2] :
+      variableId;
+    // update the html
+    $(createVariableId(curVariable, true)).html(createVariableHtml(modal));
+    // only increment if we are inserting a new variable
+    if (typeof(curVariable) === 'number') variableId++;
+    // reset the name value to be an empty string
+    $('.modal-variable-name').attr('data-variable-cur-id', null);
   });
 
-  $('.fr-variable').on('dblclick', function(e) {
+
+  $('#variableModal').on('hide.bs.modal', function(e) {
+    // if we are hiding the modal, we need to remove the new shell that we made
+    // and reset the values
+    $(createVariableId(variableId, true)).remove();
+    $('.modal-variable-name').attr('data-variable-cur-id', null);
+    $('.modal-variable-name').val('');
+    $('.modal-variable-type').val('Text');
+  });
+
+  $('.froala-view').on('dblclick', '.fr-variable', function(e) {
     editVariable(e.target);
   });
 
-  // remove the shell on close
-  $('#myModal').on('hide.bs.modal', function(e) {
-    $(createVariableId(variableId, true)).remove();
-  });
-
   function editVariable(target) {
-    $('.modal-variable-name').val(
-      $(target).html().split(':')[1].slice(0, -2)
-    );
-    $('#myModal').modal('show');
+    var modalNameInput = $('.modal-variable-name');
+    var modalTypeInput = $('.modal-variable-type');
+    // if we are editing an existing variable, attach the existing values
+    // to the modal field, and the variable id as a data attribute so that we
+    // can access it later
+    modalNameInput.val($(target).html().split(':')[1].slice(0, -2));
+    modalTypeInput.val($(target).html().split(':')[0].slice(2, $(target).html().split(':')[0].length));
+    modalNameInput.attr('data-variable-cur-id', target.id)
+    $('#variableModal').modal('show');
   }
 
   var clicking = false, _el;
 
-  $('.fr-variable').on('mousedown.froalaCustom.moveVariable', function(e){
+  // if we click on a variable, we have an element and we are clicking
+  $('.froala-view').on('mousedown.froalaCustom.moveVariable', '.fr-variable', function(e){
     _el = e.target;
     clicking = true;
   });
 
-  $('.froala-view').on('mouseup.froalaCustom.moveVariable', function(e){
+  // we need to attach listeners both on the froala editor and the document
+  // to get all possible mouseups. when we do, we are no longer clicking
+  $('.froala-view').on('mouseup.froalaCustom.moveVariable', function(e) {
+    clicking = false;
+  });
+
+  $('.froala-editor').on('mouseup.froalaCustom.moveVariable', function(e) {
     clicking = false;
   });
 
@@ -94,18 +121,16 @@ $(function() {
     clicking = false;
   });
 
-  $('fr-variable').on('')
-
   $('.froala-view').on('mousemove.froalaCustom.moveVariable', function(e){
-    e.preventDefault();
     if (clicking === false || !_el) return;
+    e.preventDefault();
 
     var range, textRange, x = e.clientX, y = e.clientY;
 
-    //remove the old pin
+    // detach and store the old element outside the DOM
     _el = _el.parentNode.removeChild(_el);
 
-    // Try the standards-based way first
+    // Try to set the range the standards-based way first
     if (document.caretPositionFromPoint) {
       var pos = document.caretPositionFromPoint(x, y);
       range = document.createRange();
@@ -127,7 +152,7 @@ $(function() {
       span.parentNode.replaceChild(_el, span);
     }
     if (range) {
-      //place the new pin
+      // place the element at the beginning of the range
       range.insertNode(_el);
     }
   });
