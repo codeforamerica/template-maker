@@ -29,11 +29,16 @@
   {% if section %}
     {% if section.section_type == 'text' or section.section_type == 'fixed_text' %}
       <script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
+      <script id="sectionText" type="section-text">
+        {% if section.text %}
+        {{ section.text | safe }}
+        {% endif %}
+      </script>
       <script type="text/javascript">
         $(document).ready(function() {
           CKEDITOR.replace('widget');
           {% if section.text %}
-          CKEDITOR.instances.widget.setData('{{ section.text | safe }}');
+          CKEDITOR.instances.widget.setData($('#sectionText').html());
           {% endif %}
         });
       </script>

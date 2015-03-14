@@ -18,7 +18,7 @@
         <td>{{ template.description|truncate(120) }}</td>
         <td>
           <a class="btn btn-primary btn-sm" href="{{ url_for('builder.edit_template', template_id=template.id) }}">Edit Text</a>
-          <a class="btn btn-danger btn-sm" ng-click="deleteTemplate({{ template.id }})">Delete Template</a>
+          <a class="btn btn-danger btn-sm" href="{{ url_for('builder.edit_template_metadata', template_id=template.id, method='DELETE') }}">Delete Template</a>
         </td>
       </tr>
       {% endfor %}
