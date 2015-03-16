@@ -1,15 +1,19 @@
-<div class="builder-section-sidebar">
-  {% if sections %}
-  {% for section in sections %}
-  <div>
-    <a href="{{ url_for('builder.edit_section', template_id=template.id, section_id=section.id) }}">
-      {{ section.title }}
-    </a>
+{% import "macros.html" as macros %}
+
+<div class="new-section">
+  <h4>Insert a new Blank Section</h4>
+  <div class="dropdown">
+    <button id="Blank Section" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-default">
+      Choose a Section Type
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+      {% for type in new_section_form.type.choices %}
+      <li><a href="{{ url_for('builder.new_section', template_id=template.id, section_type=type[0]) }}">{{ type[1] }}</a></li>
+      {% endfor %}
+    </ul>
   </div>
-  <hr>
-  {% endfor %}
-  <div class="text-center">
-    <a class="btn btn-default btn-sm" href="{{ url_for('builder.edit_template', template_id=template.id) }}">Add Section</a>
-  </div>
-  {% endif %}
+  <div class="pad-30"></div>
+  <h4>Insert Boilerplate Section</h4>
+  <p class="text-muted"></p>
 </div>

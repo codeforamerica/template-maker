@@ -20,8 +20,8 @@ def create_new_section(section, template_id):
     Creates a new section based on the section_type sent by the request
     '''
     new_section = SECTION_TYPE_MAPS.get(section.get('type'))(
-        section.get('title'),
-        section.get('description'),
+        section.get('title', ''),
+        '',
         template_id
     )
     db.session.add(new_section)
@@ -43,6 +43,7 @@ def update_section(section, template_id, form_input):
     Updates TemplateSection and TemplateVariables models associated with
     a particular template_id
     '''
+    section.title = form_input.get('title')
     if section.section_type == 'fixed_text':
         # TODO: Sanitize HTML input
         section.text = form_input.get('widget')

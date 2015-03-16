@@ -34,9 +34,9 @@
   </div>
 </div>
 
-<form class="form" role="form" method="POST" action="{{ url_for('builder.edit_section', template_id=template.id, section_id=section.id) }}">
+<div>
   {{ form.csrf_token }}
   {{ form.widget }}
   <hr>
   <input type="submit" class="btn btn-success" value="Save">
-</form>
+</div>

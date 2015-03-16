@@ -8,15 +8,17 @@
 
 <form class="form" role="form" method="POST" action="/build/new">
   {{ form.csrf_token }}
-  <label for="title">Template Title</label>
-  {{ macros.with_errors(form.title, class_="form-control") }}
-  <label for="description">Template Description</label>
-  {{ macros.with_errors(form.description, class_="form-control") }}
+  <div class="pad-30">
+    <label for="title">What is the name of the template?</label>
+    {{ macros.with_errors(form.title, class_="form-control", placeholder="Ex: Generic Professional Services RFP") }}
+  </div>
+  <label for="description">What is this template about?</label>
+  {{ macros.with_errors(form.description, class_="form-control", placeholder="Ex: A basic professional services RFP suitable for all departments") }}
 
   <hr />
   <input type="submit" class="btn btn-success" value="Submit!">
-  <a href="#" class="btn btn-primary">Upload from Word</a>
-  <a href="#" class="btn btn-info">Import from Google Docs</a>
+  <a href="#" class="btn btn-primary" disabled>Upload from Word</a>
+  <a href="#" class="btn btn-info" disabled>Import from Google Docs</a>
 
 </form>
 

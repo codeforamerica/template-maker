@@ -10,7 +10,7 @@ from template_maker.builder.models import TemplateBase, TemplateSection, Templat
 from template_maker.builder.forms import (
     TemplateBaseForm, TemplateSectionForm, TemplateSectionTextForm,
     VariableForm, SelectField, StringField, Form
-) 
+)
 from template_maker.builder.util import (
     create_new_section, update_section, update_variables,
     get_template_sections, get_template_variables
@@ -18,7 +18,7 @@ from template_maker.builder.util import (
 
 blueprint = Blueprint(
     'builder', __name__, url_prefix='/build',
-    template_folder='../templates'
+    template_folder='../templates',
 )
 
 SECTION_FORM_MAP = {
@@ -70,6 +70,16 @@ def new_template():
         )
     return render_template('builder/new.html', form=form)
 
+@blueprint.route('/<int:template_id>/section/new/<section_type>')
+def new_section(template_id, section_title='', section_type=None):
+    if section_type is not None:
+        new_section = { 'type': section_type, 'title': section_title }
+        new_section_id = create_new_section(new_section, template_id)
+        return redirect(
+            url_for('builder.edit_template', template_id=template_id, section_id=new_section_id)
+        )
+    return abort(403)
+
 @blueprint.route('/<int:template_id>/edit', methods=['GET', 'PUT', 'DELETE'])
 def edit_template_metadata(template_id):
     '''
@@ -88,44 +98,15 @@ def edit_template_metadata(template_id):
         db.session.commit()
         return redirect(url_for('builder.list_templates'))
 
-@blueprint.route('/<int:template_id>/section/new', methods=['GET', 'POST'])
-def edit_template(template_id):
-    '''
-    Route for interacting with base templates
-
-    GET - Gets the template and renders out the section editor view with
-    a new section form pre-loaded
-    POST - Creates a new section
-    '''
-    template_base = TemplateBase.query.get(template_id)
-
-    if template_base is None:
-        return render_template('404.html')
-
-    new_section_form = TemplateSectionForm()
-
-    if new_section_form.validate_on_submit():
-        new_section = request.form
-        new_section_id = create_new_section(new_section, template_id)
-        return redirect(
-            url_for('builder.edit_section', template_id=template_id, section_id=new_section_id)
-        )
-    else:
-        sections = get_template_sections(template_id)
-        return render_template(
-            'builder/sections/new-section.html', template=template_base,
-            sections=sections, new_section_form=new_section_form,
-            edit_section=False
-        )
-
-@blueprint.route('/<int:template_id>/section/')
+@blueprint.route('/<int:template_id>/', methods=['GET', 'POST', 'DELETE'])
+@blueprint.route('/<int:template_id>/section/', methods=['GET', 'POST', 'DELETE'])
 @blueprint.route('/<int:template_id>/section/<int:section_id>', methods=['GET', 'POST', 'DELETE'])
-def edit_section(template_id, section_id=-1):
+def edit_template(template_id, section_id=-1, section_type=None):
     '''
     Route for interacting with individual sections
 
     GET - Gets the template and renders out the editing for that particular section
-    POST - Updates the section
+    POST - Creates a new section or updates it
     DELETE - Deletes the section
     '''
     template_base = TemplateBase.query.get(template_id)
@@ -134,18 +115,21 @@ def edit_section(template_id, section_id=-1):
         return render_template('404.html')
 
     sections = get_template_sections(template_id)
-    form = SECTION_FORM_MAP[section.section_type]() if section else Form()
+    form = SECTION_FORM_MAP[section.section_type]() if section else TemplateSectionForm()
+    new_section_form = TemplateSectionForm()
 
     if form.validate_on_submit():
         update_section(section, template_id, request.form)
         return redirect(url_for(
-            'builder.edit_section', template_id=template_id,
+            'builder.edit_template', template_id=template_id,
             section_id=section_id
         ))
     else:
         return render_template(
             'builder/edit.html', template=template_base,
-            sections=sections, form=form, current_section=section
+            sections=sections, form=form,
+            new_section_form=new_section_form,
+            current_section=section
         )
 
 # TODO: is there a way to cache this once per session as opposed
