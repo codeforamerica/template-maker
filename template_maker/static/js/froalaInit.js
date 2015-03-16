@@ -1,4 +1,8 @@
 $(function() {
+  // handle accordion glyphicon swapping
+  $('#accordion').on('show.bs.collapse', function () {
+    $('#accordion .in').collapse('hide');
+  });
 
   $('#widget')
     .html($('#sectionText').html())
@@ -156,5 +160,4 @@ $(function() {
       range.insertNode(_el);
     }
   });
-
 });

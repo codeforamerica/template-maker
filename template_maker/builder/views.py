@@ -113,7 +113,7 @@ def edit_template(template_id):
     else:
         sections = get_template_sections(template_id)
         return render_template(
-            'builder/edit.html', template=template_base,
+            'builder/sections/new-section.html', template=template_base,
             sections=sections, new_section_form=new_section_form,
             edit_section=False
         )
@@ -144,8 +144,7 @@ def edit_section(template_id, section_id):
     else:
         return render_template(
             'builder/edit.html', template=template_base,
-            sections=sections, section=section,
-            form=form
+            sections=sections, form=form, current_section=section
         )
 
 # TODO: is there a way to cache this once per session as opposed

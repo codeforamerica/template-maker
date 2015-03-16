@@ -19,15 +19,40 @@
       {% include 'builder/sections/section-sidebar.html' %}
     </div>
     <div class="col-sm-9">
-      {% if section %}
-        {% if section.section_type == 'text' %}
-          {% include 'builder/sections/text-section.html' %}
-        {% elif section.section_type == 'fixed_text' %}
-          {% include 'builder/sections/text-section.html' %}
-        {% endif %}
-      {% else %}
-        {% include 'builder/sections/new-section.html' %}
-      {% endif %}
+      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      {% for section in sections %}
+        <div class="panel panel-default">
+          <div class="panel-heading" >
+            <span class="panel-title" role="tab" id="heading{{ section.id }}" data-toggle="collapse" href="#collapse{{ section.id }}" aria-expanded="false" aria-controls="collapse{{ section.id }}">
+              <span class="glyphicon {% if section.id == current_section.id %}glyphicon-pencil{% else %}glyphicon glyphicon-arrow-down{% endif %} js-glyphicon" aria-hidden="true"></span>
+              <strong>{{ section.title }}</strong>
+              <span>{{ section.description }}</span>
+            </span>
+            <a class="pull-right" href="{{ url_for('builder.edit_section', template_id=template.id, section_id=section.id) }}">Edit</a>
+          </div>
+
+          {% if section.id == current_section.id %}
+          <div id="collapse{{ section.id }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading{{ section.id }}">
+            <div class="panel-body">
+              {% if section.section_type == 'text' %}
+                {% include 'builder/sections/text-section.html' %}
+              {% elif section.section_type == 'fixed_text' %}
+                {% include 'builder/sections/text-section.html' %}
+              {% endif %}
+            </div>
+          </div>
+          {% else %}
+          <div id="collapse{{ section.id }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ section.id }}">
+            <div class="panel-body">
+              {{ section.text | safe }}
+            </div>
+          </div>
+          {% endif %}
+
+        </div>
+      {% endfor %}
+      </div>
+
     </div>
   </div>
 </div>
@@ -35,17 +60,15 @@
 {% endblock %}
 
 {% block javascripts %}
-  {% if section %}
-    {% if section.section_type == 'text' or section.section_type == 'fixed_text' %}
-      <script src="{{ url_for('static', filename='lib/froala/js/froala_editor.min.js') }}"></script>
-      <!-- Include IE8 JS. -->
-      <!--[if lt IE 9]>
-        <script src="{{ url_for('static', filename='lib/froala/js/froala_editor_ie8.min.js') }}></script>
-      <![endif]-->
-      <script id="sectionText" type="section-text">
-        {{ section.text | safe }}
-      </script>
-      <script type="text/javascript" src="{{ url_for('static', filename='js/froalaInit.js') }}"></script>
-    {% endif %}
+  {% if current_section.section_type == 'text' or section.section_type == 'fixed_text' %}
+    <script src="{{ url_for('static', filename='lib/froala/js/froala_editor.min.js') }}"></script>
+    <!-- Include IE8 JS. -->
+    <!--[if lt IE 9]>
+      <script src="{{ url_for('static', filename='lib/froala/js/froala_editor_ie8.min.js') }}></script>
+    <![endif]-->
+    <script id="sectionText" type="section-text">
+      {{ current_section.text | safe }}
+    </script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/froalaInit.js') }}"></script>
   {% endif %}
 {% endblock %}

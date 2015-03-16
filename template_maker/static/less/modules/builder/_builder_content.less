@@ -1,41 +1,8 @@
 // Custom styles for the template builder content
 
-// Set the builder container to have a solid gray background
-// and line up properly with the controls
-.builder-container {
-  border: 1px solid gray;
-  min-height: 140px;
-  margin-top: 10px;
-  position: relative;
-  margin-bottom: 55px;
-}
+// Make the panel title feel like a link that can be clicked on
 
-.builder-fix-bottom {
-  position: absolute;
-  bottom: 0;
-  margin-bottom: -15px;
-}
-
-// Handle the styles for all content types
-.glyphicon-remove {
-  color: @brand-danger;
-  margin-bottom: -15px;
-  margin-right: 4px;
-}
-
-.builder-content-block {
-  padding-bottom: 15px;
-  padding-top: 5px;
-}
-
-// Handle the styles for the title types
-.js-builder-title {
-  font-size: @font-size-h3;
-  line-height: @font-size-h3 * 1.25;
-  height: @font-size-h3 * 1.75;
-}
-
-.js-builder-section {
-  overflow-y: auto;
-  height: 100px;
+.panel-title:hover {
+  text-decoration: underline;
+  cursor: pointer;
 }
