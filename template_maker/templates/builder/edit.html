@@ -24,7 +24,7 @@
         <div class="panel panel-default">
           <div class="panel-heading" >
             <span class="panel-title" role="tab" id="heading{{ section.id }}" data-toggle="collapse" href="#collapse{{ section.id }}" aria-expanded="false" aria-controls="collapse{{ section.id }}">
-              <span class="glyphicon {% if section.id == current_section.id %}glyphicon-pencil{% else %}glyphicon glyphicon-arrow-down{% endif %} js-glyphicon" aria-hidden="true"></span>
+              <span class="glyphicon {% if section.id == current_section.id %}glyphicon-pencil{% else %}glyphicon glyphicon-arrow-down js-glyphicon{% endif %}" aria-hidden="true"></span>
               <strong>{{ section.title }}</strong>
               <span>{{ section.description }}</span>
             </span>
@@ -53,6 +53,8 @@
       {% endfor %}
       </div>
 
+
+      <a href="{{ url_for('builder.publish_template', template_id=template.id) }}" class="btn btn-primary">Preview Template</a>
     </div>
   </div>
 </div>
@@ -60,7 +62,7 @@
 {% endblock %}
 
 {% block javascripts %}
-  {% if current_section.section_type == 'text' or section.section_type == 'fixed_text' %}
+  {% if current_section.section_type in ['text', 'fixed_text'] %}
     <script src="{{ url_for('static', filename='lib/froala/js/froala_editor.min.js') }}"></script>
     <!-- Include IE8 JS. -->
     <!--[if lt IE 9]>

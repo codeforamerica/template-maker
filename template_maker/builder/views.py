@@ -9,7 +9,7 @@ from template_maker.database import db
 from template_maker.builder.models import TemplateBase, TemplateSection, TemplateVariables, VariableTypes
 from template_maker.builder.forms import (
     TemplateBaseForm, TemplateSectionForm, TemplateSectionTextForm,
-    VariableForm, SelectField, StringField
+    VariableForm, SelectField, StringField, Form
 ) 
 from template_maker.builder.util import (
     create_new_section, update_section, update_variables,
@@ -118,8 +118,9 @@ def edit_template(template_id):
             edit_section=False
         )
 
+@blueprint.route('/<int:template_id>/section/')
 @blueprint.route('/<int:template_id>/section/<int:section_id>', methods=['GET', 'POST', 'DELETE'])
-def edit_section(template_id, section_id):
+def edit_section(template_id, section_id=-1):
     '''
     Route for interacting with individual sections
 
@@ -129,11 +130,11 @@ def edit_section(template_id, section_id):
     '''
     template_base = TemplateBase.query.get(template_id)
     section = TemplateSection.query.get(section_id)
-    if template_base is None or section is None or section.template_id != template_id:
+    if (template_base is None or section is None or section.template_id != template_id) and section_id > 0:
         return render_template('404.html')
 
     sections = get_template_sections(template_id)
-    form = SECTION_FORM_MAP[section.section_type]()
+    form = SECTION_FORM_MAP[section.section_type]() if section else Form()
 
     if form.validate_on_submit():
         update_section(section, template_id, request.form)
