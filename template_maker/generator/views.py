@@ -49,9 +49,9 @@ def create_rivets_bindings(variable, section):
     '''
     Converts a variable into a <span> that rivets can grab onto
     '''
-    repl_text = '<input id="{variable_name}-value" placeholder="{variable_name}"'.format(variable_name=strip_tags(variable.name)) + \
-    'class="template-variable" rv-value="template.variable_{idcombo}" disabled>'.format(idcombo=strip_tags(variable.name))
-    return re.sub(re.escape(variable.name), repl_text, section.text)
+    repl_text = '<input id="{variable_name}-value" placeholder="{variable_name}"'.format(variable_name=strip_tags(variable.display_name)) + \
+    'class="template-variable" rv-value="template.variable_{idcombo}" disabled>'.format(idcombo=strip_tags(variable.display_name))
+    return re.sub(re.escape(variable.full_name), repl_text, section.text)
 
 @blueprint.route('/<int:template_id>/generate')
 def build_document(template_id):
@@ -72,16 +72,17 @@ def build_document(template_id):
             variables = get_section_variables(section.id)
             for variable in variables:
                 # add a data_input value onto the variable
-                variable.rv_data_input = 'variable_' + strip_tags(variable.name)
+                variable.rv_data_input = 'variable_' + strip_tags(variable.display_name)
                 # format the section text
                 section.text = create_rivets_bindings(variable, section)
                 # set up the form
-                setattr(F, variable.name, TYPE_VARIABLES_MAP[variable.type](variable.name))
+                setattr(F, variable.display_name, TYPE_VARIABLES_MAP[variable.type](variable.display_name))
 
     form = F()
     for field in form.__iter__():
         # set the rv_data_input value on the form field as well as on the variable
         setattr(field, 'rv_data_input', 'template.variable_' + strip_tags(field.name))
+        setattr(field, 'label', strip_tags(field.name))
 
     return render_template('generator/build-document.html', sections=sections, variables=variables, form=form)
 

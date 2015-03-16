@@ -124,7 +124,7 @@ def edit_section(template_id, section_id):
     Route for interacting with individual sections
 
     GET - Gets the template and renders out the editing for that particular section
-    PUT - Updates the section
+    POST - Updates the section
     DELETE - Deletes the section
     '''
     template_base = TemplateBase.query.get(template_id)

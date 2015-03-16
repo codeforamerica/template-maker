@@ -1,5 +1,14 @@
 {% extends "builder/main.html" %}
 
+{% block css %}
+<!-- Include Font Awesome. -->
+<link href="{{ url_for('static', filename='lib/froala/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css" />
+
+<!-- Include Editor style. -->
+<link href="{{ url_for('static', filename='lib/froala/css/froala_editor.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ url_for('static', filename='lib/froala/css/froala_style.min.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
 {% block subcontent %}
 
 <div>
@@ -28,20 +37,15 @@
 {% block javascripts %}
   {% if section %}
     {% if section.section_type == 'text' or section.section_type == 'fixed_text' %}
-      <script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
+      <script src="{{ url_for('static', filename='lib/froala/js/froala_editor.min.js') }}"></script>
+      <!-- Include IE8 JS. -->
+      <!--[if lt IE 9]>
+        <script src="{{ url_for('static', filename='lib/froala/js/froala_editor_ie8.min.js') }}></script>
+      <![endif]-->
       <script id="sectionText" type="section-text">
-        {% if section.text %}
         {{ section.text | safe }}
-        {% endif %}
       </script>
-      <script type="text/javascript">
-        $(document).ready(function() {
-          CKEDITOR.replace('widget');
-          {% if section.text %}
-          CKEDITOR.instances.widget.setData($('#sectionText').html());
-          {% endif %}
-        });
-      </script>
+      <script type="text/javascript" src="{{ url_for('static', filename='js/froalaInit.js') }}"></script>
     {% endif %}
   {% endif %}
 {% endblock %}

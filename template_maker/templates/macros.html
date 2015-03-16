@@ -1,5 +1,4 @@
 {% macro with_errors(field) %}
-  <div class="form_field">
   {% if field.errors %}
     {% set css_class = 'has-error ' + kwargs.pop('class_', '') %}
     {% for error in field.errors %}
@@ -12,5 +11,4 @@
   {% else %}
     {{ field(**kwargs) }}
   {% endif %}
-  </div>
 {% endmacro %}

@@ -19,22 +19,23 @@ class TemplateSectionForm(Form):
     description = TextAreaField('Description', validators=[DataRequired()])
     type = SelectField('Type', choices=IMPLEMENTED_SECTIONS, validators=[DataRequired()])
 
-class CKTextAreaWidget(widgets.TextArea):
+class FroalaWidget(widgets.TextArea):
     '''
     Custom CKEditor Text Area Widget
     '''
     def __call__(self, field, **kwargs):
-        kwargs.setdefault('class_', 'ckeditor')
-        return super(CKTextAreaWidget, self).__call__(field, **kwargs)
+        kwargs.setdefault('class_', 'froala')
+        kwargs.setdefault('style', 'display:none;')
+        return super(FroalaWidget, self).__call__(field, **kwargs)
 
-class CKTextAreaField(TextAreaField):
-    widget = CKTextAreaWidget()
+class FroalaField(TextAreaField):
+    widget = FroalaWidget()
 
 class TemplateSectionTextForm(Form):
     '''
     WYSIWYG Editor for the TextSection and FixedTextSection Models
     '''
-    widget = CKTextAreaField()
+    widget = FroalaField()
 
 class VariableForm(Form):
     '''

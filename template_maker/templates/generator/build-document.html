@@ -4,12 +4,19 @@
 {% block subcontent %}
 
 <div class="row" id="js-rivets-template">
-  <div class="col-sm-4">
-    {{ form.csrf_token }}
-    {% for field in form if not field.id == 'csrf_token' %}
-      {{ field.label }}
-      {{ macros.with_errors(field, class_="form-control", **{'rv-value': field.rv_data_input }) }}
-    {% endfor %}
+  <div class="col-sm-4 variables-legend-container">
+    <h3>Fill in Variables</h3>
+    <form class="form-horizontal">
+      {{ form.csrf_token }}
+      {% for field in form if not field.id == 'csrf_token' %}
+      <div class="form-group">
+        <label for="[[{{ field.label }}]]" class="col-sm-2 control-label">{{ field.label }}</label>
+        <div class="col-sm-10">
+          {{ macros.with_errors(field, class_="form-control", **{'rv-value': field.rv_data_input }) }}
+        </div>
+      </div>
+      {% endfor %}
+    </form>
   </div>
   <div class="col-sm-8">
     {% include "generator/preview-template.html" %}
