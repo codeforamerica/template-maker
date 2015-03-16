@@ -6,7 +6,7 @@ from template_maker.builder.models import (
 )
 
 VARIABLE_TYPE_MAPS = {
-    'unicode': 1, 'date': 2,'int': 3, 'float': 4
+    'text': 1, 'date': 2,'int': 3, 'float': 4
 }
 
 SECTION_TYPE_MAPS = {
@@ -54,7 +54,6 @@ def update_section(section, template_id, form_input):
         db.session.commit()
         # find all variables, using the regex set above
         input_variables = [i.group() for i in re.finditer(VARIABLE_RE, html)]
-        import pdb; pdb.set_trace()
         # get any existing variables
         current_variables = get_section_variables(section.id)
 
@@ -70,7 +69,8 @@ def update_section(section, template_id, form_input):
         for var_idx, variable in enumerate(input_variables):
             _variable = current_variables[var_idx] if len(current_variables) > 0 and var_idx < len(current_variables) else TemplateVariables()
             var_type, var_name = parse_variable_text(variable)
-            _variable.name = var_name
+            _variable.full_name = variable
+            _variable.display_name = var_name
             _variable.template_id = template_id
             _variable.section_id = section.id
             _variable.type = VARIABLE_TYPE_MAPS[var_type]

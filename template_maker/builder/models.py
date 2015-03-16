@@ -130,7 +130,8 @@ class TemplateVariables(Model):
 
     __tablename__ = 'template_variables'
     id = Column(db.Integer, primary_key=True)
-    name = Column(db.Text)
+    full_name = Column(db.Text)
+    display_name = Column(db.Text)
     type = Column(db.Integer, db.ForeignKey('variable_types.id'))
     template_id = ReferenceCol('template_base')
     section_id = ReferenceCol('template_section')
