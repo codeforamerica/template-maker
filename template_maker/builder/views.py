@@ -2,7 +2,8 @@ import json
 import datetime
 from flask import (
     Blueprint, request, Response, jsonify,
-    render_template, redirect, abort, url_for
+    render_template, redirect, abort, url_for,
+    flash
 )
 
 from template_maker.database import db
@@ -108,8 +109,7 @@ def edit_template(template_id, section_id=-1, section_type=None):
     Route for interacting with individual sections
 
     GET - Gets the template and renders out the editing for that particular section
-    POST - Creates a new section or updates it
-    DELETE - Deletes the section
+    POST - Updates a section
     '''
     template_base = TemplateBase.query.get(template_id)
     section = TemplateSection.query.get(section_id)
@@ -122,6 +122,7 @@ def edit_template(template_id, section_id=-1, section_type=None):
 
     if form.validate_on_submit():
         update_section(section, template_id, request.form)
+        flash('Successfully saved!', 'alert-success')
         return redirect(url_for(
             'builder.edit_template', template_id=template_id,
             section_id=section_id
@@ -139,6 +140,7 @@ def delete_section(template_id, section_id):
     section = TemplateSection.query.get(section_id)
     db.session.delete(section)
     db.session.commit()
+    flash('Section successfully deleted!', 'alert-success')
     return redirect(url_for('builder.edit_template', template_id=template_id))
 
 # TODO: is there a way to cache this once per session as opposed

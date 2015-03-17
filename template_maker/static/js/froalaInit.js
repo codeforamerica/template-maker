@@ -1,23 +1,4 @@
 $(function() {
-  // handle accordion glyphicon swapping
-  $('#accordion').on('hide.bs.collapse', function(e) {
-    // if we are collapsing the currently opened one, flip the arrow
-    if (e.target.id === $('#accordion .in').attr('id')) {
-      $(e.target).parent().find('.js-glyphicon').
-        attr('class', 'glyphicon glyphicon-chevron-down js-glyphicon');
-    }
-  });
-
-  $('#accordion').on('show.bs.collapse', function(e) {
-    // flip the up arrows to down arrows
-    $('#accordion').find('.glyphicon-chevron-up').
-      attr('class', 'glyphicon glyphicon-chevron-down js-glyphicon');
-    // flip the clicked arrow to up
-    $(e.target).parent().find('.js-glyphicon').
-      attr('class', 'glyphicon glyphicon-chevron-up js-glyphicon');
-    // hide the currently opened section
-    $('#accordion .in').collapse('hide');
-  });
 
   $('#widget')
     .html($('#sectionText').html())
@@ -39,7 +20,14 @@ $(function() {
             var froala = this;
             insertVariable()
 
-            froala.insertHTML(createVariableShell());
+            if (froala.getHTML() === '') {
+              // we have to add a non-breaking space character if there is
+              // absolutely no html due to some weirdness
+              froala.insertHTML('&nbsp' + createVariableShell() + '&nbsp ');
+            } else {
+              froala.insertHTML(createVariableShell() + '&nbsp ');
+            }
+
           }
         }
       }
@@ -69,8 +57,8 @@ $(function() {
 
   function createVariableShell(modal) {
     // create a shell to insert the variable into
-    var shell = '<span contenteditable=false class="fr-variable" data-fr-verified="true"' +
-    'id="' + createVariableId(variableId, false) + '">' + '</span>';
+    var shell = '<span contenteditable=false class="fr-variable" data-fr-verified="true" ' +
+    'id="' + createVariableId(variableId, false) + '"> </span>';
     return shell;
   }
 
@@ -93,7 +81,6 @@ $(function() {
     // reset the name value to be an empty string
     $('.modal-variable-name').attr('data-variable-cur-id', null);
   });
-
 
   $('#variableModal').on('hide.bs.modal', function(e) {
     // if we are hiding the modal, we need to remove the new shell that we made
