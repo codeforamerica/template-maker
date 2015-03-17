@@ -24,6 +24,8 @@ def create_new_section(section, template_id):
         '',
         template_id
     )
+    if section.get('type') in ('text', 'fixed_text'):
+        new_section.text = section.get('html', '')
     db.session.add(new_section)
     db.session.commit()
     return new_section.id

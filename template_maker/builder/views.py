@@ -74,6 +74,8 @@ def new_template():
 def new_section(template_id, section_type=None):
     if section_type is not None:
         new_section = { 'type': section_type, 'title': request.args.get('section_title', '') }
+        if request.args.get('boilerplate', False):
+            new_section['html'] = 'filled in stuff'
         new_section_id = create_new_section(new_section, template_id)
         return redirect(
             url_for('builder.edit_template', template_id=template_id, section_id=new_section_id)
