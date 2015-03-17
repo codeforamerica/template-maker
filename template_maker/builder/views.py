@@ -71,9 +71,9 @@ def new_template():
     return render_template('builder/new.html', form=form)
 
 @blueprint.route('/<int:template_id>/section/new/<section_type>')
-def new_section(template_id, section_title='', section_type=None):
+def new_section(template_id, section_type=None):
     if section_type is not None:
-        new_section = { 'type': section_type, 'title': section_title }
+        new_section = { 'type': section_type, 'title': request.args.get('section_title', '') }
         new_section_id = create_new_section(new_section, template_id)
         return redirect(
             url_for('builder.edit_template', template_id=template_id, section_id=new_section_id)

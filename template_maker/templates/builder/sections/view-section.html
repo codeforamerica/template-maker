@@ -1,7 +1,7 @@
 <div class="panel panel-default">
   <div class="panel-heading" >
-    <span class="panel-title">
-      <span class="glyphicon {% if section.id == current_section.id %}glyphicon-pencil{% else %}glyphicon glyphicon-arrow-down js-glyphicon{% endif %}" aria-hidden="true" role="tab" id="heading{{ section.id }}" data-toggle="collapse" href="#collapse{{ section.id }}" aria-expanded="false" aria-controls="collapse{{ section.id }}"></span>
+    <span class="panel-title" aria-hidden="true" role="tab" id="heading{{ section.id }}" data-toggle="collapse" href="#collapse{{ section.id }}" aria-expanded="false" aria-controls="collapse{{ section.id }}">
+      <span class="glyphicon {% if section.id == current_section.id %}glyphicon-pencil{% else %}glyphicon glyphicon-chevron-down js-glyphicon{% endif %}"></span>
       {{ section.title }}
     </span>
     <span class="pull-right">

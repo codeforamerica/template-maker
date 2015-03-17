@@ -4,17 +4,17 @@ $(function() {
     // if we are collapsing the currently opened one, flip the arrow
     if (e.target.id === $('#accordion .in').attr('id')) {
       $(e.target).parent().find('.js-glyphicon').
-        attr('class', 'glyphicon glyphicon-arrow-down js-glyphicon');
+        attr('class', 'glyphicon glyphicon-chevron-down js-glyphicon');
     }
   });
 
   $('#accordion').on('show.bs.collapse', function(e) {
     // flip the up arrows to down arrows
-    $('#accordion').find('.glyphicon-arrow-up').
-      attr('class', 'glyphicon glyphicon-arrow-down js-glyphicon');
+    $('#accordion').find('.glyphicon-chevron-up').
+      attr('class', 'glyphicon glyphicon-chevron-down js-glyphicon');
     // flip the clicked arrow to up
     $(e.target).parent().find('.js-glyphicon').
-      attr('class', 'glyphicon glyphicon-arrow-up js-glyphicon');
+      attr('class', 'glyphicon glyphicon-chevron-up js-glyphicon');
     // hide the currently opened section
     $('#accordion .in').collapse('hide');
   });
