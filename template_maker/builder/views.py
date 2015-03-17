@@ -134,6 +134,13 @@ def edit_template(template_id, section_id=-1, section_type=None):
             current_section=section
         )
 
+@blueprint.route('/<int:template_id>/section/<int:section_id>/delete')
+def delete_section(template_id, section_id):
+    section = TemplateSection.query.get(section_id)
+    db.session.delete(section)
+    db.session.commit()
+    return redirect(url_for('builder.edit_template', template_id=template_id))
+
 # TODO: is there a way to cache this once per session as opposed
 # to getting it from the database all the time?
 def get_variable_types():

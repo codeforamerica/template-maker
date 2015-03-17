@@ -9,16 +9,14 @@
       </span>
       <span class="pull-right section-title-center-text">
         Currently Editing
-        <a class="text-danger" href="{{ url_for('builder.edit_template', template_id=template.id, section_id=section.id) }}">Delete</a>
+        <a class="text-danger" href="{{ url_for('builder.delete_section', template_id=template.id, section_id=section.id) }}">Delete</a>
       </span>
     </div>
 
     <div id="collapse{{ section.id }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading{{ section.id }}">
       <div class="panel-body">
-        {% if section.section_type == 'text' %}
-        {% include 'builder/sections/text-section.html' %}
-        {% elif section.section_type == 'fixed_text' %}
-        {% include 'builder/sections/text-section.html' %}
+        {% if section.section_type in ['text', 'fixed_text'] %}
+          {% include 'builder/sections/text-section.html' %}
         {% endif %}
       </div>
     </div>

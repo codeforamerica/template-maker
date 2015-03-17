@@ -1,3 +1,4 @@
+
 <div class="panel panel-default">
   <div class="panel-heading" >
     <span class="panel-title" aria-hidden="true" role="tab" id="heading{{ section.id }}" data-toggle="collapse" href="#collapse{{ section.id }}" aria-expanded="false" aria-controls="collapse{{ section.id }}">
@@ -6,7 +7,7 @@
     </span>
     <span class="pull-right">
       <a href="{{ url_for('builder.edit_template', template_id=template.id, section_id=section.id) }}">Edit</a>
-      <a class="text-danger" href="{{ url_for('builder.edit_template', template_id=template.id, section_id=section.id) }}">Delete</a>
+      <a class="text-danger" href="{{ url_for('builder.delete_section', template_id=template.id, section_id=section.id) }}">Delete</a>
     </span>
   </div>
 

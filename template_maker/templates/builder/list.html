@@ -2,7 +2,21 @@
 
 {% block subcontent %}
 
-<div ng-controller="templateListCtrl">
+<div class="row pad-30">
+  <form class="navbar-form" role="search">
+    <a class="btn btn-primary" href="{{ url_for('builder.new_template') }}">
+      <span class="glyphicon glyphicon-plus"></span>
+      New Template
+    </a>
+    <div class="pull-right">
+      <div class="form-group">
+        <input type="text" class="form-control" placeholder="Search" disabled>
+      </div>
+      <button type="submit" class="btn btn-default" disabled>Submit</button>
+    </div>
+  </form>
+</div>
+<div class="row">
   <table class="table table-striped table-sm table-bordered">
     <thead>
       <tr>

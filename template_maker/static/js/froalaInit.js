@@ -45,6 +45,8 @@ $(function() {
       }
     });
 
+  $('#widget').editable('focus');
+
   // get the minimum variable id which should one more than the total number
   // of variables on the page right now
   variableId = $($('#widget').editable('getHTML')).find('.fr-variable').length + 1;
