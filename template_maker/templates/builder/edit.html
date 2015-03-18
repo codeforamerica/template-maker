@@ -14,8 +14,8 @@
 <div>
   <div class="row">
     <div class="col-sm-3">
-      <h3>{{ template.title }}</h3>
-      <hr>
+      <h4>{{ template.title }}</h4>
+      <hr class="hr-no-margin pad-10">
       {% include 'builder/sections/section-sidebar.html' %}
     </div>
     <div class="col-sm-9">
@@ -73,5 +73,5 @@
     </script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/froalaInit.js') }}"></script>
   {% endif %}
-  <script type="text/javascript" src="{{ url_for('static', filename='js/builderAccordion.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/editPageInteractions.js') }}"></script>
 {% endblock %}

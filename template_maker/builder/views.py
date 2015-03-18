@@ -175,7 +175,7 @@ def configure_variables(template_id):
         sections=sections, variables=variables, form=form
     )
 
-@blueprint.route('/edit/<int:template_id>/publish', methods=['GET', 'POST'])
+@blueprint.route('/<int:template_id>/publish', methods=['GET', 'POST'])
 def publish_template(template_id):
     '''
     Route for taking documents from the BUILDER and turning them into TEMPLATES via the GENERATOR

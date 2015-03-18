@@ -6,7 +6,7 @@ from template_maker.builder.models import (
 )
 
 VARIABLE_TYPE_MAPS = {
-    'text': 1, 'date': 2,'int': 3, 'float': 4
+    'text': 1, 'date': 2,'number': 3, 'float': 4
 }
 
 SECTION_TYPE_MAPS = {
