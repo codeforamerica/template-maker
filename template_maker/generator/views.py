@@ -85,5 +85,5 @@ def build_document(template_id):
         setattr(field, 'rv_data_input', 'template.variable_' + strip_tags(field.name))
         setattr(field, 'label', strip_tags(field.name))
 
-    return render_template('generator/build-document.html', sections=sections, variables=variables, form=form)
-
+    return render_template('generator/build-document.html', 
+        template=template_base, sections=sections, variables=variables, form=form)

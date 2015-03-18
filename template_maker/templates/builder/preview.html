@@ -2,6 +2,12 @@
 
 {% block subcontent %}
 
+<div class="row pad-10">
+  <h2>{{ template.title }}
+    <a class="pull-right btn btn-primary" href="{{ url_for('builder.edit_template', template_id=template.id) }}">Edit this Template</a>
+  </h2>
+</div>
+
 <div class="row">
   <form method="POST" action="{{ url_for('builder.publish_template', template_id=template.id) }}">
     <div class="template-preview-content" id="templatePreviewContent">

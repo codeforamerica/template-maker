@@ -120,8 +120,11 @@ def edit_template(template_id, section_id=-1, section_type=None):
 
     # handle re-ordering
     old_order = template_base.section_order
-    request_sections = request.form.getlist('id')
-    new_order = reorder_sections(template_base, request_sections) if len(request_sections) > 0 else None
+    if request.method == 'POST':
+        request_sections = request.form.getlist('id')
+        new_order = reorder_sections(template_base, request_sections) if len(request_sections) > 0 else None
+    else:
+        new_order = None
 
     # get the sections and initialize the forms
     sections = get_template_sections(template_base)
@@ -153,38 +156,6 @@ def delete_section(template_id, section_id):
     flash('Section successfully deleted!', 'alert-success')
     return redirect(url_for('builder.edit_template', template_id=template_id))
 
-# TODO: is there a way to cache this once per session as opposed
-# to getting it from the database all the time?
-def get_variable_types():
-    return [
-        (i.type, i.type) for i in VariableTypes.query.all()
-    ]
-
-@blueprint.route('/<int:template_id>/configure', methods=['GET', 'POST'])
-def configure_variables(template_id):
-    template_base = TemplateBase.query.get(template_id)
-    if template_base is None:
-        return render_template('404.html')
-
-    class F(VariableForm):
-        pass
-
-    variables = get_template_variables(template_id)
-
-    for variable in variables:
-        setattr(F, variable.name, SelectField(variable.name, choices=get_variable_types()))
-
-    form = F()
-    if form.validate_on_submit():
-        update_variables(variables, request.form, template_id)
-        return redirect(url_for('builder.publish_template', template_id=template_id))
-
-    sections = get_template_sections(template_base)
-    return render_template(
-        'builder/configure.html', template=template_base,
-        sections=sections, variables=variables, form=form
-    )
-
 @blueprint.route('/<int:template_id>/publish', methods=['GET', 'POST'])
 def publish_template(template_id):
     '''
@@ -200,8 +171,7 @@ def publish_template(template_id):
         return render_template('404.html')
     if request.method == 'GET':
         sections = get_template_sections(template_base)
-        template = {'id': template_id}
-        return render_template('builder/preview.html', sections=sections, template=template)
+        return render_template('builder/preview.html', sections=sections, template=template_base, preview=True)
     elif request.method == 'POST':
         # set the publish flag to be true, set the section order
         template = TemplateBase.query.get(template_id)

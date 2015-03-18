@@ -6,8 +6,10 @@ $(function() {
       inlineMode: false,
       height: 450,
       buttons: [
-        'bold', 'italic', 'underline', 'formatBlock', 'insertOrderedList',
-        'insertUnorderedList', 'insertVariable', 'undo', 'redo',
+        'insertVariable', 'sep',
+        'bold', 'italic', 'underline', 'sep',
+        'formatBlock', 'insertOrderedList','insertUnorderedList', 'sep',
+        'undo', 'redo', 'sep',
       ],
       customButtons: {
         insertVariable: {
