@@ -90,7 +90,7 @@ def update_variables(template_variables, variables, template_id):
         db.session.commit()
     return
 
-def get_template_sections(template_id):
+def get_template_sections(template):
     '''
     Gets the text of the sections for the template
 
@@ -98,10 +98,13 @@ def get_template_sections(template_id):
     in the proper order that they should be
     arranged on the page
     '''
-    if TemplateBase.query.get(template_id):
-        return TemplateSection.query.filter(TemplateSection.template_id==template_id).all()
-    else:
-        return None
+    sections = TemplateSection.query.filter(TemplateSection.template_id==template.id).all()
+    if template.section_order and len(template.section_order) == len(sections):
+        order = []
+        for ix, i in enumerate(template.section_order):
+            order.append([section.id for section in sections].index(i))
+        sections = [ sections[i] for i in order ]
+    return sections
 
 def get_template_variables(template_id):
     '''

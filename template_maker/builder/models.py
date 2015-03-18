@@ -5,6 +5,7 @@ from template_maker.database import (
     ReferenceCol,
 )
 from template_maker.user.models import User
+from sqlalchemy.dialects.postgres import ARRAY
 
 class TemplateBase(Model):
     '''
@@ -26,6 +27,7 @@ class TemplateBase(Model):
     template_text = db.relationship('TemplateSection', cascade='all,delete', lazy='dynamic')
     template_variables = db.relationship('TemplateVariables', cascade='all,delete', lazy='dynamic')
     published = Column(db.Boolean, default=False)
+    section_order = Column(ARRAY(db.Integer))
     # created_by = ReferenceCol('users')
 
     def __init__(self, created_at, updated_at, title, description):
@@ -44,7 +46,7 @@ class TemplateSection(Model):
     - position: Where in the template the section lies
     - template_id: Foreign Key relationship back to the TemplateBase
     - section_type: The type of section to be used. This uses "joined
-    table inheritance": http://docs.sqlalchemy.org/en/rel_0_9/orm/inheritance.html
+    table inheritance": http://docs.sqlalchemy.org/en/rel_0_9/orm/inheritance
     '''
 
     __tablename__ = 'template_section'

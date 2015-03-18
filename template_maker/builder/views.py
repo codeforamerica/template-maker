@@ -116,7 +116,7 @@ def edit_template(template_id, section_id=-1, section_type=None):
     if (template_base is None or section is None or section.template_id != template_id) and section_id > 0:
         return render_template('404.html')
 
-    sections = get_template_sections(template_id)
+    sections = get_template_sections(template_base)
     form = SECTION_FORM_MAP[section.section_type]() if section else TemplateSectionForm()
     new_section_form = TemplateSectionForm()
 
@@ -169,7 +169,7 @@ def configure_variables(template_id):
         update_variables(variables, request.form, template_id)
         return redirect(url_for('builder.publish_template', template_id=template_id))
 
-    sections = get_template_sections(template_id)
+    sections = get_template_sections(template_base)
     return render_template(
         'builder/configure.html', template=template_base,
         sections=sections, variables=variables, form=form
@@ -185,13 +185,17 @@ def publish_template(template_id):
     version of the template into new database tables, allowing the builder documents
     to be edited and create new templates later on.
     '''
+    template_base = TemplateBase.query.get(template_id)
+    if template_base is None:
+        return render_template('404.html')
     if request.method == 'GET':
-        sections = get_template_sections(template_id)
+        sections = get_template_sections(template_base)
         template = {'id': template_id}
         return render_template('builder/preview.html', sections=sections, template=template)
     elif request.method == 'POST':
-        # set the publish flag to be true
+        # set the publish flag to be true, set the section order
         template = TemplateBase.query.get(template_id)
         template.published = True
+        template.section_order = [int(i) for i in request.form.getlist('id')]
         db.session.commit()
         return redirect(url_for('generator.list_templates'))

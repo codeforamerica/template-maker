@@ -3,20 +3,21 @@
 {% block subcontent %}
 
 <div class="row">
-  <div class="template-preview-content" id="templatePreviewContent">
-  {% for section in sections %}
-    <div class="section-content">
-    {% if section.section_type == 'text' or section.section_type == 'fixed_text' %}
-      {% if section.text %}
-        {% include "builder/sections/view-section.html" %}
-      {% endif %}
-    {% endif %}
-    </div>
-  {% endfor %}
-  </div>
-
-
   <form method="POST" action="{{ url_for('builder.publish_template', template_id=template.id) }}">
+    <div class="template-preview-content" id="templatePreviewContent">
+    {% for section in sections %}
+      <div class="section-content">
+      <input type="hidden" name="id" value="{{ section.id }}" />
+      {% if section.section_type == 'text' or section.section_type == 'fixed_text' %}
+        {% if section.text %}
+          {% include "builder/sections/view-section.html" %}
+        {% endif %}
+      {% endif %}
+      </div>
+    {% endfor %}
+    </div>
+
+
     <div class="text-center">
       <input type="submit" value="Publish" class="btn btn-success" />
     </div>
