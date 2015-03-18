@@ -24,4 +24,7 @@ $(function() {
     $('.flashed-alert').alert('close')
   }, 1500);
 
+  $('#templatePreviewContent').sortable();
+  $('#templatePreviewContent').disableSelection();
+
 });

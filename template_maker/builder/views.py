@@ -187,7 +187,8 @@ def publish_template(template_id):
     '''
     if request.method == 'GET':
         sections = get_template_sections(template_id)
-        return render_template('builder/preview.html', sections=sections, template_id=template_id)
+        template = {'id': template_id}
+        return render_template('builder/preview.html', sections=sections, template=template)
     elif request.method == 'POST':
         # set the publish flag to be true
         template = TemplateBase.query.get(template_id)
