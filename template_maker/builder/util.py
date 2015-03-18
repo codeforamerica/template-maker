@@ -40,6 +40,15 @@ def parse_variable_text(variable):
     var_name = '[[' + no_tags.split('||')[1] + ']]'
     return var_type, var_name
 
+def reorder_sections(template, section_order):
+    '''
+    Takes a template, a list of ids, and sets the order
+    on the template base model
+    '''
+    template.section_order = [int(i) for i in section_order]
+    db.session.commit()
+    return template.section_order
+
 def update_section(section, template_id, form_input):
     '''
     Updates TemplateSection and TemplateVariables models associated with

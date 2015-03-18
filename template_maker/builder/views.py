@@ -14,7 +14,7 @@ from template_maker.builder.forms import (
 )
 from template_maker.builder.util import (
     create_new_section, update_section, update_variables,
-    get_template_sections, get_template_variables
+    get_template_sections, get_template_variables, reorder_sections
 )
 
 blueprint = Blueprint(
@@ -115,7 +115,15 @@ def edit_template(template_id, section_id=-1, section_type=None):
     section = TemplateSection.query.get(section_id)
     if (template_base is None or section is None or section.template_id != template_id) and section_id > 0:
         return render_template('404.html')
+    # if we don't have a section, set up a dummy section
+    current_section = section if section else { 'id': -1, 'type': 'dummy' }
 
+    # handle re-ordering
+    old_order = template_base.section_order
+    request_sections = request.form.getlist('id')
+    new_order = reorder_sections(template_base, request_sections) if len(request_sections) > 0 else None
+
+    # get the sections and initialize the forms
     sections = get_template_sections(template_base)
     form = SECTION_FORM_MAP[section.section_type]() if section else TemplateSectionForm()
     new_section_form = TemplateSectionForm()
@@ -128,11 +136,13 @@ def edit_template(template_id, section_id=-1, section_type=None):
             section_id=section_id
         ))
     else:
+        if new_order and new_order != old_order:
+            flash('Successfully saved!', 'alert-success')
         return render_template(
             'builder/edit.html', template=template_base,
             sections=sections, form=form,
             new_section_form=new_section_form,
-            current_section=section
+            current_section=current_section
         )
 
 @blueprint.route('/<int:template_id>/section/<int:section_id>/delete')
@@ -196,6 +206,5 @@ def publish_template(template_id):
         # set the publish flag to be true, set the section order
         template = TemplateBase.query.get(template_id)
         template.published = True
-        template.section_order = [int(i) for i in request.form.getlist('id')]
-        db.session.commit()
-        return redirect(url_for('generator.list_templates'))
+        reorder_sections(template, request.form.getlist('id'))
+        return redirect(url_for('generator.build_document', template_id=template.id))

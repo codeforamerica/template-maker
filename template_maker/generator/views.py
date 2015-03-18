@@ -61,7 +61,8 @@ def build_document(template_id):
     GET - Returns a new document generator based on the template
     POST - TODO
     '''
-    sections = get_template_sections(template_id)
+    template_base = TemplateBase.query.get(template_id)
+    sections = get_template_sections(template_base)
     class F(VariableForm):
         pass
 
