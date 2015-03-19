@@ -1,28 +1,17 @@
-import datetime
 from werkzeug.datastructures import ImmutableMultiDict
 from template_maker_test.unit.test_base import BaseTestCase
 from template_maker.app import db
 from template_maker.builder.models import (
     TemplateBase, TemplateSection, TextSection
 )
-
-def create_a_template():
-    now = datetime.datetime.utcnow()
-    return TemplateBase(created_at=now, updated_at=now, title='test', description='test')
-
-def create_a_text_section(title, text):
-    section = TextSection(template_id=1, title=title, description=None)
-    section.text = text
-    return section
+from template_maker_test.unit.util import (
+    create_a_template, create_a_text_section, insert_new_template
+)
 
 class TestBuilder(BaseTestCase):
     render_templates = False
     def test_list_view(self):
-        template = create_a_template()
-        db.session.add(template)
-        db.session.commit()
-
-        assert template in db.session
+        template = insert_new_template()
 
         response = self.client.get('/build/')
         assert response.status_code == 200
