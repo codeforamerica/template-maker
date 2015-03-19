@@ -13,7 +13,7 @@ from template_maker.builder.forms import (
     VariableForm, SelectField, StringField, Form
 )
 from template_maker.builder.util import (
-    create_new_section, update_section, update_variables,
+    create_new_section, update_section,
     get_template_sections, get_template_variables, reorder_sections
 )
 from template_maker.builder.boilerplate import boilerplate as html_boilerplate

@@ -92,13 +92,6 @@ def update_section(section, template_id, form_input):
 
     return section.id
 
-def update_variables(template_variables, variables, template_id):
-    variables_dict = variables.to_dict()
-    for variable in template_variables:
-        variable.type = VARIABLE_TYPE_MAPS[variables_dict[variable.name]]
-        db.session.commit()
-    return
-
 def get_template_sections(template):
     '''
     Gets the text of the sections for the template
