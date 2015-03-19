@@ -132,6 +132,7 @@ def edit_template(template_id, section_id=None, section_type=None):
     form = SECTION_FORM_MAP[section.section_type]() if section else TemplateSectionForm()
     new_section_form = TemplateSectionForm()
 
+    # if the form is valid, go ahead and save everything
     if form.validate_on_submit():
         update_section(section, template_id, request.form)
         flash('Successfully saved!', 'alert-success')
@@ -139,7 +140,13 @@ def edit_template(template_id, section_id=None, section_type=None):
             'builder.edit_template', template_id=template_id,
             section_id=section_id
         ))
+<<<<<<< HEAD
     elif request.method == 'POST':
+=======
+    # otherwise, flash the new order if it was successfully rendered
+    # and go ahead with the response otherwise
+    else:
+>>>>>>> added tests for builder views
         if new_order and new_order != old_order:
             flash('Successfully saved!', 'alert-success')
         if section_id == 0:
