@@ -23,12 +23,14 @@ def create_new_section(section, template_id):
         section.get('title', ''),
         '',
         template_id
-    )
-    if section.get('type') in ('text', 'fixed_text'):
-        new_section.text = section.get('html', '')
-    db.session.add(new_section)
-    db.session.commit()
-    return new_section.id
+    ) if section.get('type') in SECTION_TYPE_MAPS.keys() else None
+    if new_section:
+        if section.get('type') in ('text', 'fixed_text'):
+            new_section.text = section.get('html', '')
+        db.session.add(new_section)
+        db.session.commit()
+        return new_section.id
+    return False
 
 def parse_variable_text(variable):
     '''
@@ -91,13 +93,6 @@ def update_section(section, template_id, form_input):
             db.session.commit()
 
     return section.id
-
-def update_variables(template_variables, variables, template_id):
-    variables_dict = variables.to_dict()
-    for variable in template_variables:
-        variable.type = VARIABLE_TYPE_MAPS[variables_dict[variable.name]]
-        db.session.commit()
-    return
 
 def get_template_sections(template):
     '''

@@ -5,6 +5,7 @@ from flask import (
     render_template, redirect, abort, url_for,
     flash
 )
+from sqlalchemy.dialects.postgresql import array
 
 from template_maker.database import db
 from template_maker.builder.models import TemplateBase, TemplateSection, TemplateVariables, VariableTypes
@@ -13,10 +14,11 @@ from template_maker.builder.forms import (
     VariableForm, SelectField, StringField, Form
 )
 from template_maker.builder.util import (
-    create_new_section, update_section, update_variables,
+    create_new_section, update_section,
     get_template_sections, get_template_variables, reorder_sections
 )
 from template_maker.builder.boilerplate import boilerplate as html_boilerplate
+
 
 blueprint = Blueprint(
     'builder', __name__, url_prefix='/build',
@@ -74,11 +76,12 @@ def new_template():
 
 @blueprint.route('/<int:template_id>/section/new/<section_type>')
 def new_section(template_id, section_type=None):
-    if section_type is not None:
-        new_section = { 'type': section_type, 'title': request.args.get('section_title', '') }
-        if request.args.get('boilerplate', False):
-            new_section['html'] = html_boilerplate.get(request.args.get('boilerplate'), 'Please insert your text here.')
-        new_section_id = create_new_section(new_section, template_id)
+    new_section = { 'type': section_type, 'title': request.args.get('section_title', '') }
+    if request.args.get('boilerplate', False):
+        new_section['html'] = html_boilerplate.get(request.args.get('boilerplate'), 'Please insert your text here.')
+    new_section_id = create_new_section(new_section, template_id)
+
+    if new_section_id:
         return redirect(
             url_for('builder.edit_template', template_id=template_id, section_id=new_section_id)
         )
@@ -102,9 +105,12 @@ def edit_template_metadata(template_id):
         db.session.commit()
         return redirect(url_for('builder.list_templates'))
 
-@blueprint.route('/<int:template_id>/', methods=['GET', 'POST', 'DELETE'])
-@blueprint.route('/<int:template_id>/section/', methods=['GET', 'POST', 'DELETE'])
-@blueprint.route('/<int:template_id>/section/<int:section_id>', methods=['GET', 'POST', 'DELETE'])
+@blueprint.route('/<int:template_id>/')
+def redirect_to_section(template_id):
+    return redirect(url_for('builder.edit_template', template_id=template_id))
+
+@blueprint.route('/<int:template_id>/section/', methods=['GET', 'POST'])
+@blueprint.route('/<int:template_id>/section/<int:section_id>', methods=['GET', 'POST'])
 def edit_template(template_id, section_id=None, section_type=None):
     '''
     Route for interacting with individual sections
@@ -132,6 +138,7 @@ def edit_template(template_id, section_id=None, section_type=None):
     form = SECTION_FORM_MAP[section.section_type]() if section else TemplateSectionForm()
     new_section_form = TemplateSectionForm()
 
+    # if the form is valid, go ahead and save everything
     if form.validate_on_submit():
         update_section(section, template_id, request.form)
         flash('Successfully saved!', 'alert-success')
@@ -161,7 +168,13 @@ def edit_template(template_id, section_id=None, section_type=None):
 def delete_section(template_id, section_id):
     template = TemplateBase.query.get(template_id)
     if template.section_order:
+
         template.section_order.remove(section_id)
+
+        # cast it to a sqlalchemy array type to ensure
+        # the commit works properly
+        new_order = array(template.section_order)
+        template.section_order = new_order
         db.session.commit()
 
     section = TemplateSection.query.get(section_id)

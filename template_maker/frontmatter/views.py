@@ -1,4 +1,7 @@
-from flask import Blueprint, render_template
+from flask import (
+    Blueprint,
+    render_template,
+)
 
 blueprint = Blueprint(
     'frontmatter', __name__,
