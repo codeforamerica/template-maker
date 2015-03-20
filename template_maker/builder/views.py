@@ -169,7 +169,8 @@ def delete_section(template_id, section_id):
     template = TemplateBase.query.get(template_id)
     if template.section_order:
 
-        template.section_order.remove(section_id)
+        if section_id in template.section_order:
+            template.section_order.remove(section_id)
 
         # cast it to a sqlalchemy array type to ensure
         # the commit works properly
