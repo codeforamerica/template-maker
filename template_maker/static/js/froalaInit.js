@@ -39,10 +39,14 @@ $(function() {
 
           }
         }
-      }
+      },
+
     });
 
   $('#widget').editable('focus');
+  $('#widget').on('editable.contentChanged', function (e, editor) {
+    $('#widget').parents('form').trigger('checkform.areYouSure');
+  });
 
   // get the minimum variable id which should one more than the total number
   // of variables on the page right now

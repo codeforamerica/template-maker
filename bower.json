@@ -12,6 +12,7 @@
     "rivets": "~0.8.0",
     "bootstrap-datepicker": "~1.4.0",
     "froala": "~1.2.6",
-    "jquery-ui": "~1.11.4"
+    "jquery-ui": "~1.11.4",
+    "jquery.are-you-sure": "~1.9.0"
   }
 }
