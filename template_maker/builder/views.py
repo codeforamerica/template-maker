@@ -140,13 +140,7 @@ def edit_template(template_id, section_id=None, section_type=None):
             'builder.edit_template', template_id=template_id,
             section_id=section_id
         ))
-<<<<<<< HEAD
     elif request.method == 'POST':
-=======
-    # otherwise, flash the new order if it was successfully rendered
-    # and go ahead with the response otherwise
-    else:
->>>>>>> added tests for builder views
         if new_order and new_order != old_order:
             flash('Successfully saved!', 'alert-success')
         if section_id == 0:
