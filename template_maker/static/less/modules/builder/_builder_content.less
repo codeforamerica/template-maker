@@ -1,41 +1,34 @@
 // Custom styles for the template builder content
 
-// Set the builder container to have a solid gray background
-// and line up properly with the controls
-.builder-container {
-  border: 1px solid gray;
-  min-height: 140px;
-  margin-top: 10px;
-  position: relative;
-  margin-bottom: 55px;
+// Make the panel title feel like a link that can be clicked on
+
+.panel-title:hover {
+  cursor: pointer;
 }
 
-.builder-fix-bottom {
-  position: absolute;
-  bottom: 0;
-  margin-bottom: -15px;
+.form-control-section-title {
+  display: inline-block;
+  width: 50%
 }
 
-// Handle the styles for all content types
-.glyphicon-remove {
-  color: @brand-danger;
-  margin-bottom: -15px;
-  margin-right: 4px;
+.section-title-center-text {
+  padding-top: 7px;
 }
 
-.builder-content-block {
-  padding-bottom: 15px;
-  padding-top: 5px;
+input.submitlink {
+  background: transparent;
+  border: 0;
+  cursor:pointer;
+  margin: 0;
+  padding: 0;
+  color: @link-color;
 }
 
-// Handle the styles for the title types
-.js-builder-title {
-  font-size: @font-size-h3;
-  line-height: @font-size-h3 * 1.25;
-  height: @font-size-h3 * 1.75;
+input.submitlink:visited {
+  text-decoration: underline;
 }
 
-.js-builder-section {
-  overflow-y: auto;
-  height: 100px;
+input.submitlink:hover {
+  color: darken(@link-color, 15%);
+  text-decoration: underline;
 }

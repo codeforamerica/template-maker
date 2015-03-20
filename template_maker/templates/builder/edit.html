@@ -14,20 +14,54 @@
 <div>
   <div class="row">
     <div class="col-sm-3">
-      <h3>{{ template.title }}</h3>
-      <hr>
+      <h4>{{ template.title }}</h4>
+      <hr class="hr-no-margin pad-10">
       {% include 'builder/sections/section-sidebar.html' %}
     </div>
     <div class="col-sm-9">
-      {% if section %}
-        {% if section.section_type == 'text' %}
-          {% include 'builder/sections/text-section.html' %}
-        {% elif section.section_type == 'fixed_text' %}
-          {% include 'builder/sections/text-section.html' %}
-        {% endif %}
-      {% else %}
-        {% include 'builder/sections/new-section.html' %}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert {{ category }} alert-dismissible flashed-alert fade in" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          {{ message }}
+        </div>
+        {% endfor %}
       {% endif %}
+      {% endwith %}
+
+      {% if sections | length == 0 %}
+      <div class="well">
+        <span class="lead">
+          There don't seem to be any sections in this template! Why not choose a section from the left to get started.
+        </span>
+      </div>
+
+      {% else %}
+      <form class="form" role="form" method="POST" action="{{ url_for('builder.edit_template', template_id=template.id, section_id=current_section.id) }}" id="accordion">
+        {{ form.csrf_token }}
+        <div id="templatePreviewContent" class="template-preview-content">
+
+          {% for section in sections %}
+          <div class="section-content">
+            <input type="hidden" name="id" value="{{ section.id }}" />
+            {% if section.id == current_section.id %}
+              <input type="hidden" name="current_section" value="{{ section.id }}" />
+              {% include "builder/sections/editable-section.html" %}
+            {% else %}
+              {% include "builder/sections/view-section.html" %}
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        <input type="submit" class="btn btn-success" value="Save Template">
+        <a href="{{ url_for('builder.publish_template', template_id=template.id) }}" class="btn btn-primary pull-right">Preview Template</a>
+
+      </form>
+
+      {% endif %}
+
     </div>
   </div>
 </div>
@@ -35,17 +69,21 @@
 {% endblock %}
 
 {% block javascripts %}
-  {% if section %}
-    {% if section.section_type == 'text' or section.section_type == 'fixed_text' %}
-      <script src="{{ url_for('static', filename='lib/froala/js/froala_editor.min.js') }}"></script>
-      <!-- Include IE8 JS. -->
-      <!--[if lt IE 9]>
-        <script src="{{ url_for('static', filename='lib/froala/js/froala_editor_ie8.min.js') }}></script>
-      <![endif]-->
-      <script id="sectionText" type="section-text">
-        {{ section.text | safe }}
-      </script>
-      <script type="text/javascript" src="{{ url_for('static', filename='js/froalaInit.js') }}"></script>
-    {% endif %}
+  {% if current_section.section_type in ['text', 'fixed_text'] %}
+    <script src="{{ url_for('static', filename='lib/froala/js/froala_editor.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/froala/js/plugins/lists.min.js') }}"></script>
+    <!-- Include IE8 JS. -->
+    <!--[if lt IE 9]>
+      <script src="{{ url_for('static', filename='lib/froala/js/froala_editor_ie8.min.js') }}></script>
+    <![endif]-->
+    <script id="sectionText" type="section-text">
+      {{ current_section.text | safe }}
+    </script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/froalaInit.js') }}"></script>
   {% endif %}
+    <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-ui/ui/minified/core.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-ui/ui/minified/widget.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-ui/ui/minified/mouse.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-ui/ui/minified/sortable.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/editPageInteractions.js') }}"></script>
 {% endblock %}

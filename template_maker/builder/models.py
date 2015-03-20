@@ -5,6 +5,7 @@ from template_maker.database import (
     ReferenceCol,
 )
 from template_maker.user.models import User
+from sqlalchemy.dialects.postgres import ARRAY
 
 class TemplateBase(Model):
     '''
@@ -26,6 +27,7 @@ class TemplateBase(Model):
     template_text = db.relationship('TemplateSection', cascade='all,delete', lazy='dynamic')
     template_variables = db.relationship('TemplateVariables', cascade='all,delete', lazy='dynamic')
     published = Column(db.Boolean, default=False)
+    section_order = Column(ARRAY(db.Integer))
     # created_by = ReferenceCol('users')
 
     def __init__(self, created_at, updated_at, title, description):

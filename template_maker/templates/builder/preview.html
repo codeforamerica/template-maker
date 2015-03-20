@@ -2,14 +2,40 @@
 
 {% block subcontent %}
 
-<div class="row">
-  {% include "builder/preview-template.html" %}
+<div class="row pad-10">
+  <h2>{{ template.title }}
+    <a class="pull-right btn btn-primary" href="{{ url_for('builder.edit_template', template_id=template.id) }}">Edit this Template</a>
+  </h2>
+</div>
 
-  <form method="POST" action="{{ url_for('builder.publish_template', template_id=template_id) }}">
+<div class="row">
+  <form method="POST" action="{{ url_for('builder.publish_template', template_id=template.id) }}">
+    <div class="template-preview-content" id="templatePreviewContent">
+    {% for section in sections %}
+      <div class="section-content">
+      <input type="hidden" name="id" value="{{ section.id }}" />
+      {% if section.section_type == 'text' or section.section_type == 'fixed_text' %}
+        {% if section.text %}
+          {% include "builder/sections/view-section.html" %}
+        {% endif %}
+      {% endif %}
+      </div>
+    {% endfor %}
+    </div>
+
+
     <div class="text-center">
       <input type="submit" value="Publish" class="btn btn-success" />
     </div>
   </form>
 </div>
 
+{% endblock %}
+
+{% block javascripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-ui/ui/minified/core.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-ui/ui/minified/widget.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-ui/ui/minified/mouse.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-ui/ui/minified/sortable.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/editPageInteractions.js') }}"></script>
 {% endblock %}

@@ -6,8 +6,10 @@ $(function() {
       inlineMode: false,
       height: 450,
       buttons: [
-        'bold', 'italic', 'underline', 'formatBlock', 'insertOrderedList',
-        'insertUnorderedList', 'insertVariable', 'undo', 'redo',
+        'insertVariable', 'sep',
+        'bold', 'italic', 'underline', 'sep',
+        'formatBlock', 'insertOrderedList','insertUnorderedList', 'sep',
+        'undo', 'redo', 'sep',
       ],
       customButtons: {
         insertVariable: {
@@ -20,11 +22,20 @@ $(function() {
             var froala = this;
             insertVariable()
 
-            froala.insertHTML(createVariableShell());
+            if (froala.getHTML() === '') {
+              // we have to add a non-breaking space character if there is
+              // absolutely no html due to some weirdness
+              froala.insertHTML('&nbsp' + createVariableShell() + '&nbsp ');
+            } else {
+              froala.insertHTML(createVariableShell() + '&nbsp ');
+            }
+
           }
         }
       }
     });
+
+  $('#widget').editable('focus');
 
   // get the minimum variable id which should one more than the total number
   // of variables on the page right now
@@ -48,8 +59,8 @@ $(function() {
 
   function createVariableShell(modal) {
     // create a shell to insert the variable into
-    var shell = '<span contenteditable=false class="fr-variable" data-fr-verified="true"' +
-    'id="' + createVariableId(variableId, false) + '">' + '</span>';
+    var shell = '<span contenteditable=false class="fr-variable" data-fr-verified="true" ' +
+    'id="' + createVariableId(variableId, false) + '"> </span>';
     return shell;
   }
 
@@ -72,7 +83,6 @@ $(function() {
     // reset the name value to be an empty string
     $('.modal-variable-name').attr('data-variable-cur-id', null);
   });
-
 
   $('#variableModal').on('hide.bs.modal', function(e) {
     // if we are hiding the modal, we need to remove the new shell that we made
@@ -156,5 +166,4 @@ $(function() {
       range.insertNode(_el);
     }
   });
-
 });

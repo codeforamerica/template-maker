@@ -16,6 +16,6 @@ class ProdConfig(Config):
 
 class TestingConfig(Config):
     ENV = 'test'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/test_template_maker'
     WTF_CSRF_ENABLED = False
     TESTING = True

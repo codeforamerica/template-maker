@@ -16,3 +16,17 @@ class BaseTestCase(TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+        db.get_engine(self.app).dispose()
+
+    def assert_flashes(self, expected_message, expected_category='message'):
+        '''
+        Helper to test if we have flashes.
+        Taken from: http://blog.paulopoiati.com/2013/02/22/testing-flash-messages-in-flask/
+        '''
+        with self.client.session_transaction() as session:
+            try:
+                category, message = session['_flashes'][0]
+            except KeyError:
+                raise AssertionError('nothing flashed')
+            assert expected_message in message
+            assert expected_category == category

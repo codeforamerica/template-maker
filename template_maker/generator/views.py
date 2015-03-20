@@ -61,7 +61,8 @@ def build_document(template_id):
     GET - Returns a new document generator based on the template
     POST - TODO
     '''
-    sections = get_template_sections(template_id)
+    template_base = TemplateBase.query.get(template_id)
+    sections = get_template_sections(template_base)
     class F(VariableForm):
         pass
 
@@ -84,5 +85,5 @@ def build_document(template_id):
         setattr(field, 'rv_data_input', 'template.variable_' + strip_tags(field.name))
         setattr(field, 'label', strip_tags(field.name))
 
-    return render_template('generator/build-document.html', sections=sections, variables=variables, form=form)
-
+    return render_template('generator/build-document.html', 
+        template=template_base, sections=sections, variables=variables, form=form)

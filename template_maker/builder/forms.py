@@ -15,9 +15,8 @@ class TemplateSectionForm(Form):
     '''
     Simple form for creating adding a new template section
     '''
-    title = StringField('Title', validators=[DataRequired()])
-    description = TextAreaField('Description', validators=[DataRequired()])
-    type = SelectField('Type', choices=IMPLEMENTED_SECTIONS, validators=[DataRequired()])
+    title = StringField('Title')
+    type = SelectField('Type', choices=IMPLEMENTED_SECTIONS)
 
 class FroalaWidget(widgets.TextArea):
     '''
@@ -35,6 +34,7 @@ class TemplateSectionTextForm(Form):
     '''
     WYSIWYG Editor for the TextSection and FixedTextSection Models
     '''
+    title = StringField('Title')
     widget = FroalaField()
 
 class VariableForm(Form):

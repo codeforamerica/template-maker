@@ -6,7 +6,7 @@ from template_maker.builder.models import (
 )
 
 VARIABLE_TYPE_MAPS = {
-    'text': 1, 'date': 2,'int': 3, 'float': 4
+    'text': 1, 'date': 2,'number': 3, 'float': 4
 }
 
 SECTION_TYPE_MAPS = {
@@ -20,13 +20,17 @@ def create_new_section(section, template_id):
     Creates a new section based on the section_type sent by the request
     '''
     new_section = SECTION_TYPE_MAPS.get(section.get('type'))(
-        section.get('title'),
-        section.get('description'),
+        section.get('title', ''),
+        '',
         template_id
-    )
-    db.session.add(new_section)
-    db.session.commit()
-    return new_section.id
+    ) if section.get('type') in SECTION_TYPE_MAPS.keys() else None
+    if new_section:
+        if section.get('type') in ('text', 'fixed_text'):
+            new_section.text = section.get('html', '')
+        db.session.add(new_section)
+        db.session.commit()
+        return new_section.id
+    return False
 
 def parse_variable_text(variable):
     '''
@@ -38,11 +42,21 @@ def parse_variable_text(variable):
     var_name = '[[' + no_tags.split('||')[1] + ']]'
     return var_type, var_name
 
+def reorder_sections(template, section_order):
+    '''
+    Takes a template, a list of ids, and sets the order
+    on the template base model
+    '''
+    template.section_order = [int(i) for i in section_order]
+    db.session.commit()
+    return template.section_order
+
 def update_section(section, template_id, form_input):
     '''
     Updates TemplateSection and TemplateVariables models associated with
     a particular template_id
     '''
+    section.title = form_input.get('title')
     if section.section_type == 'fixed_text':
         # TODO: Sanitize HTML input
         section.text = form_input.get('widget')
@@ -80,14 +94,7 @@ def update_section(section, template_id, form_input):
 
     return section.id
 
-def update_variables(template_variables, variables, template_id):
-    variables_dict = variables.to_dict()
-    for variable in template_variables:
-        variable.type = VARIABLE_TYPE_MAPS[variables_dict[variable.name]]
-        db.session.commit()
-    return
-
-def get_template_sections(template_id):
+def get_template_sections(template):
     '''
     Gets the text of the sections for the template
 
@@ -95,10 +102,16 @@ def get_template_sections(template_id):
     in the proper order that they should be
     arranged on the page
     '''
-    if TemplateBase.query.get(template_id):
-        return TemplateSection.query.filter(TemplateSection.template_id==template_id).all()
-    else:
-        return None
+    sections = TemplateSection.query.filter(TemplateSection.template_id==template.id).all()
+    if template.section_order and len(template.section_order) == len(sections):
+        order = []
+        try:
+            for ix, i in enumerate(template.section_order):
+                order.append([section.id for section in sections].index(i))
+            sections = [ sections[i] for i in order ]
+        except ValueError:
+            pass
+    return sections
 
 def get_template_variables(template_id):
     '''
