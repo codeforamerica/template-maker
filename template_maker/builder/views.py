@@ -167,7 +167,7 @@ def edit_template(template_id, section_id=None, section_type=None):
 @blueprint.route('/<int:template_id>/section/<int:section_id>/delete')
 def delete_section(template_id, section_id):
     template = TemplateBase.query.get(template_id)
-    if template.section_order:
+    if template.section_order and len(template.section_order) > 0:
 
         if section_id in template.section_order:
             template.section_order.remove(section_id)
@@ -175,7 +175,7 @@ def delete_section(template_id, section_id):
         # cast it to a sqlalchemy array type to ensure
         # the commit works properly
         new_order = array(template.section_order)
-        template.section_order = new_order
+        template.section_order = new_order if len(new_order) > 0 else None
         db.session.commit()
 
     section = TemplateSection.query.get(section_id)
