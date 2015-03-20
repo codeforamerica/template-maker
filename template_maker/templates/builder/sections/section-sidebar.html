@@ -28,8 +28,8 @@
 
   <h5>Add Boilerplate</h5>
   <p class="text-muted">These sections don't change over time.</p>
-  <a href="{{ url_for('builder.new_section', template_id=template.id, boilerplate=True, section_title='MWDBE Requirements', section_type='text') }}" class="btn btn-primary btn-block btn-default">Insert MWDBE Requirements</a>
-  <a href="{{ url_for('builder.new_section', template_id=template.id, boilerplate=True, section_title='Insurance Requirements', section_type='text') }}" class="btn btn-primary btn-block btn-default">Insert Insurance Requirements</a>
-  <a href="{{ url_for('builder.new_section', template_id=template.id, boilerplate=True, section_title='Reservation of Rights', section_type='text') }}" class="btn btn-primary btn-block btn-default">Insert Reservation of Rights</a>
+  <a href="{{ url_for('builder.new_section', template_id=template.id, boilerplate='CONTRACT_INFO', section_title='Basic Contract Information', section_type='text') }}" class="btn btn-primary btn-block btn-default">Insert Basic Contract Information</a>
+  <a href="{{ url_for('builder.new_section', template_id=template.id, boilerplate='INSTRUCTIONS_TO_BIDDERS', section_title='Instructions to Bidders', section_type='text') }}" class="btn btn-primary btn-block btn-default">Insert Instructions to Bidders</a>
+  <a href="{{ url_for('builder.new_section', template_id=template.id, boilerplate='NONDISCRIMINATION_CERTIFICATION', section_title='Nondescrimination Certification', section_type='text') }}" class="btn btn-primary btn-block btn-default">Insert Nondescrimination Certification</a>
 
 </div>

@@ -1,7 +1,7 @@
 import json
 import datetime
 from flask import (
-    Blueprint, request, Response, jsonify,
+    Blueprint, request, make_response, jsonify,
     render_template, redirect, abort, url_for,
     flash
 )
@@ -16,6 +16,7 @@ from template_maker.builder.util import (
     create_new_section, update_section, update_variables,
     get_template_sections, get_template_variables, reorder_sections
 )
+from template_maker.builder.boilerplate import boilerplate as html_boilerplate
 
 blueprint = Blueprint(
     'builder', __name__, url_prefix='/build',
@@ -76,7 +77,7 @@ def new_section(template_id, section_type=None):
     if section_type is not None:
         new_section = { 'type': section_type, 'title': request.args.get('section_title', '') }
         if request.args.get('boilerplate', False):
-            new_section['html'] = 'filled in stuff'
+            new_section['html'] = html_boilerplate.get(request.args.get('boilerplate'), 'Please insert your text here.')
         new_section_id = create_new_section(new_section, template_id)
         return redirect(
             url_for('builder.edit_template', template_id=template_id, section_id=new_section_id)
@@ -104,7 +105,7 @@ def edit_template_metadata(template_id):
 @blueprint.route('/<int:template_id>/', methods=['GET', 'POST', 'DELETE'])
 @blueprint.route('/<int:template_id>/section/', methods=['GET', 'POST', 'DELETE'])
 @blueprint.route('/<int:template_id>/section/<int:section_id>', methods=['GET', 'POST', 'DELETE'])
-def edit_template(template_id, section_id=-1, section_type=None):
+def edit_template(template_id, section_id=None, section_type=None):
     '''
     Route for interacting with individual sections
 
@@ -112,11 +113,11 @@ def edit_template(template_id, section_id=-1, section_type=None):
     POST - Updates a section
     '''
     template_base = TemplateBase.query.get(template_id)
-    section = TemplateSection.query.get(section_id)
+    section = TemplateSection.query.get(section_id) if section_id else None
     if (template_base is None or section is None or section.template_id != template_id) and section_id > 0:
         return render_template('404.html')
     # if we don't have a section, set up a dummy section
-    current_section = section if section else { 'id': -1, 'type': 'dummy' }
+    current_section = section if section else { 'id': 0, 'type': 'dummy' }
 
     # handle re-ordering
     old_order = template_base.section_order
@@ -138,18 +139,31 @@ def edit_template(template_id, section_id=-1, section_type=None):
             'builder.edit_template', template_id=template_id,
             section_id=section_id
         ))
-    else:
+    elif request.method == 'POST':
         if new_order and new_order != old_order:
             flash('Successfully saved!', 'alert-success')
-        return render_template(
-            'builder/edit.html', template=template_base,
-            sections=sections, form=form,
-            new_section_form=new_section_form,
-            current_section=current_section
-        )
+        if section_id == 0:
+            return redirect(url_for('builder.edit_template', template_id=template_id))
+        else:
+            return redirect(url_for('builder.edit_template', 
+                template_id=template_id, section_id=section_id
+            ))
+
+    response = make_response(render_template(
+        'builder/edit.html', template=template_base,
+        sections=sections, form=form,
+        new_section_form=new_section_form,
+        current_section=current_section
+    ))
+    return response
 
 @blueprint.route('/<int:template_id>/section/<int:section_id>/delete')
 def delete_section(template_id, section_id):
+    template = TemplateBase.query.get(template_id)
+    if template.section_order:
+        template.section_order.remove(section_id)
+        db.session.commit()
+
     section = TemplateSection.query.get(section_id)
     db.session.delete(section)
     db.session.commit()

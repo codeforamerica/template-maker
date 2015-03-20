@@ -110,9 +110,12 @@ def get_template_sections(template):
     sections = TemplateSection.query.filter(TemplateSection.template_id==template.id).all()
     if template.section_order and len(template.section_order) == len(sections):
         order = []
-        for ix, i in enumerate(template.section_order):
-            order.append([section.id for section in sections].index(i))
-        sections = [ sections[i] for i in order ]
+        try:
+            for ix, i in enumerate(template.section_order):
+                order.append([section.id for section in sections].index(i))
+            sections = [ sections[i] for i in order ]
+        except ValueError:
+            pass
     return sections
 
 def get_template_variables(template_id):
