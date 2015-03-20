@@ -46,7 +46,7 @@ class TemplateSection(Model):
     - position: Where in the template the section lies
     - template_id: Foreign Key relationship back to the TemplateBase
     - section_type: The type of section to be used. This uses "joined
-    table inheritance": http://docs.sqlalchemy.org/en/rel_0_9/orm/inheritance
+    table inheritance": http://docs.sqlalchemy.org/en/rel_0_9/orm/inheritance.html
     '''
 
     __tablename__ = 'template_section'
