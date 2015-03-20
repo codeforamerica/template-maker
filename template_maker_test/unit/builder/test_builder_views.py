@@ -77,7 +77,9 @@ class TestEditTemplate(BaseTestCase):
         # we can add new boilerplate sections
         self.client.get('/build/1/section/new/text?boilerplate=true')
         self.assertEquals(len(TemplateSection.query.all()), 5)
-        self.assertEquals(TemplateSection.query.get(5).text, 'filled in stuff')
+        self.assertEquals(TemplateSection.query.get(5).text, 'Please insert your text here.')
+
+        self.assert403(self.client.get('/build/1/section/new/foobarbaz'))
 
     def test_edit_template_metadata(self):
         self.assertEquals(len(TemplateBase.query.all()), 1)
@@ -93,6 +95,9 @@ class TestEditTemplate(BaseTestCase):
         self.assertEquals(self.get_context_variable('current_section').text, 'text1')
         self.assertEquals(self.get_context_variable('template').id, 1)
         self.assertEquals(len(self.get_context_variable('sections')), 2)
+
+        response = self.client.get('/build/1/')
+        self.assertEquals(response.location, 'http://localhost/build/1/section/')
 
     def test_edit_template_post(self):
         # update a section's title and text content
@@ -115,12 +120,13 @@ class TestEditTemplate(BaseTestCase):
         self.assertEquals(order, [1,2])
 
         # make a post request with a different order of sections
-        self.client.post('/build/1/section/1', data=ImmutableMultiDict(
-            [('id', '2'), ('id', '1'), ('widget', 'foo')]
+        post = self.client.post('/build/1/section/', data=ImmutableMultiDict(
+            [('id', '2'), ('id', '1')]
         ))
 
         # Ensure that saved flashes
         self.assert_flashes('Successfully saved!', expected_category='alert-success')
+        self.assertEquals(post.location, 'http://localhost/build/1/section/')
 
         # ensure the TemplateBase was updated properly
         self.assertEquals(TemplateBase.query.get(1).section_order, [2,1])
@@ -129,6 +135,14 @@ class TestEditTemplate(BaseTestCase):
         new_order = [i.id for i in self.get_context_variable('sections')]
         self.assertEquals(new_order, [2,1])
 
+        # ensure you can delete a section
+        self.client.get('/build/1/section/2/delete')
+        self.assertEquals(TemplateBase.query.get(1).section_order, [1])
+        self.assertEquals(len(TemplateSection.query.all()), 1)
+
+        # ensure POSTing when there is no section id still works
+        post = self.client.post('/build/1/section/0')
+        self.assertEquals(post.location, 'http://localhost/build/1/section/')
 
     def test_delete_section(self):
         request = self.client.get('/build/1/section/2/delete')

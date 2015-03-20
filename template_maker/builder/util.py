@@ -23,12 +23,14 @@ def create_new_section(section, template_id):
         section.get('title', ''),
         '',
         template_id
-    )
-    if section.get('type') in ('text', 'fixed_text'):
-        new_section.text = section.get('html', '')
-    db.session.add(new_section)
-    db.session.commit()
-    return new_section.id
+    ) if section.get('type') in SECTION_TYPE_MAPS.keys() else None
+    if new_section:
+        if section.get('type') in ('text', 'fixed_text'):
+            new_section.text = section.get('html', '')
+        db.session.add(new_section)
+        db.session.commit()
+        return new_section.id
+    return False
 
 def parse_variable_text(variable):
     '''
