@@ -3,7 +3,7 @@ import datetime
 from flask import (
     Blueprint, request, make_response, jsonify,
     render_template, redirect, abort, url_for,
-    flash
+    flash, current_app
 )
 from flask.ext.login import current_user
 from sqlalchemy.dialects.postgresql import array
@@ -35,8 +35,9 @@ def load_user(userid):
 # restrict blueprint to only authenticated users
 @blueprint.before_request
 def restrict_access():
-    if not current_user.is_authenticated() or current_user.is_anonymous():
-        return redirect(url_for('users.login'))
+    if current_app.config.get('ENV') != 'test':
+        if not current_user.is_authenticated() or current_user.is_anonymous():
+            return redirect(url_for('users.login'))
 
 SECTION_FORM_MAP = {
     'text': TemplateSectionTextForm,
