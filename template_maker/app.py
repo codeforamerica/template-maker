@@ -2,11 +2,9 @@ from flask import Flask
 
 from template_maker.settings import DevConfig, ProdConfig
 from template_maker.assets import assets
-from template_maker import builder, generator, frontmatter
+from template_maker import builder, generator, frontmatter, users
 from template_maker.extensions import (
-    db,
-    migrate,
-    debug_toolbar
+    db, migrate, debug_toolbar, login_manager
 )
 
 def create_app(config_object=DevConfig):
@@ -20,6 +18,7 @@ def register_blueprints(app):
     app.register_blueprint(builder.views.blueprint)
     app.register_blueprint(generator.views.blueprint)
     app.register_blueprint(frontmatter.views.blueprint)
+    app.register_blueprint(users.views.blueprint)
     return None
 
 def register_extensions(app):
@@ -27,4 +26,5 @@ def register_extensions(app):
     db.init_app(app)
     migrate.init_app(app, db)
     debug_toolbar.init_app(app)
+    login_manager.init_app(app)
     return None

@@ -10,3 +10,6 @@ migrate = Migrate()
 from flask.ext.debugtoolbar import DebugToolbarExtension
 debug_toolbar = DebugToolbarExtension()
 
+from flask.ext.login import LoginManager
+login_manager = LoginManager()
+

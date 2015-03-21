@@ -5,14 +5,17 @@ from flask import (
     render_template, redirect, abort, url_for,
     flash
 )
+from flask.ext.login import current_user
 from sqlalchemy.dialects.postgresql import array
 
 from template_maker.database import db
+from template_maker.extensions import login_manager
 from template_maker.builder.models import TemplateBase, TemplateSection, TemplateVariables, VariableTypes
 from template_maker.builder.forms import (
     TemplateBaseForm, TemplateSectionForm, TemplateSectionTextForm,
     VariableForm, SelectField, StringField, Form
 )
+from template_maker.users.models import User
 from template_maker.builder.util import (
     create_new_section, update_section,
     get_template_sections, get_template_variables, reorder_sections
@@ -24,6 +27,16 @@ blueprint = Blueprint(
     'builder', __name__, url_prefix='/build',
     template_folder='../templates',
 )
+
+@login_manager.user_loader
+def load_user(userid):
+    return User.get_by_id(int(userid))
+
+# restrict blueprint to only authenticated users
+@blueprint.before_request
+def restrict_access():
+    if not current_user.is_authenticated() or current_user.is_anonymous():
+        return redirect(url_for('users.login'))
 
 SECTION_FORM_MAP = {
     'text': TemplateSectionTextForm,
@@ -45,7 +58,6 @@ def list_templates():
             'id': template.id,
             'title': template.title,
             'description': template.description,
-            'num_vars': template.template_variables.count()
         })
 
     return render_template('builder/list.html', templates=output)

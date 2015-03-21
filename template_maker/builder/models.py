@@ -4,7 +4,7 @@ from template_maker.database import (
     db,
     ReferenceCol,
 )
-from template_maker.user.models import User
+from template_maker.users.models import User
 from sqlalchemy.dialects.postgres import ARRAY
 
 class TemplateBase(Model):
