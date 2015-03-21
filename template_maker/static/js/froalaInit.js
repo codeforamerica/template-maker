@@ -1,5 +1,13 @@
 $(function() {
 
+  // on initialization, focus the editor and restyle the "add-variable" button
+  $("#widget").on('editable.initialized', function(e, editor) {
+    $('.froala-editor').find('.fr-bttn[data-name="insertVariable"]').css({
+      'width': '120px', 'font-size': '14px'
+    });
+    editor.focus();
+  });
+
   $('#widget')
     .html($('#sectionText').html())
     .editable({
@@ -8,15 +16,15 @@ $(function() {
       buttons: [
         'insertVariable', 'sep',
         'bold', 'italic', 'underline', 'sep',
-        'formatBlock', 'insertOrderedList','insertUnorderedList', 'sep',
+        'formatBlock', 'insertOrderedList','insertUnorderedList', 'insertHorizontalRule', 'sep',
         'undo', 'redo', 'sep',
       ],
       customButtons: {
         insertVariable: {
-          title: 'Insert Variable',
+          title: 'Insert Placeholder',
           icon: {
-            type: 'font',
-            value: 'fa fa-plus'
+            type: 'txt',
+            value: 'Add Placeholder',
           },
           callback: function () {
             var froala = this;
@@ -34,8 +42,6 @@ $(function() {
         }
       }
     });
-
-  $('#widget').editable('focus');
 
   // get the minimum variable id which should one more than the total number
   // of variables on the page right now

@@ -84,7 +84,7 @@ class TextSection(TemplateSection):
     def __init__(self, title, description, template_id):
         super(TextSection, self).__init__(template_id=template_id, title=title, description=description)
 
-class FixedTextSection(TemplateSection):
+class FixedTextSection(Model):
     '''
     FixedTextSection is a class of TemplateSection. It does not allow document generators
     to interpolate variables.

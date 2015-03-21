@@ -46,7 +46,7 @@ class TestBuilder(BaseTestCase):
         post = self.client.post('/build/1/publish')
         template = TemplateBase.query.get(1)
         self.assertTrue(template.published)
-        assert post.location == 'http://localhost/generate/1/generate'
+        assert post.location == 'http://localhost/build/'
 
 class TestEditTemplate(BaseTestCase):
     render_templates = False
