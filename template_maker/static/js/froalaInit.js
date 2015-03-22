@@ -7,6 +7,8 @@ $(function() {
     });
   });
 
+  $('#widget').parents('form').areYouSure();
+
   $('#widget')
     .html($('#sectionText').html())
     .editable({
