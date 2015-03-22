@@ -21,3 +21,4 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/test_template_maker'
     WTF_CSRF_ENABLED = False
     TESTING = True
+    BROWSERID_URL = 'test'

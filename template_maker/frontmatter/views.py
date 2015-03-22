@@ -1,6 +1,5 @@
 from flask import (
-    Blueprint,
-    render_template,
+    Blueprint, render_template, redirect, url_for
 )
 
 blueprint = Blueprint(
@@ -10,4 +9,5 @@ blueprint = Blueprint(
 
 @blueprint.route('/')
 def index():
-    return render_template('frontmatter/index.html')
+    # return render_template('frontmatter/index.html')
+    return redirect(url_for('builder.list_templates'))

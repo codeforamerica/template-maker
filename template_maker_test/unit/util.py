@@ -3,6 +3,7 @@ from template_maker.database import db
 from template_maker.builder.models import (
     TemplateBase, TemplateSection, TextSection, TemplateVariables
 )
+from template_maker.users.models import User
 
 def create_a_template():
     now = datetime.datetime.utcnow()
@@ -36,3 +37,12 @@ def insert_new_variable(section_id=None):
     db.session.add(variable)
     db.session.commit()
     return variable
+
+def create_a_user(is_admin, email='foo@foo.com'):
+    return User(email=email, first_name='foo', last_name='foo', is_admin=is_admin)
+
+def insert_a_user(is_admin=False, email='foo@foo.com'):
+    user = create_a_user(is_admin, email)
+    db.session.add(user)
+    db.session.commit()
+    return user.id

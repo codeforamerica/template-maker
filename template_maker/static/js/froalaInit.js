@@ -5,7 +5,6 @@ $(function() {
     $('.froala-editor').find('.fr-bttn[data-name="insertVariable"]').css({
       'width': '120px', 'font-size': '14px'
     });
-    editor.focus();
   });
 
   $('#widget')
@@ -42,6 +41,8 @@ $(function() {
         }
       }
     });
+
+  $('#widget').editable('focus');
 
   // get the minimum variable id which should one more than the total number
   // of variables on the page right now

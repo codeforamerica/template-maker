@@ -38,6 +38,6 @@ def auth():
     if user:
         login_user(user)
         flash('Logged in successfully!', 'alert-success')
-        return '{next}'.format(next=next_url if next_url else '/build'), 200
+        return redirect(next_url if next_url else '/build')
     else:
         abort(403)
