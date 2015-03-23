@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+# install bower as normal
+npm install -g bower
+
+# install bower dependencies
+bower install
