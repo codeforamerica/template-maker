@@ -46,5 +46,6 @@ class TestUserAuth(BaseTestCase):
             assertion='test'
         ))
 
-        self.assertEquals(post.status_code, 302)
-        self.assertEquals(post.location, 'http://localhost/build/8/sections/')
+        self.assert200(post)
+        self.assertEquals(post.data, '/build/8/sections/')
+

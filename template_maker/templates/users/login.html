@@ -8,7 +8,7 @@
 
 {% block javascripts %}
 <script>
-var currentUser = {{current_user|tojson|safe}};
+var currentUser = {{current_user.email|tojson|safe}};
 
 navigator.id.watch({
   loggedInUser: currentUser,
@@ -24,7 +24,6 @@ navigator.id.watch({
         window.location.href = res; 
       },
       error: function(xhr, status, err) {
-        navigator.id.logout();
         alert("Login failure: " + err);
       }
     });

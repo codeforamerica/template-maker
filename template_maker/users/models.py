@@ -3,7 +3,6 @@ import datetime as dt
 
 from flask.ext.login import UserMixin
 
-from template_maker.extensions import bcrypt
 from template_maker.database import (
     Column,
     db,

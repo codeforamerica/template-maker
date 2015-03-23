@@ -16,7 +16,8 @@ blueprint = Blueprint(
 
 @blueprint.route("/login", methods=["GET"])
 def login():
-    return render_template("users/login.html", current_user=current_user.email)
+    user = current_user if not current_user.is_anonymous() else dict(email=None)
+    return render_template("users/login.html", current_user=user)
 
 @blueprint.route('/auth', methods=['POST'])
 def auth():
@@ -38,6 +39,6 @@ def auth():
     if user:
         login_user(user)
         flash('Logged in successfully!', 'alert-success')
-        return redirect(next_url if next_url else '/build')
+        return next_url if next_url else '/build'
     else:
         abort(403)
