@@ -1,4 +1,5 @@
 from mock import Mock, patch
+from flask.ext.login import current_user, login_user
 
 from template_maker_test.unit.test_base import BaseTestCase
 from template_maker_test.unit.util import insert_a_user
@@ -49,3 +50,15 @@ class TestUserAuth(BaseTestCase):
         self.assert200(post)
         self.assertEquals(post.data, '/build/8/sections/')
 
+    @patch('urllib2.urlopen')
+    def test_logout(self, urlopen):
+
+        login_user(User.query.all()[0])
+
+        logout = self.client.get('/users/logout', follow_redirects=True)
+        self.assert_flashes('Logged out successfully!', 'alert-success')
+        self.assert_template_used('users/logout.html')
+
+        login_user(User.query.all()[0])
+        logout = self.client.post('/users/logout?persona=True', follow_redirects=True)
+        self.assertTrue(logout.data, 'OK')

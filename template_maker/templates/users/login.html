@@ -42,16 +42,18 @@ navigator.id.watch({
   }
 });
 
-var signinLink = document.getElementById('signin');
+var signinLink = $('#signin');
 if (signinLink) {
-  signinLink.onclick = function() { 
+  signinLink.on('click', function() {
     navigator.id.request(); 
-  };
+  });
 }
 
-var signoutLink = document.getElementById('signout');
+var signoutLink = $('#signout');
 if (signoutLink) {
-  signoutLink.onclick = function() { navigator.id.logout(); };
+  signoutLink.on('click', function() {
+    navigator.id.logout();
+  });
 }
 </script>
 

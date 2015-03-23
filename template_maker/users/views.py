@@ -5,7 +5,7 @@ from flask import (
     Blueprint, render_template, request, flash,
     current_app, abort, redirect, url_for
 )
-from flask.ext.login import current_user, login_user
+from flask.ext.login import current_user, login_user, logout_user
 
 from template_maker.users.models import User
 
@@ -18,6 +18,15 @@ blueprint = Blueprint(
 def login():
     user = current_user if not current_user.is_anonymous() else dict(email=None)
     return render_template("users/login.html", current_user=user)
+
+@blueprint.route('/logout', methods=['GET', 'POST'])
+def logout():
+    logout_user()
+    if request.args.get('persona', None):
+        return 'OK'
+    else:
+        flash('Logged out successfully!', 'alert-success')
+        return render_template('users/logout.html')
 
 @blueprint.route('/auth', methods=['POST'])
 def auth():
@@ -39,6 +48,6 @@ def auth():
     if user:
         login_user(user)
         flash('Logged in successfully!', 'alert-success')
-        return next_url if next_url else '/build'
+        return next_url if next_url else '/build/'
     else:
         abort(403)
