@@ -11,13 +11,27 @@ if os.environ.get('TEMPLATE_MAKER_ENV') == 'prod':
 else:
     app = create_app(DevConfig)
 
+manager = Manager(app)
+
 def _make_context():
     """Return context dict for a shell session so you can access
     app and db by default.
     """
     return {'app': app, 'db': db}
 
-manager = Manager(app)
+@manager.command
+def seed_email():
+    from template_maker.users.models import User
+    user_exists = User.query.filter(User.email==app.config.get('SEED_EMAIL'))
+    if not user_exists:
+        print 'Creating seed user'
+        seed_user = User(email=app.config.get('SEED_EMAIL'), is_admin=True)
+        db.session.add(seed_user)
+        db.session.commit()
+    else:
+        print 'Seeded email already exists. Skipping...'
+    return
+
 manager.add_command('server', Server(port=9000))
 manager.add_command('shell', Shell(make_context=_make_context))
 manager.add_command('db', MigrateCommand)

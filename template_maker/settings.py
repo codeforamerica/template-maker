@@ -2,6 +2,7 @@ import os
 
 class Config(object):
     SECRET_KEY = os.environ.get('TEMPLATE_MAKER_SECRET', 'template-maker') # todo: change me
+    SEED_EMAIL = os.environ.get('SEED_EMAIL', 'benjamin.smithgall@pittsburghpa.gov')
 
 class DevConfig(Config):
     ENV = os.environ.get('TEMPLATE_MAKER_ENV', 'dev')

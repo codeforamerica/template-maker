@@ -5,9 +5,13 @@ set -eo pipefail
 
 echo "-----> Starting Post-compile Hook"
 
-echo "-----> Upgrading database"
 MANAGE_FILE=$(find . -maxdepth 3 -type f -name 'manage.py' | head -1)
+
+echo "-----> Upgrading database"
 python $MANAGE_FILE db upgrade 2>&1
+
+echo "-----> Seeding Initial User Email"
+python $MANAGE_FILE seed_email 2>&1
 
 # Work around Heroku bug whereby pylibmc isn't available during
 # compile phase. See: https://github.com/heroku/heroku-buildpack-python/issues/57
