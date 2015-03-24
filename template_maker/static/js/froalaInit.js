@@ -7,7 +7,11 @@ $(function() {
     });
   });
 
-  $('#widget').parents('form').areYouSure();
+  var mainForm = $('#widget').parents('form');
+  mainForm.areYouSure()
+  mainForm.submit(function(e) {
+    e.preventDefault();
+  })
 
   $('#widget')
     .html($('#sectionText').html())
@@ -58,6 +62,8 @@ $(function() {
     var _type = modal.find('.modal-variable-type').val();
     var _name = modal.find('.modal-variable-name').val();
 
+    if (_name === '') { return false; }
+
     modal.find('.modal-variable-name').val('');
     modal.find('.modal-variable-type').val('Text');
 
@@ -90,14 +96,28 @@ $(function() {
       $('.modal-variable-name').attr('data-variable-cur-id').split('-')[2] :
       variableId;
     // update the html
-    $(createVariableId(curVariable, true)).html(createVariableHtml(modal));
+    var newHtml = createVariableHtml(modal);
+    if (newHtml) {
+      $(createVariableId(curVariable, true)).html(newHtml);
+      modal.modal('hide');
+    } else {
+      var body = modal.find('.modal-body');
+      if (body.find('.alert').length === 0) {
+        body.prepend('<div class="alert alert-danger alert-dismissable">' +
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+        '<span>Placeholders cannot be empty!</span>' +
+        '</div>'
+        )
+      }
+      return
+    }
     // only increment if we are inserting a new variable
     if (typeof(curVariable) === 'number') variableId++;
     // reset the name value to be an empty string
     $('.modal-variable-name').attr('data-variable-cur-id', null);
   });
 
-  $('#variableModal').on('hide.bs.modal', function(e) {
+  $('#variableModal').find('.close-bs-modal-no-save').on('click', function(e) {
     // if we are hiding the modal, we need to remove the new shell that we made
     // and reset the values
     $(createVariableId(variableId, true)).remove();
