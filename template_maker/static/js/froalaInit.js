@@ -56,18 +56,15 @@ $(function() {
   $('#widget').editable('focus');
   $('#widget').on('editable.contentChanged', function (e, editor) {
     $('#widget').parents('form').trigger('checkform.areYouSure');
-    mainForm.areYouSure({
-      'fieldSelector': ':input:not(input[type=submit])'
-    });
   });
 
   // get the minimum variable id which should one more than the total number
   // of variables on the page right now
   variableId = Math.max(0, Math.max.apply(null, $.map(
-    $($('#widget').editable('getHTML')).find('.fr-variable'), 
+    $('.template-preview-content').find('.fr-variable'),
     function(d) {
       return +d.id.split('-')[2];
-    })))
+    }))) + 1;
 
   function createVariableHtml(modal) {
     var _type = modal.find('.modal-variable-type').val();
@@ -110,6 +107,7 @@ $(function() {
     var newHtml = createVariableHtml(modal);
     if (newHtml) {
       $(createVariableId(curVariable, true)).html(newHtml);
+      $('#widget').parents('form').trigger('checkform.areYouSure');
       modal.modal('hide');
     } else {
       var body = modal.find('.modal-body');

@@ -22,12 +22,13 @@ def _make_context():
 @manager.command
 def seed_email():
     from template_maker.users.models import User
-    user_exists = User.query.filter(User.email==app.config.get('SEED_EMAIL'))
+    user_exists = User.query.filter(User.email==app.config.get('SEED_EMAIL')).first()
     if not user_exists:
         print 'Creating seed user'
         seed_user = User(email=app.config.get('SEED_EMAIL'), is_admin=True)
         db.session.add(seed_user)
         db.session.commit()
+        print 'User {email} created'.format(email=app.config.get('SEED_EMAIL'))
     else:
         print 'Seeded email already exists. Skipping...'
     return
