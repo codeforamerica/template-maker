@@ -57,11 +57,8 @@ def update_section(section, template_id, form_input):
     a particular template_id
     '''
     section.title = form_input.get('title')
-    if section.section_type == 'fixed_text':
-        # TODO: Sanitize HTML input
-        section.text = form_input.get('widget')
-        db.session.commit()
-    elif section.section_type == 'text':
+
+    if section.section_type == 'text':
         html = form_input.get('widget')
         section.text = html
         # save the text

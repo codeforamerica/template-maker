@@ -1,5 +1,22 @@
 $(function() {
 
+  // on initialization, focus the editor and restyle the "add-variable" button
+  $("#widget").on('editable.initialized', function(e, editor) {
+    $('.froala-editor').find('.fr-bttn[data-name="insertVariable"]').css({
+      'width': '120px', 'font-size': '14px'
+    });
+  });
+
+  var mainForm = $('#widget').parents('form');
+  mainForm.areYouSure({
+    'fieldSelector': ':input:not(input[type=submit])'
+  })
+  mainForm.find('input').keypress(function(event) {
+    if (event.which === 13) {
+      event.preventDefault();
+    }
+  });
+
   $('#widget')
     .html($('#sectionText').html())
     .editable({
@@ -8,15 +25,15 @@ $(function() {
       buttons: [
         'insertVariable', 'sep',
         'bold', 'italic', 'underline', 'sep',
-        'formatBlock', 'insertOrderedList','insertUnorderedList', 'sep',
+        'formatBlock', 'insertOrderedList','insertUnorderedList', 'insertHorizontalRule', 'sep',
         'undo', 'redo', 'sep',
       ],
       customButtons: {
         insertVariable: {
-          title: 'Insert Variable',
+          title: 'Insert Placeholder',
           icon: {
-            type: 'font',
-            value: 'fa fa-plus'
+            type: 'txt',
+            value: 'Add Placeholder',
           },
           callback: function () {
             var froala = this;
@@ -32,18 +49,28 @@ $(function() {
 
           }
         }
-      }
+      },
+
     });
 
   $('#widget').editable('focus');
+  $('#widget').on('editable.contentChanged', function (e, editor) {
+    $('#widget').parents('form').trigger('checkform.areYouSure');
+  });
 
   // get the minimum variable id which should one more than the total number
   // of variables on the page right now
-  variableId = $($('#widget').editable('getHTML')).find('.fr-variable').length + 1;
+  variableId = Math.max(0, Math.max.apply(null, $.map(
+    $('.template-preview-content').find('.fr-variable'),
+    function(d) {
+      return +d.id.split('-')[2];
+    }))) + 1;
 
   function createVariableHtml(modal) {
     var _type = modal.find('.modal-variable-type').val();
     var _name = modal.find('.modal-variable-name').val();
+
+    if (_name === '') { return false; }
 
     modal.find('.modal-variable-name').val('');
     modal.find('.modal-variable-type').val('Text');
@@ -77,14 +104,29 @@ $(function() {
       $('.modal-variable-name').attr('data-variable-cur-id').split('-')[2] :
       variableId;
     // update the html
-    $(createVariableId(curVariable, true)).html(createVariableHtml(modal));
+    var newHtml = createVariableHtml(modal);
+    if (newHtml) {
+      $(createVariableId(curVariable, true)).html(newHtml);
+      $('#widget').parents('form').trigger('checkform.areYouSure');
+      modal.modal('hide');
+    } else {
+      var body = modal.find('.modal-body');
+      if (body.find('.alert').length === 0) {
+        body.prepend('<div class="alert alert-danger alert-dismissable">' +
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+        '<span>Placeholders cannot be empty!</span>' +
+        '</div>'
+        )
+      }
+      return
+    }
     // only increment if we are inserting a new variable
     if (typeof(curVariable) === 'number') variableId++;
     // reset the name value to be an empty string
     $('.modal-variable-name').attr('data-variable-cur-id', null);
   });
 
-  $('#variableModal').on('hide.bs.modal', function(e) {
+  $('#variableModal').find('.close-bs-modal-no-save').on('click', function(e) {
     // if we are hiding the modal, we need to remove the new shell that we made
     // and reset the values
     $(createVariableId(variableId, true)).remove();

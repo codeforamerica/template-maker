@@ -9,7 +9,7 @@
       {% if not preview %}
       <a href="{{ url_for('builder.edit_template', template_id=template.id, section_id=section.id) }}">Edit</a>
       {% endif %}
-      <a class="text-danger" href="{{ url_for('builder.delete_section', template_id=template.id, section_id=section.id) }}">Delete</a>
+      <a class="text-danger" href="{{ url_for('builder.delete_section', template_id=template.id, section_id=section.id) }}" onclick="return confirm('Are you sure? This cannot be undone!');">Delete</a>
     </span>
   </div>
 

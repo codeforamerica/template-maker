@@ -19,10 +19,10 @@ $(function() {
     $('#accordion .in').collapse('hide');
   });
 
-  // turn off all alerts after 1.5 seconds if they aren't closed already
+  // turn off all alerts after 3.5 seconds if they aren't closed already
   window.setTimeout(function() {
     $('.flashed-alert').alert('close')
-  }, 1500);
+  }, 3500);
 
   $('#templatePreviewContent').sortable({
     handle: '.js-sortable-handle',

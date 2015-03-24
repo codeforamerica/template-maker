@@ -3,16 +3,19 @@ import datetime
 from flask import (
     Blueprint, request, make_response, jsonify,
     render_template, redirect, abort, url_for,
-    flash
+    flash, current_app
 )
+from flask.ext.login import current_user
 from sqlalchemy.dialects.postgresql import array
 
 from template_maker.database import db
+from template_maker.extensions import login_manager
 from template_maker.builder.models import TemplateBase, TemplateSection, TemplateVariables, VariableTypes
 from template_maker.builder.forms import (
     TemplateBaseForm, TemplateSectionForm, TemplateSectionTextForm,
     VariableForm, SelectField, StringField, Form
 )
+from template_maker.users.models import User
 from template_maker.builder.util import (
     create_new_section, update_section,
     get_template_sections, get_template_variables, reorder_sections
@@ -25,12 +28,21 @@ blueprint = Blueprint(
     template_folder='../templates',
 )
 
+@login_manager.user_loader
+def load_user(userid):
+    return User.get_by_id(int(userid))
+
+# restrict blueprint to only authenticated users
+@blueprint.before_request
+def restrict_access():
+    if current_app.config.get('ENV') != 'test':
+        if not current_user.is_authenticated() or current_user.is_anonymous():
+            return redirect(url_for('users.login'))
+
 SECTION_FORM_MAP = {
     'text': TemplateSectionTextForm,
     'fixed_text': TemplateSectionTextForm
 }
-
-# GET-only "data" routes for client-side interactions
 
 @blueprint.route('/')
 def list_templates():
@@ -47,7 +59,6 @@ def list_templates():
             'id': template.id,
             'title': template.title,
             'description': template.description,
-            'num_vars': template.template_variables.count()
         })
 
     return render_template('builder/list.html', templates=output)
@@ -120,7 +131,7 @@ def edit_template(template_id, section_id=None, section_type=None):
     '''
     template_base = TemplateBase.query.get(template_id)
     section = TemplateSection.query.get(section_id) if section_id else None
-    if (template_base is None or section is None or section.template_id != template_id) and section_id > 0:
+    if template_base is None or (section and section.template_id != template_id):
         return render_template('404.html')
     # if we don't have a section, set up a dummy section
     current_section = section if section else { 'id': 0, 'type': 'dummy' }
@@ -143,8 +154,7 @@ def edit_template(template_id, section_id=None, section_type=None):
         update_section(section, template_id, request.form)
         flash('Successfully saved!', 'alert-success')
         return redirect(url_for(
-            'builder.edit_template', template_id=template_id,
-            section_id=section_id
+            'builder.edit_template', template_id=template_id
         ))
     elif request.method == 'POST':
         if new_order and new_order != old_order:
@@ -205,4 +215,4 @@ def publish_template(template_id):
         template = TemplateBase.query.get(template_id)
         template.published = True
         reorder_sections(template, request.form.getlist('id'))
-        return redirect(url_for('generator.build_document', template_id=template.id))
+        return redirect(url_for('builder.list_templates'))

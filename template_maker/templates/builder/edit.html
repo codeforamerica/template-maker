@@ -39,7 +39,7 @@
       </div>
 
       {% else %}
-      <form class="form" role="form" method="POST" action="{{ url_for('builder.edit_template', template_id=template.id, section_id=current_section.id) }}" id="accordion">
+      <form class="form" role="form" method="POST" action="{{ url_for('builder.edit_template', template_id=template.id, section_id=current_section.id) }}" id="accordion" >
         {{ form.csrf_token }}
         <div id="templatePreviewContent" class="template-preview-content">
 
@@ -55,7 +55,7 @@
           </div>
           {% endfor %}
         </div>
-        <input type="submit" class="btn btn-success" value="Save Template">
+        <input type="submit" class="btn btn-success template-submit" value="Save Template">
         <a href="{{ url_for('builder.publish_template', template_id=template.id) }}" class="btn btn-primary pull-right">Preview Template</a>
 
       </form>
@@ -70,6 +70,8 @@
 
 {% block javascripts %}
   {% if current_section.section_type in ['text', 'fixed_text'] %}
+    <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery.are-you-sure/jquery.are-you-sure.js') }}"></script> 
+    </script>
     <script src="{{ url_for('static', filename='lib/froala/js/froala_editor.min.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/froala/js/plugins/lists.min.js') }}"></script>
     <!-- Include IE8 JS. -->

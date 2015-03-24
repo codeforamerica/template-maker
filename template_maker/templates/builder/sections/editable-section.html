@@ -7,8 +7,8 @@
       {{ macros.with_errors(form.title, placeholder="What is this section's title?", class_="form-control-section-title form-control", value=section.title) }}
     </span>
     <span class="pull-right section-title-center-text">
-      <input type="submit" class="submitlink" value="Save">
-      <a class="text-danger" href="{{ url_for('builder.delete_section', template_id=template.id, section_id=section.id) }}">Delete</a>
+      <input type="submit" class="submitlink template-submit" value="Save">
+      <a class="text-danger" href="{{ url_for('builder.delete_section', template_id=template.id, section_id=section.id) }}" onclick="return confirm('Are you sure? This cannot be undone!');">Delete</a>
     </span>
   </div>
 
