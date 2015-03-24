@@ -8,10 +8,14 @@ $(function() {
   });
 
   var mainForm = $('#widget').parents('form');
-  mainForm.areYouSure()
-  mainForm.submit(function(e) {
-    e.preventDefault();
+  mainForm.areYouSure({
+    'fieldSelector': ':input:not(input[type=submit])'
   })
+  mainForm.find('input').keypress(function(event) {
+    if (event.which === 13) {
+      event.preventDefault();
+    }
+  });
 
   $('#widget')
     .html($('#sectionText').html())
@@ -52,11 +56,18 @@ $(function() {
   $('#widget').editable('focus');
   $('#widget').on('editable.contentChanged', function (e, editor) {
     $('#widget').parents('form').trigger('checkform.areYouSure');
+    mainForm.areYouSure({
+      'fieldSelector': ':input:not(input[type=submit])'
+    });
   });
 
   // get the minimum variable id which should one more than the total number
   // of variables on the page right now
-  variableId = $($('#widget').editable('getHTML')).find('.fr-variable').length + 1;
+  variableId = Math.max(0, Math.max.apply(null, $.map(
+    $($('#widget').editable('getHTML')).find('.fr-variable'), 
+    function(d) {
+      return +d.id.split('-')[2];
+    })))
 
   function createVariableHtml(modal) {
     var _type = modal.find('.modal-variable-type').val();
