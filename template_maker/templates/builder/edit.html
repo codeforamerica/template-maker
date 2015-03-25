@@ -1,14 +1,5 @@
 {% extends "builder/main.html" %}
 
-{% block css %}
-<!-- Include Font Awesome. -->
-<link href="{{ url_for('static', filename='lib/froala/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css" />
-
-<!-- Include Editor style. -->
-<link href="{{ url_for('static', filename='lib/froala/css/froala_editor.min.css') }}" rel="stylesheet" type="text/css" />
-<link href="{{ url_for('static', filename='lib/froala/css/froala_style.min.css') }}" rel="stylesheet" type="text/css" />
-{% endblock %}
-
 {% block subcontent %}
 
 <div>
@@ -72,16 +63,15 @@
   {% if current_section.section_type in ['text', 'fixed_text'] %}
     <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery.are-you-sure/jquery.are-you-sure.js') }}"></script> 
     </script>
-    <script src="{{ url_for('static', filename='lib/froala/js/froala_editor.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='lib/froala/js/plugins/lists.min.js') }}"></script>
-    <!-- Include IE8 JS. -->
-    <!--[if lt IE 9]>
-      <script src="{{ url_for('static', filename='lib/froala/js/froala_editor_ie8.min.js') }}></script>
-    <![endif]-->
+    <script src="{{ url_for('static', filename='lib/ckeditor/ckeditor.js') }}"></script>
     <script id="sectionText" type="section-text">
       {{ current_section.text | safe }}
     </script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/froalaInit.js') }}"></script>
+    <script>
+      CKEDITOR.replace('widget', {
+        skin: '../../../css/ckeditor-skins/mc'
+      });
+    </script>
   {% endif %}
     <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-ui/ui/minified/core.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery-ui/ui/minified/widget.min.js') }}"></script>

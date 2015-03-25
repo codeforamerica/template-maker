@@ -3,7 +3,7 @@ from flask.ext.assets import Bundle, Environment
 less = Bundle(
     'less/main.less',
     filters='less',
-    output='css/main.css',
+    output='css/app/main.css',
     depends=('less/*.less', 'less/**/*.less', 'less/**/**/*.less')
 )
 
