@@ -4,11 +4,20 @@ from template_maker.builder.models import (
     TemplateBase, TemplateSection, TextSection,
     FixedTextSection, TemplateVariables
 )
-from template_maker.builder.util import (
-    create_new_section, parse_variable_text, reorder_sections,
-    get_template_sections, get_template_variables, get_section_variables,
-    update_section
+
+from template_maker.data.templates import (
+    get_all_templates, get_single_template, delete_template, create_new_template, 
+    publish_template as _publish_template
 )
+from template_maker.data.sections import (
+    create_new_section, update_section, get_template_sections, reorder_sections,
+    get_single_section, delete_section as _delete_section
+)
+
+from template_maker.data.placeholders import (
+    get_section_variables, get_template_variables, parse_variable_text
+)
+
 from template_maker_test.unit.util import (
     create_a_template, insert_new_template, insert_new_section,
     create_a_variable, insert_new_variable

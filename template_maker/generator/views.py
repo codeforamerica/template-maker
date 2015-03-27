@@ -15,7 +15,8 @@ from template_maker.builder.models import TemplateBase
 from wtforms import TextField, IntegerField, FloatField
 from template_maker.builder.forms import VariableForm
 from template_maker.generator.forms import DatePickerField
-from template_maker.builder.util import get_template_sections, get_section_variables
+from template_maker.data.sections import get_template_sections
+from template_maker.data.placeholders import get_section_variables
 
 TYPE_VARIABLES_MAP = {
     1: TextField, 2: DatePickerField, 3: IntegerField, 4: FloatField
