@@ -13,10 +13,10 @@ from flask import (
 from template_maker.database import db
 from template_maker.builder.models import TemplateBase
 from wtforms import TextField, IntegerField, FloatField
-from template_maker.builder.forms import VariableForm
+from template_maker.builder.forms import PlaceholderForm
 from template_maker.generator.forms import DatePickerField
 from template_maker.data.sections import get_template_sections
-from template_maker.data.placeholders import get_section_variables
+from template_maker.data.placeholders import get_section_placeholders
 
 TYPE_VARIABLES_MAP = {
     1: TextField, 2: DatePickerField, 3: IntegerField, 4: FloatField
@@ -40,19 +40,19 @@ def list_templates():
 
 def strip_tags(name):
     '''
-    Takes a variable name and strips out the tags
+    Takes a placeholder name and strips out the tags
     '''
     regex = re.compile('[%s]' % re.escape(string.punctuation))
     name = re.sub(regex, "", name)
     return "_".join(name.split())
 
-def create_rivets_bindings(variable, section):
+def create_rivets_bindings(placeholder, section):
     '''
-    Converts a variable into a <span> that rivets can grab onto
+    Converts a placeholder into a <span> that rivets can grab onto
     '''
-    repl_text = '<input id="{variable_name}-value" placeholder="{variable_name}"'.format(variable_name=strip_tags(variable.display_name)) + \
-    'class="template-variable" rv-value="template.variable_{idcombo}" disabled>'.format(idcombo=strip_tags(variable.display_name))
-    return re.sub(re.escape(variable.full_name), repl_text, section.text)
+    repl_text = '<input id="{placeholder_name}-value" placeholder="{placeholder_name}"'.format(placeholder_name=strip_tags(placeholder.display_name)) + \
+    'class="template-placeholder" rv-value="template.placeholder_{idcombo}" disabled>'.format(idcombo=strip_tags(placeholder.display_name))
+    return re.sub(re.escape(placeholder.full_name), repl_text, section.text)
 
 @blueprint.route('/<int:template_id>/generate')
 def build_document(template_id):
@@ -64,27 +64,27 @@ def build_document(template_id):
     '''
     template_base = TemplateBase.query.get(template_id)
     sections = get_template_sections(template_base)
-    class F(VariableForm):
+    class F(PlaceholderForm):
         pass
 
     for section in sections:
         if section.section_type == 'text':
             # if we have a text section, we need to prep the page for the rivets
             # two-way data binding
-            variables = get_section_variables(section.id)
-            for variable in variables:
-                # add a data_input value onto the variable
-                variable.rv_data_input = 'variable_' + strip_tags(variable.display_name)
+            placeholders = get_section_placeholders(section.id)
+            for placeholder in placeholders:
+                # add a data_input value onto the placeholder
+                placeholder.rv_data_input = 'placeholder_' + strip_tags(placeholder.display_name)
                 # format the section text
-                section.text = create_rivets_bindings(variable, section)
+                section.text = create_rivets_bindings(placeholder, section)
                 # set up the form
-                setattr(F, variable.display_name, TYPE_VARIABLES_MAP[variable.type](variable.display_name))
+                setattr(F, placeholder.display_name, TYPE_VARIABLES_MAP[placeholder.type](placeholder.display_name))
 
     form = F()
     for field in form.__iter__():
-        # set the rv_data_input value on the form field as well as on the variable
-        setattr(field, 'rv_data_input', 'template.variable_' + strip_tags(field.name))
+        # set the rv_data_input value on the form field as well as on the placeholder
+        setattr(field, 'rv_data_input', 'template.placeholder_' + strip_tags(field.name))
         setattr(field, 'label', strip_tags(field.name))
 
     return render_template('generator/build-document.html', 
-        template=template_base, sections=sections, variables=variables, form=form)
+        template=template_base, sections=sections, placeholders=placeholders, form=form)

@@ -4,7 +4,7 @@ from sqlalchemy.dialects.postgresql import array
 from template_maker.database import db
 from template_maker.builder.models import TemplateSection, TextSection, FixedTextSection
 from template_maker.data.placeholders import (
-    delete_excess_variables, create_or_update_variable, get_section_variables
+    delete_excess_placeholders, create_or_update_placeholder, get_section_placeholders
 )
 
 VARIABLE_RE = re.compile('(\[\[ |\[\[).*?\|\|.*?(\]\]| \]\])')
@@ -80,7 +80,7 @@ def reorder_sections(template, section_order, to_delete=None):
 
 def update_section(section, template_id, form_input):
     '''
-    Updates TemplateSection and TemplateVariables models associated with
+    Updates TemplateSection and TemplatePlaceholders models associated with
     a particular template_id
     '''
     section.title = form_input.get('title')
@@ -90,17 +90,17 @@ def update_section(section, template_id, form_input):
         section.text = html
         # save the text
         db.session.commit()
-        # find all variables, using the regex set above
-        input_variables = [i.group() for i in re.finditer(VARIABLE_RE, html)]
-        # get any existing variables
-        current_variables = get_section_variables(section.id)
+        # find all placeholders, using the regex set above
+        input_placeholders = [i.group() for i in re.finditer(VARIABLE_RE, html)]
+        # get any existing placeholders
+        current_placeholders = get_section_placeholders(section.id)
 
-        # if there are more old variables than new ones, delete the excess
-        delete_excess_variables(current_variables, input_variables)
+        # if there are more old placeholders than new ones, delete the excess
+        delete_excess_placeholders(current_placeholders, input_placeholders)
 
-        # overwrite the old variables with the new ones
-        for var_idx, variable in enumerate(input_variables):
-            create_or_update_variable(var_idx, variable, input_variables, current_variables, template_id, section.id)
+        # overwrite the old placeholders with the new ones
+        for var_idx, placeholder in enumerate(input_placeholders):
+            create_or_update_placeholder(var_idx, placeholder, input_placeholders, current_placeholders, template_id, section.id)
 
     return section.id
 

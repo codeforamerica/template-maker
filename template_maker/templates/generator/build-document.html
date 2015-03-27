@@ -11,8 +11,8 @@
 </div>
 
 <div class="row" id="js-rivets-template">
-  <div class="col-sm-4 variables-legend-container well">
-    <h3 style="margin-top:0;">Fill in Variables</h3>
+  <div class="col-sm-4 placeholders-legend-container well">
+    <h3 style="margin-top:0;">Fill in Placeholders</h3>
     <form class="form-horizontal">
       {{ form.csrf_token }}
       {% for field in form if not field.id == 'csrf_token' %}
@@ -37,8 +37,8 @@
 <script src="{{ url_for('static', filename='lib/rivets/dist/rivets.bundled.min.js') }}"></script>
 <script>
   var template = {
-  {% for variable in variables %}
-    {{ variable.rv_data_input | safe }}: '',
+  {% for placeholder in placeholders %}
+    {{ placeholder.rv_data_input | safe }}: '',
   {% endfor %}
   };
   rivets.bind(document.getElementById('js-rivets-template'), {template: template});

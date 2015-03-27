@@ -1,59 +1,59 @@
 from template_maker.database import db
-from template_maker.builder.models import TemplateVariables
+from template_maker.builder.models import TemplatePlaceholders
 
 VARIABLE_TYPE_MAPS = {
     'text': 1, 'date': 2,'number': 3, 'float': 4
 }
 
-def get_template_variables(template_id):
+def get_template_placeholders(template_id):
     '''
-    Gets the variables associated with each template
+    Gets the placeholders associated with each template
 
-    Returns a list of variables associated with the template
+    Returns a list of placeholders associated with the template
     along with the sections that they are tied to
     '''
-    return TemplateVariables.query.filter(
-        TemplateVariables.template_id==template_id
-    ).order_by(TemplateVariables.id).all()
+    return TemplatePlaceholders.query.filter(
+        TemplatePlaceholders.template_id==template_id
+    ).order_by(TemplatePlaceholders.id).all()
 
-def get_section_variables(section_id):
+def get_section_placeholders(section_id):
     '''
-    Gets the variables associated with each section
+    Gets the placeholders associated with each section
 
-    Returns a list of TemplateVariables associated
+    Returns a list of TemplatePlaceholders associated
     with the input section_id
     '''
-    return TemplateVariables.query.filter(
-        TemplateVariables.section_id==section_id
-    ).order_by(TemplateVariables.id).all()
+    return TemplatePlaceholders.query.filter(
+        TemplatePlaceholders.section_id==section_id
+    ).order_by(TemplatePlaceholders.id).all()
 
-def parse_variable_text(variable):
+def parse_placeholder_text(placeholder):
     '''
-    Takes a variable of the form [[TYPE:NAME]] and
+    Takes a placeholder of the form [[TYPE:NAME]] and
     returns the type and the name
     '''
-    no_tags = variable.lstrip('[[').rstrip(']]')
+    no_tags = placeholder.lstrip('[[').rstrip(']]')
     var_type = no_tags.split('||')[0].lower()
     var_name = '[[' + no_tags.split('||')[1] + ']]'
     return var_type, var_name
 
-def delete_excess_variables(current_variables, input_variables):
-    if len(current_variables) > len(input_variables):
-        TemplateVariables.query.filter(
-            TemplateVariables.id.in_(
-                [i.id for i in current_variables[len(input_variables):]]
+def delete_excess_placeholders(current_placeholders, input_placeholders):
+    if len(current_placeholders) > len(input_placeholders):
+        TemplatePlaceholders.query.filter(
+            TemplatePlaceholders.id.in_(
+                [i.id for i in current_placeholders[len(input_placeholders):]]
             )
         ).delete(synchronize_session=False)
     return True
 
-def create_or_update_variable(var_idx, variable, input_variables, current_variables, template_id, section_id):
-    _variable = current_variables[var_idx] if len(current_variables) > 0 and var_idx < len(current_variables) else TemplateVariables()
-    var_type, var_name = parse_variable_text(variable)
-    _variable.full_name = variable
-    _variable.display_name = var_name
-    _variable.template_id = template_id
-    _variable.section_id = section_id
-    _variable.type = VARIABLE_TYPE_MAPS[var_type]
-    if not _variable.id:
-        db.session.add(_variable)
+def create_or_update_placeholder(var_idx, placeholder, input_placeholders, current_placeholders, template_id, section_id):
+    _placeholder = current_placeholders[var_idx] if len(current_placeholders) > 0 and var_idx < len(current_placeholders) else TemplatePlaceholders()
+    var_type, var_name = parse_placeholder_text(placeholder)
+    _placeholder.full_name = placeholder
+    _placeholder.display_name = var_name
+    _placeholder.template_id = template_id
+    _placeholder.section_id = section_id
+    _placeholder.type = VARIABLE_TYPE_MAPS[var_type]
+    if not _placeholder.id:
+        db.session.add(_placeholder)
     db.session.commit()

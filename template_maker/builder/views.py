@@ -10,7 +10,7 @@ from template_maker.users.models import User
 
 from template_maker.builder.forms import (
     TemplateBaseForm, TemplateSectionForm, TemplateSectionTextForm,
-    VariableForm, SelectField, StringField, Form
+    PlaceholderForm, SelectField, StringField, Form
 )
 
 from template_maker.data.templates import (
@@ -22,7 +22,7 @@ from template_maker.data.sections import (
     get_single_section, delete_section as _delete_section
 )
 
-from template_maker.data.placeholders import get_template_variables
+from template_maker.data.placeholders import get_template_placeholders
 from template_maker.builder.boilerplate import boilerplate as html_boilerplate
 
 blueprint = Blueprint(
@@ -103,7 +103,7 @@ def edit_template_metadata(template_id):
     GET - TODO
     PUT - TODO
     DELETE - Deletes the template (and cascades to delete
-    template text and associated variables) and returns a 204
+    template text and associated placeholders) and returns a 204
     or returns a 403
     '''
     template_base = get_single_template(template_id)
@@ -185,7 +185,7 @@ def publish_template(template_id):
     Route for taking documents from the BUILDER and turning them into TEMPLATES via the GENERATOR
 
     GET - Returns the preview for the template
-    POST - Data contains sections and variables. Publish freezes the current
+    POST - Data contains sections and placeholders. Publish freezes the current
     version of the template into new database tables, allowing the builder documents
     to be edited and create new templates later on.
     '''

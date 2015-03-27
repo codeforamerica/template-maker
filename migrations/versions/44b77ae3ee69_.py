@@ -1,4 +1,4 @@
-"""empty message
+"""Add section order as a template property
 
 Revision ID: 44b77ae3ee69
 Revises: 228017954653

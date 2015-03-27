@@ -2,7 +2,7 @@ from template_maker_test.unit.test_base import BaseTestCase
 from template_maker.database import db
 from template_maker.builder.models import (
     TemplateBase, TemplateSection, TextSection,
-    FixedTextSection, TemplateVariables
+    FixedTextSection, TemplatePlaceholders
 )
 
 from template_maker.data.templates import (
@@ -15,12 +15,12 @@ from template_maker.data.sections import (
 )
 
 from template_maker.data.placeholders import (
-    get_section_variables, get_template_variables, parse_variable_text
+    get_section_placeholders, get_template_placeholders, parse_placeholder_text
 )
 
 from template_maker_test.unit.util import (
     create_a_template, insert_new_template, insert_new_section,
-    create_a_variable, insert_new_variable
+    create_a_placeholder, insert_new_placeholder
 )
 
 class BuilderUtilTest(BaseTestCase):
@@ -37,16 +37,16 @@ class BuilderUtilTest(BaseTestCase):
         self.assertEquals(TemplateSection.query.get(new_section_id).__class__.__name__, 'TextSection')
         self.assertEquals(TemplateSection.query.get(new_section_id).title, 'foobar')
 
-    def test_parse_variable_text(self):
+    def test_parse_placeholder_text(self):
         # simple example
-        variable = '[[FOO||BAR]]'
-        var_type, var_name = parse_variable_text(variable)
+        placeholder = '[[FOO||BAR]]'
+        var_type, var_name = parse_placeholder_text(placeholder)
         self.assertEquals(var_type, 'foo')
         self.assertEquals(var_name, '[[BAR]]')
 
         # complex example should still work
-        variable = '[[FOO||This is a LONG StrINg with Weird Characterz]]'
-        var_type, var_name = parse_variable_text(variable)
+        placeholder = '[[FOO||This is a LONG StrINg with Weird Characterz]]'
+        var_type, var_name = parse_placeholder_text(placeholder)
         self.assertEquals(var_type, 'foo')
         self.assertEquals(var_name, '[[This is a LONG StrINg with Weird Characterz]]')
 
@@ -65,26 +65,26 @@ class BuilderUtilTest(BaseTestCase):
         self.assertEquals(template.section_order, new_order)
 
     def test_update_section(self):
-        db.session.execute('''INSERT INTO variable_types VALUES (1, 'unicode')''')
+        db.session.execute('''INSERT INTO placeholder_types VALUES (1, 'unicode')''')
 
         template = insert_new_template()
         section = insert_new_section()
-        variable = insert_new_variable(section.id)
+        placeholder = insert_new_placeholder(section.id)
 
         new_content = {
             'widget': 'this is a [[Text||foo]] [[Text||bar]] [[Text||baz]] update'
         }
 
         update_section(section, template.id, new_content)
-        self.assertEquals(len(TemplateVariables.query.all()), 3)
+        self.assertEquals(len(TemplatePlaceholders.query.all()), 3)
         self.assertEquals(section.text, new_content.get('widget'))
 
         new_content2 = {
-            'widget': 'this is a section with fewer variables [[Text||foo]]'
+            'widget': 'this is a section with fewer placeholders [[Text||foo]]'
         }
 
         update_section(section, template.id, new_content2)
-        self.assertEquals(len(TemplateVariables.query.all()), 1)
+        self.assertEquals(len(TemplatePlaceholders.query.all()), 1)
         self.assertEquals(section.text, new_content2.get('widget'))
 
 
@@ -109,30 +109,30 @@ class BuilderUtilTest(BaseTestCase):
         self.assertEquals(len(sections), 3)
         self.assertEquals([i.id for i in sections], new_order)
 
-    def test_get_template_variables(self):
+    def test_get_template_placeholders(self):
         template = insert_new_template()
         self.assertEquals(template.section_order, None)
 
-        # insert some sections and some variables
+        # insert some sections and some placeholders
         section1 = insert_new_section()
         section2 = insert_new_section()
-        variable1 = insert_new_variable(section1.id)
-        variable2 = insert_new_variable(section2.id)
+        placeholder1 = insert_new_placeholder(section1.id)
+        placeholder2 = insert_new_placeholder(section2.id)
 
-        variables = get_template_variables(template.id)
-        self.assertEquals(len(variables), 2)
+        placeholders = get_template_placeholders(template.id)
+        self.assertEquals(len(placeholders), 2)
 
-    def test_get_section_variables(self):
+    def test_get_section_placeholders(self):
         template = insert_new_template()
         self.assertEquals(template.section_order, None)
 
-        # insert some sections and some variables
+        # insert some sections and some placeholders
         section1 = insert_new_section()
         section2 = insert_new_section()
-        variable1 = insert_new_variable(section1.id)
-        variable2 = insert_new_variable(section2.id)
+        placeholder1 = insert_new_placeholder(section1.id)
+        placeholder2 = insert_new_placeholder(section2.id)
 
-        variables = get_section_variables(variable1.id)
-        self.assertEquals(len(variables), 1)
-        variables = get_section_variables(variable2.id)
-        self.assertEquals(len(variables), 1)
+        placeholders = get_section_placeholders(placeholder1.id)
+        self.assertEquals(len(placeholders), 1)
+        placeholders = get_section_placeholders(placeholder2.id)
+        self.assertEquals(len(placeholders), 1)
