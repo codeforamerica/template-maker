@@ -1,4 +1,4 @@
-"""empty message
+"""Initial Migration -- create base tables
 
 Revision ID: 5549c709cd56
 Revises: None

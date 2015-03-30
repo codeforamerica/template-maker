@@ -25,7 +25,7 @@ class TemplateBase(Model):
     title = Column(db.String(255))
     description = Column(db.Text)
     template_text = db.relationship('TemplateSection', cascade='all,delete', lazy='dynamic')
-    template_variables = db.relationship('TemplateVariables', cascade='all,delete', lazy='dynamic')
+    template_placeholders = db.relationship('TemplatePlaceholders', cascade='all,delete', lazy='dynamic')
     published = Column(db.Boolean, default=False)
     section_order = Column(ARRAY(db.Integer))
     # created_by = ReferenceCol('users')
@@ -54,7 +54,7 @@ class TemplateSection(Model):
     title = Column(db.String(255))
     description = Column(db.Text)
     template_id = ReferenceCol('template_base')
-    template_variables = db.relationship('TemplateVariables', cascade='all,delete', lazy='dynamic')
+    template_placeholders = db.relationship('TemplatePlaceholders', cascade='all,delete', lazy='dynamic')
     section_type = Column('section_type', db.String(50))
     __mapper_args__ = {'polymorphic_on': section_type}
 
@@ -66,7 +66,7 @@ class TemplateSection(Model):
 class TextSection(TemplateSection):
     '''
     TextSection is a class of TemplateSection; it supports large text input with
-    variable interpolation
+    placeholder interpolation
 
     Fields:
     - id: 1:1 Relationship from TemplateSection
@@ -87,7 +87,7 @@ class TextSection(TemplateSection):
 class FixedTextSection(Model):
     '''
     FixedTextSection is a class of TemplateSection. It does not allow document generators
-    to interpolate variables.
+    to interpolate placeholders.
 
     - id: 1:1 Relationship from TemplateSection
     - text: Text of the section
@@ -108,33 +108,33 @@ class FixedTextSection(Model):
 # A list of all implemented section types for a new section CHOICES field
 IMPLEMENTED_SECTIONS = [cls.choice_type for cls in vars()['TemplateSection'].__subclasses__()]
 
-class VariableTypes(Model):
+class PlaceholderTypes(Model):
     '''
-    The types associated with different variables. We use a FK
+    The types associated with different placeholders. We use a FK
     constraint to make sure it's one of the approved tyes
 
     Fields:
     - type: The name of the type in question
     '''
-    __tablename__ = 'variable_types'
+    __tablename__ = 'placeholder_types'
     id = Column(db.Integer, primary_key=True)
     type = Column(db.Text)
 
-class TemplateVariables(Model):
+class TemplatePlaceholders(Model):
     '''
-    The variables associated with each section
+    The placeholders associated with each section
 
     Fields:
-    - name: The actual name of the variable
+    - name: The actual name of the placeholder
     - template_id: Foreign Key back to the TemplateBase model
     - section_id: Foreign Key back to the TemplateSection model
     '''
 
-    __tablename__ = 'template_variables'
+    __tablename__ = 'template_placeholders'
     id = Column(db.Integer, primary_key=True)
     full_name = Column(db.Text)
     display_name = Column(db.Text)
-    type = Column(db.Integer, db.ForeignKey('variable_types.id'))
+    type = Column(db.Integer, db.ForeignKey('placeholder_types.id'))
     template_id = ReferenceCol('template_base')
     section_id = ReferenceCol('template_section')
 

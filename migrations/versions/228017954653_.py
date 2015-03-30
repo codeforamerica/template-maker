@@ -1,4 +1,4 @@
-"""empty message
+"""Decorate variables
 
 Revision ID: 228017954653
 Revises: 5549c709cd56

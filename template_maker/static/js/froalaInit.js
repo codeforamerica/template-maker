@@ -1,8 +1,8 @@
 $(function() {
 
-  // on initialization, focus the editor and restyle the "add-variable" button
+  // on initialization, focus the editor and restyle the "add-placeholder" button
   $("#widget").on('editable.initialized', function(e, editor) {
-    $('.froala-editor').find('.fr-bttn[data-name="insertVariable"]').css({
+    $('.froala-editor').find('.fr-bttn[data-name="insertPlaceholder"]').css({
       'width': '120px', 'font-size': '14px'
     });
   });
@@ -23,13 +23,13 @@ $(function() {
       inlineMode: false,
       height: 450,
       buttons: [
-        'insertVariable', 'sep',
+        'insertPlaceholder', 'sep',
         'bold', 'italic', 'underline', 'sep',
         'formatBlock', 'insertOrderedList','insertUnorderedList', 'insertHorizontalRule', 'sep',
         'undo', 'redo', 'sep',
       ],
       customButtons: {
-        insertVariable: {
+        insertPlaceholder: {
           title: 'Insert Placeholder',
           icon: {
             type: 'txt',
@@ -37,14 +37,14 @@ $(function() {
           },
           callback: function () {
             var froala = this;
-            insertVariable()
+            insertPlaceholder()
 
             if (froala.getHTML() === '') {
               // we have to add a non-breaking space character if there is
               // absolutely no html due to some weirdness
-              froala.insertHTML('&nbsp' + createVariableShell() + '&nbsp ');
+              froala.insertHTML('&nbsp' + createPlaceholderShell() + '&nbsp ');
             } else {
-              froala.insertHTML(createVariableShell() + '&nbsp ');
+              froala.insertHTML(createPlaceholderShell() + '&nbsp ');
             }
 
           }
@@ -58,55 +58,55 @@ $(function() {
     $('#widget').parents('form').trigger('checkform.areYouSure');
   });
 
-  // get the minimum variable id which should one more than the total number
-  // of variables on the page right now
-  variableId = Math.max(0, Math.max.apply(null, $.map(
-    $('.template-preview-content').find('.fr-variable'),
+  // get the minimum placeholder id which should one more than the total number
+  // of placeholders on the page right now
+  placeholderId = Math.max(0, Math.max.apply(null, $.map(
+    $('.template-preview-content').find('.fr-placeholder'),
     function(d) {
       return +d.id.split('-')[2];
     }))) + 1;
 
-  function createVariableHtml(modal) {
-    var _type = modal.find('.modal-variable-type').val();
-    var _name = modal.find('.modal-variable-name').val();
+  function createPlaceholderHtml(modal) {
+    var _type = modal.find('.modal-placeholder-type').val();
+    var _name = modal.find('.modal-placeholder-name').val();
 
     if (_name === '') { return false; }
 
-    modal.find('.modal-variable-name').val('');
-    modal.find('.modal-variable-type').val('Text');
+    modal.find('.modal-placeholder-name').val('');
+    modal.find('.modal-placeholder-type').val('Text');
 
     return '[[' + _type + '||' + _name + ']]';
   }
 
-  function createVariableId(variableId, isElem) {
+  function createPlaceholderId(placeholderId, isElem) {
     // returns a hash if there is an elem, no hash if there isn't
-    var variableIdRoot = 'template-variable-' + variableId;
-    return isElem ? '#' + variableIdRoot : variableIdRoot;
+    var placeholderIdRoot = 'template-placeholder-' + placeholderId;
+    return isElem ? '#' + placeholderIdRoot : placeholderIdRoot;
   }
 
-  function createVariableShell(modal) {
-    // create a shell to insert the variable into
-    var shell = '<span contenteditable=false class="fr-variable" data-fr-verified="true" ' +
-    'id="' + createVariableId(variableId, false) + '"> </span>';
+  function createPlaceholderShell(modal) {
+    // create a shell to insert the placeholder into
+    var shell = '<span contenteditable=false class="fr-placeholder" data-fr-verified="true" ' +
+    'id="' + createPlaceholderId(placeholderId, false) + '"> </span>';
     return shell;
   }
 
-  function insertVariable() {
+  function insertPlaceholder() {
     // open the modal
-    $('#variableModal').modal('show');
+    $('#placeholderModal').modal('show');
   }
 
-  // insert the actual variable on save
-  $('#variableModal').find('.modal-add-variable').on('click', function(e) {
-    var modal = $('#variableModal');
-    // figure out if we are inserting a new variable or modifying an old one
-    var curVariable = $('.modal-variable-name').attr('data-variable-cur-id') ?
-      $('.modal-variable-name').attr('data-variable-cur-id').split('-')[2] :
-      variableId;
+  // insert the actual placeholder on save
+  $('#placeholderModal').find('.modal-add-placeholder').on('click', function(e) {
+    var modal = $('#placeholderModal');
+    // figure out if we are inserting a new placeholder or modifying an old one
+    var curPlaceholder = $('.modal-placeholder-name').attr('data-placeholder-cur-id') ?
+      $('.modal-placeholder-name').attr('data-placeholder-cur-id').split('-')[2] :
+      placeholderId;
     // update the html
-    var newHtml = createVariableHtml(modal);
+    var newHtml = createPlaceholderHtml(modal);
     if (newHtml) {
-      $(createVariableId(curVariable, true)).html(newHtml);
+      $(createPlaceholderId(curPlaceholder, true)).html(newHtml);
       $('#widget').parents('form').trigger('checkform.areYouSure');
       modal.modal('hide');
     } else {
@@ -120,60 +120,60 @@ $(function() {
       }
       return
     }
-    // only increment if we are inserting a new variable
-    if (typeof(curVariable) === 'number') variableId++;
+    // only increment if we are inserting a new placeholder
+    if (typeof(curPlaceholder) === 'number') placeholderId++;
     // reset the name value to be an empty string
-    $('.modal-variable-name').attr('data-variable-cur-id', null);
+    $('.modal-placeholder-name').attr('data-placeholder-cur-id', null);
   });
 
-  $('#variableModal').find('.close-bs-modal-no-save').on('click', function(e) {
+  $('#placeholderModal').find('.close-bs-modal-no-save').on('click', function(e) {
     // if we are hiding the modal, we need to remove the new shell that we made
     // and reset the values
-    $(createVariableId(variableId, true)).remove();
-    $('.modal-variable-name').attr('data-variable-cur-id', null);
-    $('.modal-variable-name').val('');
-    $('.modal-variable-type').val('Text');
+    $(createPlaceholderId(placeholderId, true)).remove();
+    $('.modal-placeholder-name').attr('data-placeholder-cur-id', null);
+    $('.modal-placeholder-name').val('');
+    $('.modal-placeholder-type').val('Text');
   });
 
-  $('.froala-view').on('dblclick', '.fr-variable', function(e) {
-    editVariable(e.target);
+  $('.froala-view').on('dblclick', '.fr-placeholder', function(e) {
+    editPlaceholder(e.target);
   });
 
-  function editVariable(target) {
-    var modalNameInput = $('.modal-variable-name');
-    var modalTypeInput = $('.modal-variable-type');
-    // if we are editing an existing variable, attach the existing values
-    // to the modal field, and the variable id as a data attribute so that we
+  function editPlaceholder(target) {
+    var modalNameInput = $('.modal-placeholder-name');
+    var modalTypeInput = $('.modal-placeholder-type');
+    // if we are editing an existing placeholder, attach the existing values
+    // to the modal field, and the placeholder id as a data attribute so that we
     // can access it later
     modalNameInput.val($(target).html().split(':')[1].slice(0, -2));
     modalTypeInput.val($(target).html().split(':')[0].slice(2, $(target).html().split(':')[0].length));
-    modalNameInput.attr('data-variable-cur-id', target.id)
-    $('#variableModal').modal('show');
+    modalNameInput.attr('data-placeholder-cur-id', target.id)
+    $('#placeholderModal').modal('show');
   }
 
   var clicking = false, _el;
 
-  // if we click on a variable, we have an element and we are clicking
-  $('.froala-view').on('mousedown.froalaCustom.moveVariable', '.fr-variable', function(e){
+  // if we click on a placeholder, we have an element and we are clicking
+  $('.froala-view').on('mousedown.froalaCustom.movePlaceholder', '.fr-placeholder', function(e){
     _el = e.target;
     clicking = true;
   });
 
   // we need to attach listeners both on the froala editor and the document
   // to get all possible mouseups. when we do, we are no longer clicking
-  $('.froala-view').on('mouseup.froalaCustom.moveVariable', function(e) {
+  $('.froala-view').on('mouseup.froalaCustom.movePlaceholder', function(e) {
     clicking = false;
   });
 
-  $('.froala-editor').on('mouseup.froalaCustom.moveVariable', function(e) {
+  $('.froala-editor').on('mouseup.froalaCustom.movePlaceholder', function(e) {
     clicking = false;
   });
 
-  $(document).on('mouseup.froalaCustom.moveVariable', function(e) {
+  $(document).on('mouseup.froalaCustom.movePlaceholder', function(e) {
     clicking = false;
   });
 
-  $('.froala-view').on('mousemove.froalaCustom.moveVariable', function(e){
+  $('.froala-view').on('mousemove.froalaCustom.movePlaceholder', function(e){
     if (clicking === false || !_el) return;
     e.preventDefault();
 

@@ -1,7 +1,7 @@
 import datetime
 from template_maker.database import db
 from template_maker.builder.models import (
-    TemplateBase, TemplateSection, TextSection, TemplateVariables
+    TemplateBase, TemplateSection, TextSection, TemplatePlaceholders
 )
 from template_maker.users.models import User
 
@@ -26,17 +26,17 @@ def insert_new_section(title='foo', text='bar'):
     db.session.commit()
     return section
 
-def create_a_variable(section_id=1):
-    return TemplateVariables(template_id=1, section_id=section_id)
+def create_a_placeholder(section_id=1):
+    return TemplatePlaceholders(template_id=1, section_id=section_id)
 
-def insert_new_variable(section_id=None):
+def insert_new_placeholder(section_id=None):
     if len(TemplateSection.query.all()) == 0 or section_id is None:
         section = insert_new_section('foo', 'bar')
         section_id = section.id
-    variable = create_a_variable(section_id)
-    db.session.add(variable)
+    placeholder = create_a_placeholder(section_id)
+    db.session.add(placeholder)
     db.session.commit()
-    return variable
+    return placeholder
 
 def create_a_user(is_admin, email='foo@foo.com'):
     return User(email=email, first_name='foo', last_name='foo', is_admin=is_admin)

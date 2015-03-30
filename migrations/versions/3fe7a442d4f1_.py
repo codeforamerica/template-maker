@@ -1,4 +1,4 @@
-"""empty message
+"""Clean up users table for persona
 
 Revision ID: 3fe7a442d4f1
 Revises: 44b77ae3ee69
