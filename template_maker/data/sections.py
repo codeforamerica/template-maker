@@ -4,10 +4,10 @@ from sqlalchemy.dialects.postgresql import array
 from template_maker.database import db
 from template_maker.builder.models import TemplateSection, TextSection, FixedTextSection
 from template_maker.data.placeholders import (
-    delete_excess_placeholders, create_or_update_placeholder, get_section_placeholders
+    delete_excess_placeholders, create_or_update_placeholder, get_section_placeholders,
+    get_all_placeholders
 )
 
-VARIABLE_RE = re.compile('(\[\[ |\[\[).*?\|\|.*?(\]\]| \]\])')
 SECTION_TYPE_MAPS = {
     'text': TextSection, 'fixed_text': FixedTextSection,
 }
@@ -90,8 +90,8 @@ def update_section(section, template_id, form_input):
         section.text = html
         # save the text
         db.session.commit()
-        # find all placeholders, using the regex set above
-        input_placeholders = [i.group() for i in re.finditer(VARIABLE_RE, html)]
+        # find all placeholders, using beautiful soup
+        input_placeholders = get_all_placeholders(html)
         # get any existing placeholders
         current_placeholders = get_section_placeholders(section.id)
 

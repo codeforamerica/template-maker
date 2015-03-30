@@ -28,6 +28,9 @@ gunicorn==19.3.0
 webassets==0.10.1
 Flask-Assets==0.10
 
+# HTML Parsing
+beautifulsoup4==4.3.2
+
 # Debug toolbar -- included because it registers as an extension
 Flask-DebugToolbar==0.9.2
 blinker==1.3

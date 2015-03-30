@@ -1,9 +1,18 @@
 from template_maker.database import db
 from template_maker.builder.models import TemplatePlaceholders
+from bs4 import BeautifulSoup
 
 VARIABLE_TYPE_MAPS = {
     'text': 1, 'date': 2,'number': 3, 'float': 4
 }
+
+def get_all_placeholders(html):
+    '''
+    Uses BeautifulSoup to parse through an HTML block and
+    return all .fr-placeholder span tags
+    '''
+    soup = BeautifulSoup(html)
+    return soup.find_all('span', {'class': 'js-fr-placeholder'})
 
 def get_template_placeholders(template_id):
     '''
@@ -32,7 +41,8 @@ def parse_placeholder_text(placeholder):
     Takes a placeholder of the form [[TYPE:NAME]] and
     returns the type and the name
     '''
-    no_tags = placeholder.lstrip('[[').rstrip(']]')
+    placeholder_text = placeholder.text
+    no_tags = placeholder_text.lstrip('[[').rstrip(']]')
     var_type = no_tags.split('||')[0].lower()
     var_name = '[[' + no_tags.split('||')[1] + ']]'
     return var_type, var_name
@@ -49,7 +59,7 @@ def delete_excess_placeholders(current_placeholders, input_placeholders):
 def create_or_update_placeholder(var_idx, placeholder, input_placeholders, current_placeholders, template_id, section_id):
     _placeholder = current_placeholders[var_idx] if len(current_placeholders) > 0 and var_idx < len(current_placeholders) else TemplatePlaceholders()
     var_type, var_name = parse_placeholder_text(placeholder)
-    _placeholder.full_name = placeholder
+    _placeholder.full_name = placeholder.text
     _placeholder.display_name = var_name
     _placeholder.template_id = template_id
     _placeholder.section_id = section_id

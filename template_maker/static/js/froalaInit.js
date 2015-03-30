@@ -60,8 +60,8 @@ $(function() {
 
   // get the minimum placeholder id which should one more than the total number
   // of placeholders on the page right now
-  placeholderId = Math.max(0, Math.max.apply(null, $.map(
-    $('.template-preview-content').find('.fr-placeholder'),
+  var placeholderId = Math.max(0, Math.max.apply(null, $.map(
+    $('.template-preview-content').find('.js-fr-placeholder'),
     function(d) {
       return +d.id.split('-')[2];
     }))) + 1;
@@ -86,7 +86,7 @@ $(function() {
 
   function createPlaceholderShell(modal) {
     // create a shell to insert the placeholder into
-    var shell = '<span contenteditable=false class="fr-placeholder" data-fr-verified="true" ' +
+    var shell = '<span contenteditable=false class="js-fr-placeholder" data-fr-verified="true" ' +
     'id="' + createPlaceholderId(placeholderId, false) + '"> </span>';
     return shell;
   }
@@ -135,7 +135,7 @@ $(function() {
     $('.modal-placeholder-type').val('Text');
   });
 
-  $('.froala-view').on('dblclick', '.fr-placeholder', function(e) {
+  $('.froala-view').on('dblclick', '.js-fr-placeholder', function(e) {
     editPlaceholder(e.target);
   });
 
@@ -154,7 +154,7 @@ $(function() {
   var clicking = false, _el;
 
   // if we click on a placeholder, we have an element and we are clicking
-  $('.froala-view').on('mousedown.froalaCustom.movePlaceholder', '.fr-placeholder', function(e){
+  $('.froala-view').on('mousedown.froalaCustom.movePlaceholder', '.js-fr-placeholder', function(e){
     _el = e.target;
     clicking = true;
   });
