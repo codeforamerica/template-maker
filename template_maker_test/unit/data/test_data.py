@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from template_maker_test.unit.test_base import BaseTestCase
 from template_maker.database import db
 from template_maker.builder.models import (
@@ -39,13 +40,15 @@ class BuilderUtilTest(BaseTestCase):
 
     def test_parse_placeholder_text(self):
         # simple example
-        placeholder = '[[FOO||BAR]]'
+        soup = BeautifulSoup('<span>[[FOO||BAR]]</span>')
+        placeholder = soup.find('span')
         var_type, var_name = parse_placeholder_text(placeholder)
         self.assertEquals(var_type, 'foo')
         self.assertEquals(var_name, '[[BAR]]')
 
         # complex example should still work
-        placeholder = '[[FOO||This is a LONG StrINg with Weird Characterz]]'
+        soup = BeautifulSoup('<span>[[FOO||This is a LONG StrINg with Weird Characterz]]</span>')
+        placeholder = soup.find('span')
         var_type, var_name = parse_placeholder_text(placeholder)
         self.assertEquals(var_type, 'foo')
         self.assertEquals(var_name, '[[This is a LONG StrINg with Weird Characterz]]')
@@ -72,7 +75,9 @@ class BuilderUtilTest(BaseTestCase):
         placeholder = insert_new_placeholder(section.id)
 
         new_content = {
-            'widget': 'this is a [[Text||foo]] [[Text||bar]] [[Text||baz]] update'
+            'widget': 'this is a <span class="js-fr-placeholder">[[Text||foo]]</span>' +
+            '<span class="js-fr-placeholder">[[Text||bar]]</span>' +
+            '<span class="js-fr-placeholder">[[Text||baz]]</span> update'
         }
 
         update_section(section, template.id, new_content)
@@ -80,7 +85,7 @@ class BuilderUtilTest(BaseTestCase):
         self.assertEquals(section.text, new_content.get('widget'))
 
         new_content2 = {
-            'widget': 'this is a section with fewer placeholders [[Text||foo]]'
+            'widget': 'this is a section with fewer placeholders <span class="js-fr-placeholder">[[Text||foo]]</span>'
         }
 
         update_section(section, template.id, new_content2)
