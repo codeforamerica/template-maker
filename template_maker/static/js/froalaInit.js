@@ -139,14 +139,17 @@ $(function() {
     $('.modal-placeholder-name').attr('data-placeholder-cur-id', null);
   });
 
-  $('#placeholderModal').find('.close-bs-modal-no-save').on('click', function(e) {
-    // if we are hiding the modal, we need to remove the new shell that we made
-    // and reset the values
-    $(createPlaceholderId(placeholderId, true)).remove();
-    $('.modal-placeholder-name').attr('data-placeholder-cur-id', null);
-    $('.modal-placeholder-name').val('');
-    $('.modal-placeholder-type').val('Text');
-  });
+  $('#placeholderModal').on('hide.bs.modal', function() {
+    var _curPlaceholder = $(createPlaceholderId(placeholderId, true));
+    if (_curPlaceholder.text() === ' ') {
+      // if we are hiding the modal, we need to remove the new shell that we made
+      // and reset the values
+      $(createPlaceholderId(placeholderId, true)).remove();
+      $('.modal-placeholder-name').attr('data-placeholder-cur-id', null);
+      $('.modal-placeholder-name').val('');
+      $('.modal-placeholder-type').val('Text');
+    }
+  })
 
   $('.froala-view').on('dblclick', '.js-fr-placeholder', function(e) {
     editPlaceholder(e.target);
