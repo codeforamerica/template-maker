@@ -83,7 +83,9 @@ $(function() {
 
       var newPlaceholder = '[[' + _type + '||' + _name + ']]';
 
-      _existing.append($("<option/>", { text: '[[' + _type + '||' + _name + ']]' }));
+      if ($.map(_existing[0].options, function(d) { return d.value }).indexOf(newPlaceholder) === -1) {
+        _existing.append($("<option/>", { text: '[[' + _type + '||' + _name + ']]' }));
+      }
 
       return '[[' + _type + '||' + _name + ']]';      
     }
