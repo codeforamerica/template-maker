@@ -66,6 +66,8 @@ $(function() {
       return +d.id.split('-')[2];
     }))) + 1;
 
+  var placeholders = $.map($('.js-existing-placeholder'), function(d) { return d.innerHTML} );
+
   function createPlaceholderHtml(modal) {
     var _type = modal.find('.modal-placeholder-type').val();
     var _name = modal.find('.modal-placeholder-name').val();
@@ -145,8 +147,8 @@ $(function() {
     // if we are editing an existing placeholder, attach the existing values
     // to the modal field, and the placeholder id as a data attribute so that we
     // can access it later
-    modalNameInput.val($(target).html().split(':')[1].slice(0, -2));
-    modalTypeInput.val($(target).html().split(':')[0].slice(2, $(target).html().split(':')[0].length));
+    modalNameInput.val($(target).html().split('||')[1].slice(0, -2));
+    modalTypeInput.val($(target).html().split('||')[0].slice(2, $(target).html().split('||')[0].length));
     modalNameInput.attr('data-placeholder-cur-id', target.id)
     $('#placeholderModal').modal('show');
   }
