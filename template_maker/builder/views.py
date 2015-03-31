@@ -161,7 +161,7 @@ def edit_template(template_id, section_id=None, section_type=None):
 
     # otherwise, we are doing a get request, so get the sections and placeholders
     sections = get_template_sections(template_base)
-    placeholders = get_template_placeholders(template_base.id)
+    placeholders = list(set([i.full_name for i in get_template_placeholders(template_base.id)]))
 
     response = make_response(render_template(
         'builder/edit.html', template=template_base,

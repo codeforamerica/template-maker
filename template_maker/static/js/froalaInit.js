@@ -42,9 +42,9 @@ $(function() {
             if (froala.getHTML() === '') {
               // we have to add a non-breaking space character if there is
               // absolutely no html due to some weirdness
-              froala.insertHTML('&nbsp' + createPlaceholderShell() + '&nbsp ');
+              froala.insertHTML('&nbsp' + createPlaceholderShell() + '&nbsp');
             } else {
-              froala.insertHTML(createPlaceholderShell() + '&nbsp ');
+              froala.insertHTML(createPlaceholderShell() + '&nbsp');
             }
 
           }
@@ -71,13 +71,24 @@ $(function() {
   function createPlaceholderHtml(modal) {
     var _type = modal.find('.modal-placeholder-type').val();
     var _name = modal.find('.modal-placeholder-name').val();
+    var _existing = modal.find('.modal-existing-placeholder');
 
-    if (_name === '') { return false; }
+    // if we don't have a new name or an existing selection, return false
+    if (_name === '' && _existing === '-----' ) { return false; }
 
-    modal.find('.modal-placeholder-name').val('');
-    modal.find('.modal-placeholder-type').val('Text');
+    // if we have a name defer to that
+    if (_name !== '') {
+      modal.find('.modal-placeholder-name').val('');
+      modal.find('.modal-placeholder-type').val('Text');
 
-    return '[[' + _type + '||' + _name + ']]';
+      var newPlaceholder = '[[' + _type + '||' + _name + ']]';
+
+      _existing.append($("<option/>", { text: '[[' + _type + '||' + _name + ']]' }));
+
+      return '[[' + _type + '||' + _name + ']]';      
+    }
+    // otherwise, we must have an existing variable, so return that
+    return _existing.val();
   }
 
   function createPlaceholderId(placeholderId, isElem) {

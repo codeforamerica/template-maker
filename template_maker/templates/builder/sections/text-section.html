@@ -11,12 +11,8 @@
       <div class="modal-body">
 
         <div class="form form-horizontal row">
-          <div class="col-sm-6">
-            {% for placeholder in placeholders %}
-              <span class="js-existing-placeholder">{{ placeholder.full_name }}</span>
-            {% endfor %}
-          </div>
-          <div class="col-sm-6">
+          <div class="col-sm-7">
+            <label class="text-center">New Placeholder</label>
             <div class="form-group">
               <label for="modalPlaceholderName" class="col-sm-2 control-label">Name</label>
               <div class="col-sm-10">
@@ -33,6 +29,15 @@
                 </select>
               </div>
             </div>
+          </div>
+          <div class="col-sm-5">
+            <label class="text-center">Exisiting Placeholder</label>
+            <select class="form-control modal-existing-placeholder">
+              <option>-----</option>
+              {% for placeholder in placeholders %}
+              <option>{{ placeholder }}</option>
+              {% endfor %}
+            </select>
           </div>
         </div>
       </div>
