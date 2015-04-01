@@ -42,9 +42,9 @@ $(function() {
             if (froala.getHTML() === '') {
               // we have to add a non-breaking space character if there is
               // absolutely no html due to some weirdness
-              froala.insertHTML('&nbsp' + createPlaceholderShell() + '&nbsp ');
+              froala.insertHTML('&nbsp' + createPlaceholderShell() + '&nbsp');
             } else {
-              froala.insertHTML(createPlaceholderShell() + '&nbsp ');
+              froala.insertHTML(createPlaceholderShell() + '&nbsp');
             }
 
           }
@@ -66,16 +66,31 @@ $(function() {
       return +d.id.split('-')[2];
     }))) + 1;
 
+  var placeholders = $.map($('.js-existing-placeholder'), function(d) { return d.innerHTML} );
+
   function createPlaceholderHtml(modal) {
     var _type = modal.find('.modal-placeholder-type').val();
     var _name = modal.find('.modal-placeholder-name').val();
+    var _existing = modal.find('.modal-existing-placeholder');
 
-    if (_name === '') { return false; }
+    // if we don't have a new name or an existing selection, return false
+    if (_name === '' && _existing === '-----' ) { return false; }
 
-    modal.find('.modal-placeholder-name').val('');
-    modal.find('.modal-placeholder-type').val('Text');
+    // if we have a name defer to that
+    if (_name !== '') {
+      modal.find('.modal-placeholder-name').val('');
+      modal.find('.modal-placeholder-type').val('Text');
 
-    return '[[' + _type + '||' + _name + ']]';
+      var newPlaceholder = '[[' + _type + '||' + _name + ']]';
+
+      if ($.map(_existing[0].options, function(d) { return d.value }).indexOf(newPlaceholder) === -1) {
+        _existing.append($("<option/>", { text: '[[' + _type + '||' + _name + ']]' }));
+      }
+
+      return '[[' + _type + '||' + _name + ']]';      
+    }
+    // otherwise, we must have an existing variable, so return that
+    return _existing.val();
   }
 
   function createPlaceholderId(placeholderId, isElem) {
@@ -126,14 +141,17 @@ $(function() {
     $('.modal-placeholder-name').attr('data-placeholder-cur-id', null);
   });
 
-  $('#placeholderModal').find('.close-bs-modal-no-save').on('click', function(e) {
-    // if we are hiding the modal, we need to remove the new shell that we made
-    // and reset the values
-    $(createPlaceholderId(placeholderId, true)).remove();
-    $('.modal-placeholder-name').attr('data-placeholder-cur-id', null);
-    $('.modal-placeholder-name').val('');
-    $('.modal-placeholder-type').val('Text');
-  });
+  $('#placeholderModal').on('hide.bs.modal', function() {
+    var _curPlaceholder = $(createPlaceholderId(placeholderId, true));
+    if (_curPlaceholder.text() === ' ') {
+      // if we are hiding the modal, we need to remove the new shell that we made
+      // and reset the values
+      $(createPlaceholderId(placeholderId, true)).remove();
+      $('.modal-placeholder-name').attr('data-placeholder-cur-id', null);
+      $('.modal-placeholder-name').val('');
+      $('.modal-placeholder-type').val('Text');
+    }
+  })
 
   $('.froala-view').on('dblclick', '.js-fr-placeholder', function(e) {
     editPlaceholder(e.target);
@@ -145,8 +163,8 @@ $(function() {
     // if we are editing an existing placeholder, attach the existing values
     // to the modal field, and the placeholder id as a data attribute so that we
     // can access it later
-    modalNameInput.val($(target).html().split(':')[1].slice(0, -2));
-    modalTypeInput.val($(target).html().split(':')[0].slice(2, $(target).html().split(':')[0].length));
+    modalNameInput.val($(target).html().split('||')[1].slice(0, -2));
+    modalTypeInput.val($(target).html().split('||')[0].slice(2, $(target).html().split('||')[0].length));
     modalNameInput.attr('data-placeholder-cur-id', target.id)
     $('#placeholderModal').modal('show');
   }

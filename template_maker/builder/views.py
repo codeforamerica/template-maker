@@ -138,8 +138,7 @@ def edit_template(template_id, section_id=None, section_type=None):
     else:
         new_order = None
 
-    # get the sections and initialize the forms
-    sections = get_template_sections(template_base)
+    # initialize the forms
     form = SECTION_FORM_MAP[current_section.section_type]()
     new_section_form = TemplateSectionForm()
 
@@ -160,10 +159,14 @@ def edit_template(template_id, section_id=None, section_type=None):
                 template_id=template_id, section_id=section_id
             ))
 
+    # otherwise, we are doing a get request, so get the sections and placeholders
+    sections = get_template_sections(template_base)
+    placeholders = list(set([i.full_name for i in get_template_placeholders(template_base.id)]))
+
     response = make_response(render_template(
         'builder/edit.html', template=template_base,
-        sections=sections, form=form,
-        new_section_form=new_section_form,
+        sections=sections, placeholders=placeholders,
+        form=form, new_section_form=new_section_form,
         current_section=current_section
     ))
     return response
