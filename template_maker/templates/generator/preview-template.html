@@ -1,7 +1,7 @@
 {% import "macros.html" as macros %}
 
 <div class="white-wrapper">
-    <span class="span-title">SFJIOSJDFIODSJFOS</span>
+    <span class="span-title">{{ current_section.title }}</span>
     <button class="btn btn-success pull-right">Save</button>
 <!--   <div class="well placeholder-index">
     <div class="row">
@@ -26,14 +26,11 @@
 </div>
 
 <div class="document-preview-content">
-  {% for section in sections %}
-    <div class="section-content" id="section-{{ section.id }}">
-    {% if section.section_type == 'text' or section.section_type == 'fixed_text' %}
-      {% if section.text %}
-        {{ section.text | safe }}
-      {% endif %}
+  <div class="section-content" id="section-{{ current_section.id }}">
+  {% if current_section.section_type == 'text' or current_section.section_type == 'fixed_text' %}
+    {% if current_section.text %}
+      {{ current_section.text | safe }}
     {% endif %}
-    </div>
-    <hr>
-  {% endfor %}
+  {% endif %}
+  </div>
 </div>

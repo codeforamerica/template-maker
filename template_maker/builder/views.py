@@ -9,12 +9,12 @@ from template_maker.extensions import login_manager
 from template_maker.users.models import User
 
 from template_maker.builder.forms import (
-    TemplateBaseForm, TemplateSectionForm, TemplateSectionTextForm,
-    PlaceholderForm, SelectField, StringField, Form
+    TemplateBaseForm, TemplateSectionForm,
+    TemplateSectionTextForm
 )
 
 from template_maker.data.templates import (
-    get_all_templates, get_single_template, delete_template, create_new_template, 
+    get_all_templates, get_single_template, delete_template, create_new_template,
     publish_template as _publish_template
 )
 from template_maker.data.sections import (
@@ -85,7 +85,9 @@ def new_template():
 def new_section(template_id, section_type=None):
     new_section = { 'type': section_type, 'title': request.args.get('section_title', '') }
     if request.args.get('boilerplate', False):
-        new_section['html'] = html_boilerplate.get(request.args.get('boilerplate'), 'Please insert your text here.')
+        new_section['html'] = html_boilerplate.get(
+            request.args.get('boilerplate'), 'Please insert your text here.'
+        )
     new_section_id = create_new_section(new_section, template_id)
 
     if new_section_id:
@@ -155,7 +157,7 @@ def edit_template(template_id, section_id=None, section_type=None):
         if section_id == 0:
             return redirect(url_for('builder.edit_template', template_id=template_id))
         else:
-            return redirect(url_for('builder.edit_template', 
+            return redirect(url_for('builder.edit_template',
                 template_id=template_id, section_id=section_id
             ))
 

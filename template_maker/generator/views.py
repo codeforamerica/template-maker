@@ -9,7 +9,7 @@ from wtforms import TextField, IntegerField, FloatField
 from template_maker.builder.forms import PlaceholderForm
 from template_maker.generator.forms import DatePickerField, DocumentBaseForm
 from template_maker.data.templates import get_single_template, get_published_templates
-from template_maker.data.sections import get_template_sections
+from template_maker.data.sections import get_template_sections, get_single_section
 from template_maker.data.placeholders import get_section_placeholders
 from template_maker.data.documents import (
     create_new_document, get_single_document,
@@ -110,26 +110,37 @@ def edit_document_sections(document_id, section_id=None):
     '''
     document_base = get_single_document(document_id)
     template_base = get_single_template(document_base.template_id)
+
+    if template_base is None or document_base is None:
+        return render_template('404.html')
+
+    if section_id is None:
+        return redirect(url_for(
+            'generator.edit_document_sections', document_id=document_id,
+            section_id=template_base.section_order[0]
+        ))
+
     sections = get_template_sections(template_base)
+    current_section = get_single_section(section_id, template_base.id)
+
     class F(PlaceholderForm):
         pass
 
-    for section in sections:
-        if section.section_type == 'text':
-            # if we have a text section, we need to prep the page for the rivets
-            # two-way data binding
-            placeholders = get_section_placeholders(section.id)
-            for placeholder in placeholders:
-                # add a data_input value onto the placeholder
-                placeholder.rv_data_input = 'placeholder_' + strip_tags(placeholder.display_name)
-                # format the section text
-                section.text = create_rivets_bindings(placeholder, section)
-                # set up the form
-                setattr(
-                    F,
-                    placeholder.display_name,
-                    TYPE_VARIABLES_MAP[placeholder.type](placeholder.display_name)
-                )
+    if current_section.section_type == 'text':
+        # if we have a text section, we need to prep the page for the rivets
+        # two-way data binding
+        placeholders = get_section_placeholders(current_section.id)
+        for placeholder in placeholders:
+            # add a data_input value onto the placeholder
+            placeholder.rv_data_input = 'placeholder_' + strip_tags(placeholder.display_name)
+            # format the section text
+            current_section.text = create_rivets_bindings(placeholder, current_section)
+            # set up the form
+            setattr(
+                F,
+                placeholder.display_name,
+                TYPE_VARIABLES_MAP[placeholder.type](placeholder.display_name)
+            )
 
     form = F()
     for field in form.__iter__():
@@ -137,5 +148,8 @@ def edit_document_sections(document_id, section_id=None):
         setattr(field, 'rv_data_input', 'template.placeholder_' + strip_tags(field.name))
         setattr(field, 'label', strip_tags(field.name))
 
-    return render_template('generator/build-document.html', document=document_base,
-        template=template_base, sections=sections, placeholders=placeholders, form=form)
+    return render_template('generator/build-document.html',
+        document=document_base, template=template_base,
+        sections=sections, placeholders=placeholders,
+        current_section=current_section, form=form
+    )

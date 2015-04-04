@@ -13,8 +13,10 @@
       <a href="{{ url_for('builder.edit_template', template_id=template.id) }}">Edit the template</a>
     </div>
     {% for section in sections %}
-      <a href="#section-{{ section.id }}">{{ section.title }}</a>
-      <hr>
+      <div class="generator-section {% if section.id==current_section.id %}current-section{% endif %}">
+        <a href="{{ url_for('generator.edit_document_sections', document_id=document.id, section_id=section.id) }}">{{ section.title }}</a>
+      </div>
+      <hr class="hr-no-margin">
     {% endfor %}
   </div>
   <div class="col-sm-10 has-left-fixed-companion">
