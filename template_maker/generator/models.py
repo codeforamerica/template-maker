@@ -23,3 +23,19 @@ class DocumentBase(Model):
         self.updated_at = updated_at
         self.name = name
         self.template_id = template_id
+
+class DocumentPlaceholder(Model):
+    '''
+    A document's placeholder's value. Relates to the
+    document and the placeholder
+    '''
+
+    __tablename__ = 'document_placeholder'
+    id = Column(db.Integer, primary_key=True)
+    document_id = ReferenceCol('document_base')
+    placeholder_id = ReferenceCol('template_placeholders')
+    value = Column(db.Text)
+
+    def __init__(self, document_id, placeholder_id):
+        self.document_id = document_id
+        self.placeholder_id = placeholder_id

@@ -2,7 +2,7 @@
 
 <div class="white-wrapper">
     <span class="span-title">{{ current_section.title }}</span>
-    <button class="btn btn-success pull-right">Save</button>
+    <input type="submit" value="Save" class="btn btn-success pull-right">
 <!--   <div class="well placeholder-index">
     <div class="row">
       <div class="col-md-2">
@@ -28,8 +28,8 @@
 <div class="document-preview-content">
   <div class="section-content" id="section-{{ current_section.id }}">
   {% if current_section.section_type == 'text' or current_section.section_type == 'fixed_text' %}
-    {% if current_section.text %}
-      {{ current_section.text | safe }}
+    {% if current_section_text %}
+      {{ current_section_text | safe }}
     {% endif %}
   {% endif %}
   </div>

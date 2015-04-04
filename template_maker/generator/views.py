@@ -1,19 +1,19 @@
 import re
 import string
+
 from flask import (
     Blueprint, request, render_template,
     redirect, url_for, abort
 )
-
+from flask.ext.wtf import Form
 from wtforms import TextField, IntegerField, FloatField
-from template_maker.builder.forms import PlaceholderForm
+
 from template_maker.generator.forms import DatePickerField, DocumentBaseForm
 from template_maker.data.templates import get_single_template, get_published_templates
 from template_maker.data.sections import get_template_sections, get_single_section
-from template_maker.data.placeholders import get_section_placeholders
 from template_maker.data.documents import (
-    create_new_document, get_single_document,
-    get_documents_and_parent_templates, delete_document
+    create_new_document, get_single_document, save_document_section,
+    get_documents_and_parent_templates, delete_document, get_document_placeholders
 )
 
 TYPE_VARIABLES_MAP = {
@@ -87,20 +87,24 @@ def generate_class(placeholder):
         _class += ' datepicker'
     return _class
 
-def create_rivets_bindings(placeholder, section):
+def create_rivets_bindings(placeholder, section_text):
     '''
     Converts a placeholder into a <span> that rivets can grab onto
     '''
-    repl_text = '<input id="{placeholder_name}-value" placeholder="{placeholder_name}"'.format(
-        placeholder_name=strip_tags(placeholder.display_name)
+    repl_text = '<input id="{placeholder_display_name}" placeholder="{placeholder_name}"'.format(
+        placeholder_name=strip_tags(placeholder.display_name),
+        placeholder_display_name=placeholder.display_name
     ) + \
-    'class="' + generate_class(placeholder) + '" rv-value="template.placeholder_{idcombo}" >'.format(
+    ' name="{placeholder_name}"'.format(placeholder_name=placeholder.display_name) + \
+    ' class="' + generate_class(placeholder) + '" rv-value="template.placeholder_{idcombo}"'.format(
         idcombo=strip_tags(placeholder.display_name)
-    )
-    return re.sub(re.escape(placeholder.full_name), repl_text, section.text)
+    ) + \
+    'value="{placeholder_value}">'.format(placeholder_value=placeholder.value)
+    new_text = re.sub(re.escape(placeholder.full_name), repl_text, section_text)
+    return new_text
 
-@blueprint.route('/<int:document_id>/edit')
-@blueprint.route('/<int:document_id>/edit/<int:section_id>')
+@blueprint.route('/<int:document_id>/edit', methods=['GET', 'POST'])
+@blueprint.route('/<int:document_id>/edit/<int:section_id>', methods=['GET', 'POST'])
 def edit_document_sections(document_id, section_id=None):
     '''
     View to handle building a new RFP document
@@ -122,27 +126,33 @@ def edit_document_sections(document_id, section_id=None):
 
     sections = get_template_sections(template_base)
     current_section = get_single_section(section_id, template_base.id)
+    placeholders = get_document_placeholders(current_section.id)
 
-    class F(PlaceholderForm):
+    class F(Form):
         pass
 
     if current_section.section_type == 'text':
         # if we have a text section, we need to prep the page for the rivets
         # two-way data binding
-        placeholders = get_section_placeholders(current_section.id)
+        current_section_text = current_section.text
         for placeholder in placeholders:
             # add a data_input value onto the placeholder
             placeholder.rv_data_input = 'placeholder_' + strip_tags(placeholder.display_name)
             # format the section text
-            current_section.text = create_rivets_bindings(placeholder, current_section)
+            current_section_text = create_rivets_bindings(placeholder, current_section_text)
             # set up the form
             setattr(
-                F,
-                placeholder.display_name,
+                F, placeholder.display_name,
                 TYPE_VARIABLES_MAP[placeholder.type](placeholder.display_name)
             )
 
     form = F()
+
+    if form.validate_on_submit():
+        save_document_section(document_base, template_base, placeholders, request.form)
+        return redirect(url_for(
+            'generator.edit_document_sections', document_id=document_base.id, section_id=current_section.id)
+        )
     for field in form.__iter__():
         # set the rv_data_input value on the form field as well as on the placeholder
         setattr(field, 'rv_data_input', 'template.placeholder_' + strip_tags(field.name))
@@ -151,5 +161,6 @@ def edit_document_sections(document_id, section_id=None):
     return render_template('generator/build-document.html',
         document=document_base, template=template_base,
         sections=sections, placeholders=placeholders,
-        current_section=current_section, form=form
+        current_section=current_section, current_section_text=current_section_text or None,
+        form=form
     )

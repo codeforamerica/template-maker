@@ -7,7 +7,7 @@ from template_maker.builder.models import (
 )
 
 from template_maker.data.templates import (
-    get_all_templates, get_single_template, delete_template, create_new_template, 
+    get_all_templates, get_single_template, delete_template, create_new_template,
     publish_template as _publish_template
 )
 from template_maker.data.sections import (
@@ -42,14 +42,14 @@ class BuilderUtilTest(BaseTestCase):
         # simple example
         soup = BeautifulSoup('<span>[[FOO||BAR]]</span>')
         placeholder = soup.find('span')
-        var_type, var_name = parse_placeholder_text(placeholder)
+        var_type, var_name = parse_placeholder_text(placeholder.text)
         self.assertEquals(var_type, 'foo')
         self.assertEquals(var_name, '[[BAR]]')
 
         # complex example should still work
         soup = BeautifulSoup('<span>[[FOO||This is a LONG StrINg with Weird Characterz]]</span>')
         placeholder = soup.find('span')
-        var_type, var_name = parse_placeholder_text(placeholder)
+        var_type, var_name = parse_placeholder_text(placeholder.text)
         self.assertEquals(var_type, 'foo')
         self.assertEquals(var_name, '[[This is a LONG StrINg with Weird Characterz]]')
 
@@ -108,7 +108,7 @@ class BuilderUtilTest(BaseTestCase):
 
         # assert that if we have an order, the sections
         # are returned in that order
-        new_order = [3,1,2]   
+        new_order = [3,1,2]
         reorder_sections(template, new_order)
         sections = get_template_sections(template)
         self.assertEquals(len(sections), 3)

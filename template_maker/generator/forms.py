@@ -1,6 +1,6 @@
 from flask.ext.wtf import Form
 from wtforms import widgets, DateField, StringField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 
 class DatePickerWidget(widgets.TextInput):
     '''
@@ -15,6 +15,7 @@ class DatePickerWidget(widgets.TextInput):
 
 class DatePickerField(DateField):
     widget = DatePickerWidget()
+    validators=(Optional(),)
 
 class DocumentBaseForm(Form):
     name = StringField('Title', validators=[DataRequired()])

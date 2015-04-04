@@ -1,7 +1,8 @@
 import datetime
 from template_maker.database import db
-from template_maker.generator.models import DocumentBase
-from template_maker.builder.models import TemplateBase
+from template_maker.generator.models import DocumentBase, DocumentPlaceholder
+from template_maker.builder.models import TemplateBase, TemplatePlaceholders
+from template_maker.data.placeholders import get_template_placeholders
 
 def get_all_documents():
     '''
@@ -13,6 +14,17 @@ def get_documents_and_parent_templates():
     return db.session.query(
         DocumentBase.id, DocumentBase.name, TemplateBase.title
     ).filter(DocumentBase.template_id==TemplateBase.id).all()
+
+def get_document_placeholders(document_id):
+    '''
+    Gets all the placeholders associated with a document
+    '''
+    return db.session.query(
+        DocumentPlaceholder.id, TemplatePlaceholders.full_name, TemplatePlaceholders.type,
+        TemplatePlaceholders.display_name, DocumentPlaceholder.value
+    ).filter(DocumentPlaceholder.document_id==document_id).filter(
+        DocumentPlaceholder.placeholder_id==TemplatePlaceholders.id
+    ).all()
 
 def get_single_document(document_id):
     '''
@@ -29,17 +41,36 @@ def get_single_document_and_parent_template(document_id):
 
 def create_new_document(template_id, data):
     now = datetime.datetime.utcnow()
+
+    # create the document
     document_base = DocumentBase(
         created_at=now,
         updated_at=now,
         name=data.get('name'),
         template_id=template_id
     )
-
     db.session.add(document_base)
     db.session.commit()
 
+    # create the placeholders for the document
+    placeholders = get_template_placeholders(template_id)
+    for placeholder in placeholders:
+        _placeholder = DocumentPlaceholder(
+            document_id=document_base.id,
+            placeholder_id=placeholder.id,
+        )
+        db.session.add(_placeholder)
+    db.session.commit()
+
     return document_base.id
+
+def save_document_section(document, section, placeholders, data):
+    for placeholder in placeholders:
+        _placeholder = DocumentPlaceholder.query.get(placeholder.id)
+        _placeholder.value = data.get(placeholder.display_name, '')
+        db.session.commit()
+
+    return True
 
 def delete_document(document):
     db.session.delete(document)
