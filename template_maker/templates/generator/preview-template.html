@@ -1,11 +1,39 @@
-<div class="template-preview-content">
+{% import "macros.html" as macros %}
+
+<div class="white-wrapper">
+    <span class="span-title">SFJIOSJDFIODSJFOS</span>
+    <button class="btn btn-success pull-right">Save</button>
+<!--   <div class="well placeholder-index">
+    <div class="row">
+      <div class="col-md-2">
+        <span class="index-legend"><b>Placeholder Index</b></span>
+      </div>
+      <div class="col-md-10">
+        <form class="form">
+          {{ form.csrf_token }}
+          {% for field in form if not field.id == 'csrf_token' %}
+          <div class="form-group">
+            <label for="[[{{ field.label }}]]" class="control-label">{{ field.label }}</label>
+            <div>
+              {{ macros.with_errors(field, class_="form-control", **{'rv-value': field.rv_data_input }) }}
+            </div>
+          </div>
+          {% endfor %}
+        </form>
+      </div>
+    </div>
+  </div> -->
+</div>
+
+<div class="document-preview-content">
   {% for section in sections %}
-    <div class="section-content">
+    <div class="section-content" id="section-{{ section.id }}">
     {% if section.section_type == 'text' or section.section_type == 'fixed_text' %}
       {% if section.text %}
         {{ section.text | safe }}
       {% endif %}
     {% endif %}
     </div>
+    <hr>
   {% endfor %}
 </div>

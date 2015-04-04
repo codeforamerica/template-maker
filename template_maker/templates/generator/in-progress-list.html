@@ -1,0 +1,29 @@
+{% extends "generator/main.html" %}
+
+{% block subcontent %}
+
+<div class="container">
+  <table class="table table-striped table-sm table-bordered">
+    <thead>
+      <tr>
+        <th>Document Title</th>
+        <th>Template Title</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for document in documents %}
+      <tr id="document-{{ document.id }}">
+        <td>{{ document.name }}</td>
+        <td>{{ document.title }}</td>
+        <td>
+          <a class="btn btn-primary btn-sm" href="{{ url_for('generator.edit_document_sections', document_id=document.id) }}">Edit Document</a>
+          <a class="btn btn-danger btn-sm" href="{{ url_for('generator.edit_in_progress_document', document_id=document.id, method='DELETE') }}" onclick="return confirm('Are you sure? This cannot be undone!');">Delete Document</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
