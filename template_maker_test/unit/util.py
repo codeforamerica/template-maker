@@ -3,14 +3,17 @@ from template_maker.database import db
 from template_maker.builder.models import (
     TemplateBase, TemplateSection, TextSection, TemplatePlaceholders
 )
+from template_maker.generator.models import (
+    DocumentBase, DocumentPlaceholder
+)
 from template_maker.users.models import User
 
-def create_a_template():
+def create_a_template(title='test'):
     now = datetime.datetime.utcnow()
-    return TemplateBase(created_at=now, updated_at=now, title='test', description='test')
+    return TemplateBase(created_at=now, updated_at=now, title=title, description='test')
 
-def insert_new_template():
-    template = create_a_template()
+def insert_new_template(title='test'):
+    template = create_a_template(title)
     db.session.add(template)
     db.session.commit()
     return template
@@ -26,10 +29,12 @@ def insert_new_section(title='foo', text='bar'):
     db.session.commit()
     return section
 
-def create_a_placeholder(section_id=1):
-    return TemplatePlaceholders(template_id=1, section_id=section_id)
+def create_a_placeholder(section_id=1, template_id=1, full_name='[[BAR||BAZ]]'):
+    placeholder = TemplatePlaceholders(template_id=template_id, section_id=section_id)
+    placeholder.full_name=full_name
+    return placeholder
 
-def insert_new_placeholder(section_id=None):
+def insert_new_placeholder(section_id=None, template_id=1, full_name='[[BAR||BAZ]]'):
     if len(TemplateSection.query.all()) == 0 or section_id is None:
         section = insert_new_section('foo', 'bar')
         section_id = section.id
@@ -46,3 +51,15 @@ def insert_a_user(is_admin=False, email='foo@foo.com'):
     db.session.add(user)
     db.session.commit()
     return user.id
+
+def insert_new_document(template_id, name='test document'):
+    now = datetime.datetime.utcnow()
+    document = DocumentBase(
+        created_at=now,
+        updated_at=now,
+        name=name,
+        template_id=template_id
+    )
+    db.session.add(document)
+    db.session.commit()
+    return document

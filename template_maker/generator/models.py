@@ -34,7 +34,7 @@ class DocumentPlaceholder(Model):
     __tablename__ = 'document_placeholder'
     id = Column(db.Integer, primary_key=True)
     document_id = ReferenceCol('document_base')
-    placeholder_id = ReferenceCol('template_placeholders')
+    placeholder_id = ReferenceCol('template_placeholders', ondelete='CASCADE')
     value = Column(db.Text)
 
     def __init__(self, document_id, placeholder_id):

@@ -37,7 +37,7 @@ def get_single_document_and_parent_template(document_id):
         DocumentBase.id, DocumentBase.name, TemplateBase.title
     ).filter(DocumentBase.template_id==TemplateBase.id).filter(
         DocumentBase.id==document_id
-    ).all()
+    ).first()
 
 def set_document_placeholders(template_id, document_base):
     # create the placeholders for the document
@@ -90,7 +90,7 @@ def create_new_document(template_id, data):
 
     return document_base.id
 
-def save_document_section(document, section, placeholders, data):
+def save_document_section(placeholders, data):
     for placeholder in placeholders:
         _placeholder = DocumentPlaceholder.query.get(placeholder.id)
         _placeholder.value = data.get(placeholder.display_name, '')

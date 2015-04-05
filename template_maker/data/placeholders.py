@@ -50,7 +50,6 @@ def dedupe_placeholders(input_placeholders):
     return list(set([i.text for i in input_placeholders]))
 
 def update_placeholders(input_placeholders, current_placeholders, template_id, section_id):
-
     current_placeholder_full_names = set([i.full_name for i in current_placeholders])
     new_placeholders = list(set(input_placeholders).difference(current_placeholder_full_names))
     to_delete_placeholders = list(set(current_placeholder_full_names).difference(input_placeholders))
