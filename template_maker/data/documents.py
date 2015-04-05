@@ -1,8 +1,8 @@
 import datetime
 from template_maker.database import db
 from template_maker.generator.models import DocumentBase, DocumentPlaceholder
-from template_maker.builder.models import TemplateBase, TemplatePlaceholders
-from template_maker.data.placeholders import get_template_placeholders
+from template_maker.builder.models import TemplateBase
+from template_maker.data.placeholders import get_template_placeholders, TemplatePlaceholders
 
 def get_all_documents():
     '''
@@ -39,6 +39,17 @@ def get_single_document_and_parent_template(document_id):
         DocumentBase.id==document_id
     ).all()
 
+def set_document_placeholders(template_id, document_base):
+    # create the placeholders for the document
+    placeholders = get_template_placeholders(template_id)
+    for placeholder in placeholders:
+        _placeholder = DocumentPlaceholder(
+            document_id=document_base.id,
+            placeholder_id=placeholder.id,
+        )
+        db.session.add(_placeholder)
+    db.session.commit()
+
 def create_new_document(template_id, data):
     now = datetime.datetime.utcnow()
 
@@ -52,15 +63,7 @@ def create_new_document(template_id, data):
     db.session.add(document_base)
     db.session.commit()
 
-    # create the placeholders for the document
-    placeholders = get_template_placeholders(template_id)
-    for placeholder in placeholders:
-        _placeholder = DocumentPlaceholder(
-            document_id=document_base.id,
-            placeholder_id=placeholder.id,
-        )
-        db.session.add(_placeholder)
-    db.session.commit()
+    set_document_placeholders(template_id, document_base)
 
     return document_base.id
 

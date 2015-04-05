@@ -9,11 +9,9 @@ from flask.ext.wtf import Form
 from wtforms import TextField, IntegerField, FloatField
 
 from template_maker.generator.forms import DatePickerField, DocumentBaseForm
-from template_maker.data.templates import get_single_template, get_published_templates
-from template_maker.data.sections import get_template_sections, get_single_section
-from template_maker.data.documents import (
-    create_new_document, get_single_document, save_document_section,
-    get_documents_and_parent_templates, delete_document, get_document_placeholders
+from template_maker.data import (
+    templates as tp, sections as sc,
+    placeholders as ph, documents as dm
 )
 
 TYPE_VARIABLES_MAP = {
@@ -33,7 +31,7 @@ def list_templates():
     Because there is no interacton on this page, it uses
     Flask entirely
     '''
-    templates = get_published_templates()
+    templates = tp.get_published_templates()
     return render_template('generator/list.html', templates=templates)
 
 @blueprint.route('/edit')
@@ -41,7 +39,7 @@ def in_progress_documents():
     '''
     Returns a list of all currently created documents.
     '''
-    documents = get_documents_and_parent_templates()
+    documents = dm.get_documents_and_parent_templates()
     return render_template('generator/in-progress-list.html', documents=documents)
 
 @blueprint.route('/edit/<int:document_id>', methods=['GET', 'POST'])
@@ -49,9 +47,9 @@ def edit_in_progress_document(document_id):
     '''
     Allows updating and deleting of individual documents.
     '''
-    document_base = get_single_document(document_id)
+    document_base = dm.get_single_document(document_id)
     if request.args.get('method') == 'DELETE':
-        if delete_document(document_base):
+        if dm.delete_document(document_base):
             return redirect(url_for('generator.in_progress_documents'))
         return abort(403)
 
@@ -63,10 +61,10 @@ def new_document(template_id):
     GET - Returns the new document form
     POST - Creates a new document from a template
     '''
-    template = get_single_template(template_id)
+    template = tp.get_single_template(template_id)
     form = DocumentBaseForm()
     if form.validate_on_submit():
-        document_base_id = create_new_document(template_id, request.form)
+        document_base_id = dm.create_new_document(template_id, request.form)
         return redirect(
             url_for('generator.edit_document_sections', document_id=document_base_id)
         )
@@ -112,8 +110,8 @@ def edit_document_sections(document_id, section_id=None):
     GET - Returns a new document generator based on the template
     POST - TODO
     '''
-    document_base = get_single_document(document_id)
-    template_base = get_single_template(document_base.template_id)
+    document_base = dm.get_single_document(document_id)
+    template_base = tp.get_single_template(document_base.template_id)
 
     if template_base is None or document_base is None:
         return render_template('404.html')
@@ -124,9 +122,9 @@ def edit_document_sections(document_id, section_id=None):
             section_id=template_base.section_order[0]
         ))
 
-    sections = get_template_sections(template_base)
-    current_section = get_single_section(section_id, template_base.id)
-    placeholders = get_document_placeholders(current_section.id)
+    sections = sc.get_template_sections(template_base)
+    current_section = sc.get_single_section(section_id, template_base.id)
+    placeholders = dm.get_document_placeholders(current_section.id)
 
     class F(Form):
         pass
@@ -149,7 +147,7 @@ def edit_document_sections(document_id, section_id=None):
     form = F()
 
     if form.validate_on_submit():
-        save_document_section(document_base, template_base, placeholders, request.form)
+        dm.save_document_section(document_base, template_base, placeholders, request.form)
         return redirect(url_for(
             'generator.edit_document_sections', document_id=document_base.id, section_id=current_section.id)
         )

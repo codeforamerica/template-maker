@@ -2,10 +2,7 @@ from sqlalchemy.dialects.postgresql import array
 
 from template_maker.database import db
 from template_maker.builder.models import TemplateSection, TextSection, FixedTextSection
-from template_maker.data.placeholders import (
-    delete_excess_placeholders, create_or_update_placeholder, get_section_placeholders,
-    get_all_placeholders, dedupe_placeholders
-)
+from template_maker.data import placeholders as ph
 
 SECTION_TYPE_MAPS = {
     'text': TextSection, 'fixed_text': FixedTextSection,
@@ -90,16 +87,16 @@ def update_section(section, template_id, form_input):
         # save the text
         db.session.commit()
         # find all placeholders, using beautiful soup
-        input_placeholders = dedupe_placeholders(get_all_placeholders(html))
+        input_placeholders = ph.dedupe_placeholders(ph.get_all_placeholders(html))
         # get any existing placeholders
-        current_placeholders = get_section_placeholders(section.id)
+        current_placeholders = ph.get_section_placeholders(section.id)
 
         # if there are more old placeholders than new ones, delete the excess
-        delete_excess_placeholders(current_placeholders, input_placeholders)
+        ph.delete_excess_placeholders(current_placeholders, input_placeholders)
 
         # overwrite the old placeholders with the new ones
         for var_idx, placeholder in enumerate(input_placeholders):
-            create_or_update_placeholder(var_idx, placeholder, input_placeholders, current_placeholders, template_id, section.id)
+            ph.create_or_update_placeholder(var_idx, placeholder, input_placeholders, current_placeholders, template_id, section.id)
 
     return section.id
 
