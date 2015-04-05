@@ -49,23 +49,36 @@ def parse_placeholder_text(placeholder):
 def dedupe_placeholders(input_placeholders):
     return list(set([i.text for i in input_placeholders]))
 
-def delete_excess_placeholders(current_placeholders, input_placeholders):
-    if len(current_placeholders) > len(input_placeholders):
-        TemplatePlaceholders.query.filter(
-            TemplatePlaceholders.id.in_(
-                [i.id for i in current_placeholders[len(input_placeholders):]]
-            )
-        ).delete(synchronize_session=False)
+def update_placeholders(input_placeholders, current_placeholders, template_id, section_id):
+
+    current_placeholder_full_names = set([i.full_name for i in current_placeholders])
+    new_placeholders = list(set(input_placeholders).difference(current_placeholder_full_names))
+    to_delete_placeholders = list(set(current_placeholder_full_names).difference(input_placeholders))
+
+    if len(to_delete_placeholders) > 0:
+        delete_placeholders(to_delete_placeholders, template_id, section_id)
+
+    if len(new_placeholders) > 0:
+        create_placeholders(new_placeholders, template_id, section_id)
+
     return True
 
-def create_or_update_placeholder(var_idx, placeholder, input_placeholders, current_placeholders, template_id, section_id):
-    _placeholder = current_placeholders[var_idx] if len(current_placeholders) > 0 and var_idx < len(current_placeholders) else TemplatePlaceholders()
-    var_type, var_name = parse_placeholder_text(placeholder)
-    _placeholder.full_name = placeholder
-    _placeholder.display_name = var_name
-    _placeholder.template_id = template_id
-    _placeholder.section_id = section_id
-    _placeholder.type = VARIABLE_TYPE_MAPS[var_type]
-    if not _placeholder.id:
+def delete_placeholders(to_delete_placeholders, template_id, section_id):
+    TemplatePlaceholders.query.filter(
+        TemplatePlaceholders.full_name.in_(to_delete_placeholders),
+        TemplatePlaceholders.template_id==template_id,
+        TemplatePlaceholders.section_id==section_id
+    ).delete(synchronize_session=False)
+    return True
+
+def create_placeholders(new_placeholders, template_id, section_id):
+    for placeholder in new_placeholders:
+        _placeholder = TemplatePlaceholders()
+        var_type, var_name = parse_placeholder_text(placeholder)
+        _placeholder.full_name = placeholder
+        _placeholder.display_name = var_name
+        _placeholder.template_id = template_id
+        _placeholder.section_id = section_id
+        _placeholder.type = VARIABLE_TYPE_MAPS[var_type]
         db.session.add(_placeholder)
     db.session.commit()

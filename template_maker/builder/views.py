@@ -138,11 +138,13 @@ def edit_template(template_id, section_id=None, section_type=None):
     # initialize the forms
     form = SECTION_FORM_MAP[current_section.section_type]()
     new_section_form = TemplateSectionForm()
+    placeholders = ph.get_template_placeholders(template_base.id)
 
     # if the form is valid, go ahead and save everything
     if form.validate_on_submit():
-        sc.update_section(current_section, template_id, request.form)
-        flash('Successfully saved!', 'alert-success')
+        sc.update_section(current_section, placeholders, template_id, request.form)
+        total_documents = str(dm.update_documents(template_id))
+        flash('Successfully saved! ' + total_documents + ' updated', 'alert-success')
         return redirect(url_for(
             'builder.edit_template', template_id=template_id
         ))
@@ -158,7 +160,6 @@ def edit_template(template_id, section_id=None, section_type=None):
 
     # otherwise, we are doing a get request, so get the sections and placeholders
     sections = sc.get_template_sections(template_base)
-    placeholders = list(set([i.full_name for i in ph.get_template_placeholders(template_base.id)]))
 
     response = make_response(render_template(
         'builder/edit.html', template=template_base,

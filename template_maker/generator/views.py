@@ -6,12 +6,12 @@ from flask import (
     redirect, url_for, abort
 )
 from flask.ext.wtf import Form
-from wtforms import TextField, IntegerField, FloatField
+from wtforms import TextField, IntegerField, FloatField, validators
 
 from template_maker.generator.forms import DatePickerField, DocumentBaseForm
 from template_maker.data import (
     templates as tp, sections as sc,
-    placeholders as ph, documents as dm
+    documents as dm
 )
 
 TYPE_VARIABLES_MAP = {
@@ -95,7 +95,7 @@ def create_rivets_bindings(placeholder, section_text):
     ) + \
     ' name="{placeholder_name}"'.format(placeholder_name=placeholder.display_name) + \
     ' class="' + generate_class(placeholder) + '" rv-value="template.placeholder_{idcombo}"'.format(
-        idcombo=strip_tags(placeholder.display_name)
+        idcombo='_'.join(strip_tags(placeholder.display_name).split())
     ) + \
     'value="{placeholder_value}">'.format(placeholder_value=placeholder.value)
     new_text = re.sub(re.escape(placeholder.full_name), repl_text, section_text)
@@ -135,13 +135,13 @@ def edit_document_sections(document_id, section_id=None):
         current_section_text = current_section.text
         for placeholder in placeholders:
             # add a data_input value onto the placeholder
-            placeholder.rv_data_input = 'placeholder_' + strip_tags(placeholder.display_name)
+            placeholder.rv_data_input = 'placeholder_' + '_'.join(strip_tags(placeholder.display_name).split())
             # format the section text
             current_section_text = create_rivets_bindings(placeholder, current_section_text)
             # set up the form
             setattr(
                 F, placeholder.display_name,
-                TYPE_VARIABLES_MAP[placeholder.type](placeholder.display_name)
+                TYPE_VARIABLES_MAP[placeholder.type](placeholder.display_name, validators=[validators.Optional()])
             )
 
     form = F()
@@ -153,12 +153,13 @@ def edit_document_sections(document_id, section_id=None):
         )
     for field in form.__iter__():
         # set the rv_data_input value on the form field as well as on the placeholder
-        setattr(field, 'rv_data_input', 'template.placeholder_' + strip_tags(field.name))
+        setattr(field, 'rv_data_input', 'template.placeholder_' + '_'.join(strip_tags(field.name).split()))
         setattr(field, 'label', strip_tags(field.name))
 
     return render_template('generator/build-document.html',
         document=document_base, template=template_base,
         sections=sections, placeholders=placeholders,
-        current_section=current_section, current_section_text=current_section_text or None,
+        current_section=current_section,
+        current_section_text=current_section_text or None,
         form=form
     )

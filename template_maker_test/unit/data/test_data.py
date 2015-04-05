@@ -72,15 +72,16 @@ class BuilderUtilTest(BaseTestCase):
 
         template = insert_new_template()
         section = insert_new_section()
-        placeholder = insert_new_placeholder(section.id)
 
         new_content = {
             'widget': 'this is a <span class="js-fr-placeholder">[[Text||foo]]</span>' +
             '<span class="js-fr-placeholder">[[Text||bar]]</span>' +
-            '<span class="js-fr-placeholder">[[Text||baz]]</span> update'
+            '<span class="js-fr-placeholder">[[Text||baz]]</span>'
         }
 
-        update_section(section, template.id, new_content)
+        placeholders = TemplatePlaceholders.query.all()
+
+        update_section(section, placeholders, template.id, new_content)
         self.assertEquals(len(TemplatePlaceholders.query.all()), 3)
         self.assertEquals(section.text, new_content.get('widget'))
 
@@ -88,7 +89,9 @@ class BuilderUtilTest(BaseTestCase):
             'widget': 'this is a section with fewer placeholders <span class="js-fr-placeholder">[[Text||foo]]</span>'
         }
 
-        update_section(section, template.id, new_content2)
+        placeholders = TemplatePlaceholders.query.all()
+
+        update_section(section, placeholders, template.id, new_content2)
         self.assertEquals(len(TemplatePlaceholders.query.all()), 1)
         self.assertEquals(section.text, new_content2.get('widget'))
 

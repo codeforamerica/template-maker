@@ -1,8 +1,8 @@
 import datetime
 from template_maker.database import db
 from template_maker.generator.models import DocumentBase, DocumentPlaceholder
-from template_maker.builder.models import TemplateBase
-from template_maker.data.placeholders import get_template_placeholders, TemplatePlaceholders
+from template_maker.builder.models import TemplateBase, TemplatePlaceholders
+from template_maker.data.placeholders import get_template_placeholders
 
 def get_all_documents():
     '''
@@ -43,12 +43,35 @@ def set_document_placeholders(template_id, document_base):
     # create the placeholders for the document
     placeholders = get_template_placeholders(template_id)
     for placeholder in placeholders:
+        _placeholder = DocumentPlaceholder.query.filter(
+            DocumentPlaceholder.placeholder_id==placeholder.id
+        ).filter(
+            DocumentPlaceholder.document_id==document_base.id
+        ).first()
+
+        # if we already have this placeholder, pass
+        if _placeholder:
+            continue
+
         _placeholder = DocumentPlaceholder(
             document_id=document_base.id,
             placeholder_id=placeholder.id,
         )
+
         db.session.add(_placeholder)
+
     db.session.commit()
+
+def update_documents(template_id):
+    # get all non-published documents based on the template
+    documents = DocumentBase.query.filter(
+        DocumentBase.template_id==template_id
+    ).all()
+
+    for document in documents:
+        set_document_placeholders(template_id, document)
+
+    return len(documents)
 
 def create_new_document(template_id, data):
     now = datetime.datetime.utcnow()
@@ -71,7 +94,7 @@ def save_document_section(document, section, placeholders, data):
     for placeholder in placeholders:
         _placeholder = DocumentPlaceholder.query.get(placeholder.id)
         _placeholder.value = data.get(placeholder.display_name, '')
-        db.session.commit()
+    db.session.commit()
 
     return True
 

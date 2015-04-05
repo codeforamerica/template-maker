@@ -4,8 +4,6 @@
 {% block subcontent %}
 
 <div class="row" id="js-rivets-template">
-
-
   <div class="col-sm-2 placeholders-legend-container">
     <div class="pad-20">
       <h3>
@@ -36,7 +34,7 @@
 <script>
   var template = {
   {% for placeholder in placeholders %}
-    {{ placeholder.rv_data_input | safe }}: {% if placeholder.value %}'{{ placeholder.value | safe }}'{% else %}null{% endif %},
+    {{ placeholder.rv_data_input | safe }}: {% if placeholder.value %}'{{ placeholder.value | safe }}'{% else %}''{% endif %},
   {% endfor %}
   };
   rivets.bind(document.getElementById('js-rivets-template'), {template: template});

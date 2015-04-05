@@ -74,7 +74,7 @@ def reorder_sections(template, section_order, to_delete=None):
 
     return template.section_order
 
-def update_section(section, template_id, form_input):
+def update_section(section, placeholders, template_id, form_input):
     '''
     Updates TemplateSection and TemplatePlaceholders models associated with
     a particular template_id
@@ -88,15 +88,8 @@ def update_section(section, template_id, form_input):
         db.session.commit()
         # find all placeholders, using beautiful soup
         input_placeholders = ph.dedupe_placeholders(ph.get_all_placeholders(html))
-        # get any existing placeholders
-        current_placeholders = ph.get_section_placeholders(section.id)
 
-        # if there are more old placeholders than new ones, delete the excess
-        ph.delete_excess_placeholders(current_placeholders, input_placeholders)
-
-        # overwrite the old placeholders with the new ones
-        for var_idx, placeholder in enumerate(input_placeholders):
-            ph.create_or_update_placeholder(var_idx, placeholder, input_placeholders, current_placeholders, template_id, section.id)
+        ph.update_placeholders(input_placeholders, placeholders, template_id, section.id)
 
     return section.id
 
