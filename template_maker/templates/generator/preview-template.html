@@ -1,11 +1,38 @@
-<div class="template-preview-content">
-  {% for section in sections %}
-    <div class="section-content">
-    {% if section.section_type == 'text' or section.section_type == 'fixed_text' %}
-      {% if section.text %}
-        {{ section.text | safe }}
-      {% endif %}
-    {% endif %}
+{% import "macros.html" as macros %}
+
+<div class="white-wrapper">
+    <span class="span-title">{{ current_section.title }}</span>
+    <input type="submit" value="Save" class="btn btn-success pull-right">
+
+<!--   <div class="well placeholder-index">
+    <div class="row">
+      <div class="col-md-2">
+        <span class="index-legend"><b>Placeholder Index</b></span>
+      </div>
+      <div class="col-md-10">
+        <form class="form">
+          {{ form.csrf_token }}
+          {% for field in form if not field.id == 'csrf_token' %}
+          <div class="form-group">
+            <label for="[[{{ field.label }}]]" class="control-label">{{ field.label }}</label>
+            <div>
+              {{ macros.with_errors(field, class_="form-control", **{'rv-value': field.rv_data_input }) }}
+            </div>
+          </div>
+          {% endfor %}
+        </form>
+      </div>
     </div>
-  {% endfor %}
+  </div> -->
+</div>
+
+<div class="document-preview-content">
+  {{ macros.flash_messages() }}
+  <div class="section-content" id="section-{{ current_section.id }}">
+  {% if current_section.section_type == 'text' or current_section.section_type == 'fixed_text' %}
+    {% if current_section_text %}
+      {{ current_section_text | safe }}
+    {% endif %}
+  {% endif %}
+  </div>
 </div>

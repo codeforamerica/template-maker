@@ -8,6 +8,12 @@ def get_all_templates():
     '''
     return TemplateBase.query.all()
 
+def get_published_templates():
+    '''
+    Returns published templates
+    '''
+    return TemplateBase.query.filter(TemplateBase.published==True).all()
+
 def get_single_template(template_id):
     '''
     Returns a single template from a template_id

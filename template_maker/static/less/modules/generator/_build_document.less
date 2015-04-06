@@ -1,0 +1,56 @@
+// Styles for the build-document view
+
+@placeholder-index-height: 45px;
+@placeholder-index-height-wrap: 40px;
+
+.current-section {
+  background-color: @gray-lighter;
+}
+
+.generator-section {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.white-wrapper {
+  background: white;
+  height: @placeholder-index-height + @placeholder-index-height-wrap;
+  margin-top: -@placeholder-index-height-wrap/2;
+  padding-top: @placeholder-index-height-wrap/2;
+  z-index: 11;
+  margin-left: -10px;
+  padding-left: 10px;
+}
+
+.placeholders-legend-container, .placeholder-index, .white-wrapper {
+  position: fixed;
+}
+
+.placeholder-index, .white-wrapper {
+  width: 63%;
+}
+
+.placeholder-index {
+  height: @placeholder-index-height;
+  overflow: auto;
+}
+
+.has-left-fixed-companion {
+  float: right;
+  padding-left: 75px;
+  padding-right: 180px;
+}
+
+.template-placeholder {
+  border-radius: 0
+}
+
+.document-preview-content {
+  margin-top: @placeholder-index-height + (@placeholder-index-height-wrap);
+}
+
+.index-legend {
+  padding-top: @placeholder-index-height-wrap/2;
+  display: block;
+  position: fixed;
+}

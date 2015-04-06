@@ -1,0 +1,18 @@
+{% extends "generator/main.html" %}
+{% import "macros.html" as macros %}
+
+{% block subcontent %}
+
+<h2>Create a document <span class="text-muted text-small">(from {{ template.title }})</span></h2>
+
+<form class="form" role="form" method="POST" action="{{ url_for('generator.new_document', template_id=template.id) }}">
+  {{ form.csrf_token }}
+  <div class="pad-30">
+    <label for="title">What is the name of your new document?</label>
+    {{ macros.with_errors(form.name, class_="form-control", placeholder="Ex: Professional Services Agreement for Cleaning Services") }}
+  </div>
+
+  <input type="submit" class="btn btn-success" value="Next">
+</form>
+
+{% endblock %}

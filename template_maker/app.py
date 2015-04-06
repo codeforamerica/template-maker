@@ -1,8 +1,10 @@
 from flask import Flask
 
-from template_maker.settings import DevConfig, ProdConfig
+from template_maker.settings import DevConfig
 from template_maker.assets import assets
-from template_maker import builder, generator, frontmatter, users
+from template_maker.builder import views as b_views
+from template_maker.generator import views as g_views
+from template_maker import frontmatter, users
 from template_maker.extensions import (
     db, migrate, debug_toolbar, login_manager
 )
@@ -15,8 +17,8 @@ def create_app(config_object=DevConfig):
     return app
 
 def register_blueprints(app):
-    app.register_blueprint(builder.views.blueprint)
-    app.register_blueprint(generator.views.blueprint)
+    app.register_blueprint(b_views.blueprint)
+    app.register_blueprint(g_views.blueprint)
     app.register_blueprint(frontmatter.views.blueprint)
     app.register_blueprint(users.views.blueprint)
     return None

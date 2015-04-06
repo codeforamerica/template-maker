@@ -36,12 +36,3 @@ class TemplateSectionTextForm(Form):
     '''
     title = StringField('Title')
     widget = FroalaField()
-
-class PlaceholderForm(Form):
-    '''
-    Since the number of placeholders differ from template to template, we
-    just pass a blank form to get CSRF protection. In the view, we
-    use dynamic form generation as laid out here:
-    https://groups.google.com/forum/#!topic/wtforms/cJl3aqzZieA
-    '''
-    pass

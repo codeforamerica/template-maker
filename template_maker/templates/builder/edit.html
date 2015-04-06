@@ -20,16 +20,7 @@
     </div>
     <div class="col-sm-9">
 
-      {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert {{ category }} alert-dismissible flashed-alert fade in" role="alert">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          {{ message }}
-        </div>
-        {% endfor %}
-      {% endif %}
-      {% endwith %}
+      {{ macros.flash_messages() }}
 
       {% if sections | length == 0 %}
       <div class="well">
@@ -70,7 +61,7 @@
 
 {% block javascripts %}
   {% if current_section.section_type in ['text', 'fixed_text'] %}
-    <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery.are-you-sure/jquery.are-you-sure.js') }}"></script> 
+    <script type="text/javascript" src="{{ url_for('static', filename='lib/jquery.are-you-sure/jquery.are-you-sure.js') }}"></script>
     </script>
     <script src="{{ url_for('static', filename='lib/froala/js/froala_editor.min.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/froala/js/plugins/lists.min.js') }}"></script>

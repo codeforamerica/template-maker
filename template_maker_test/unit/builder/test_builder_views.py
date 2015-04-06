@@ -2,7 +2,7 @@ from werkzeug.datastructures import ImmutableMultiDict
 from template_maker_test.unit.test_base import BaseTestCase
 from template_maker.app import db
 from template_maker.builder.models import (
-    TemplateBase, TemplateSection, TextSection
+    TemplateBase, TemplateSection
 )
 from template_maker_test.unit.util import (
     create_a_template, create_a_text_section, insert_new_template
@@ -11,7 +11,7 @@ from template_maker_test.unit.util import (
 class TestBuilder(BaseTestCase):
     render_templates = False
     def test_list_view(self):
-        template = insert_new_template()
+        insert_new_template()
 
         response = self.client.get('/build/')
         assert response.status_code == 200
@@ -27,7 +27,7 @@ class TestBuilder(BaseTestCase):
             title='title',
             description = 'description'
         ))
-        # it should successfully add to the db and redirect us 
+        # it should successfully add to the db and redirect us
         # to the right section page
         self.assertEquals(len(TemplateBase.query.all()), 1)
         assert post.status_code == 302
@@ -39,7 +39,7 @@ class TestBuilder(BaseTestCase):
         db.session.commit()
 
         # assert that the right template is used
-        response = self.client.get('/build/1/publish')
+        self.client.get('/build/1/publish')
         self.assert_template_used('builder/preview.html')
 
         # assert that the post sets the publish flag to true
@@ -101,7 +101,7 @@ class TestEditTemplate(BaseTestCase):
 
     def test_edit_template_post(self):
         # update a section's title and text content
-        post = self.client.post('/build/1/section/1', data=dict(
+        self.client.post('/build/1/section/1', data=dict(
             type='text',
             title='bar',
             widget='foo'
@@ -109,7 +109,7 @@ class TestEditTemplate(BaseTestCase):
 
         self.assert_flashes('Successfully saved!', expected_category='alert-success')
 
-        request = self.client.get('/build/1/section/1')
+        self.client.get('/build/1/section/1')
         self.assertEquals(self.get_context_variable('current_section').id, 1)
         self.assertEquals(self.get_context_variable('current_section').title, 'bar')
         self.assertEquals(self.get_context_variable('current_section').text, 'foo')
@@ -131,7 +131,7 @@ class TestEditTemplate(BaseTestCase):
         # ensure the TemplateBase was updated properly
         self.assertEquals(TemplateBase.query.get(1).section_order, [2,1])
         # ensure that the returning template was updated properly
-        request = self.client.get('/build/1/section/1')
+        self.client.get('/build/1/section/1')
         new_order = [i.id for i in self.get_context_variable('sections')]
         self.assertEquals(new_order, [2,1])
 

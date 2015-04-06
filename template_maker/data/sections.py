@@ -1,12 +1,8 @@
-import re
 from sqlalchemy.dialects.postgresql import array
 
 from template_maker.database import db
 from template_maker.builder.models import TemplateSection, TextSection, FixedTextSection
-from template_maker.data.placeholders import (
-    delete_excess_placeholders, create_or_update_placeholder, get_section_placeholders,
-    get_all_placeholders
-)
+from template_maker.data import placeholders as ph
 
 SECTION_TYPE_MAPS = {
     'text': TextSection, 'fixed_text': FixedTextSection,
@@ -71,14 +67,14 @@ def reorder_sections(template, section_order, to_delete=None):
             new_order = array(template.section_order)
             template.section_order = new_order if len(new_order) > 0 else None
             db.session.commit()
-            
+
     else:
         template.section_order = [int(i) for i in section_order]
         db.session.commit()
 
     return template.section_order
 
-def update_section(section, template_id, form_input):
+def update_section(section, placeholders, template_id, form_input):
     '''
     Updates TemplateSection and TemplatePlaceholders models associated with
     a particular template_id
@@ -91,16 +87,9 @@ def update_section(section, template_id, form_input):
         # save the text
         db.session.commit()
         # find all placeholders, using beautiful soup
-        input_placeholders = get_all_placeholders(html)
-        # get any existing placeholders
-        current_placeholders = get_section_placeholders(section.id)
+        input_placeholders = ph.dedupe_placeholders(ph.get_all_placeholders(html))
 
-        # if there are more old placeholders than new ones, delete the excess
-        delete_excess_placeholders(current_placeholders, input_placeholders)
-
-        # overwrite the old placeholders with the new ones
-        for var_idx, placeholder in enumerate(input_placeholders):
-            create_or_update_placeholder(var_idx, placeholder, input_placeholders, current_placeholders, template_id, section.id)
+        ph.update_placeholders(input_placeholders, placeholders, template_id, section.id)
 
     return section.id
 
