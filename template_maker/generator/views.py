@@ -3,7 +3,7 @@ import string
 
 from flask import (
     Blueprint, request, render_template,
-    redirect, url_for, abort
+    redirect, url_for, abort, flash
 )
 from flask.ext.wtf import Form
 from wtforms import TextField, IntegerField, FloatField, validators
@@ -148,6 +148,7 @@ def edit_document_sections(document_id, section_id=None):
 
     if form.validate_on_submit():
         dm.save_document_section(placeholders, request.form)
+        flash('Changes successfully saved!', 'alert-success')
         return redirect(url_for(
             'generator.edit_document_sections', document_id=document_base.id, section_id=current_section.id)
         )

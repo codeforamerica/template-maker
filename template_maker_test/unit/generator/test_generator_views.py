@@ -86,5 +86,6 @@ class TestGenerator(BaseTestCase):
 
         # assert that the value has changed
         self.assertEquals(DocumentPlaceholder.query.first().value, 'test')
+        self.assert_flashes('Changes successfully saved!', expected_category='alert-success')
         self.assertEquals(post.status_code, 302)
         self.assertEquals(post.location, 'http://localhost/generate/1/edit/1')

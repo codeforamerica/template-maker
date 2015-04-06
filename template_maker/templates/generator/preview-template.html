@@ -3,6 +3,7 @@
 <div class="white-wrapper">
     <span class="span-title">{{ current_section.title }}</span>
     <input type="submit" value="Save" class="btn btn-success pull-right">
+
 <!--   <div class="well placeholder-index">
     <div class="row">
       <div class="col-md-2">
@@ -26,6 +27,7 @@
 </div>
 
 <div class="document-preview-content">
+  {{ macros.flash_messages() }}
   <div class="section-content" id="section-{{ current_section.id }}">
   {% if current_section.section_type == 'text' or current_section.section_type == 'fixed_text' %}
     {% if current_section_text %}
