@@ -3,6 +3,7 @@ import os
 class Config(object):
     SECRET_KEY = os.environ.get('TEMPLATE_MAKER_SECRET', 'template-maker') # todo: change me
     SEED_EMAIL = os.environ.get('SEED_EMAIL', 'benjamin.smithgall@pittsburghpa.gov')
+    DEBUG_TB_ENABLED = False
 
 class DevConfig(Config):
     ENV = os.environ.get('TEMPLATE_MAKER_ENV', 'dev')
@@ -10,6 +11,7 @@ class DevConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'postgresql://localhost/template_maker')
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     BROWSERID_URL = os.environ.get('BROWSERID_URL', 'http://localhost:9000')
+    DEBUG_TB_ENABLED = True
 
 class ProdConfig(Config):
     ENV = os.environ.get('TEMPLATE_MAKER_ENV', 'prod')

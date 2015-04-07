@@ -17,7 +17,7 @@ class DocumentBase(Model):
     updated_at = Column(db.DateTime)
     name = Column(db.String(255))
     # published = Column(db.Boolean, default=False)
-    template_id = ReferenceCol('template_base')
+    template_id = ReferenceCol('template_base', ondelete='CASCADE')
 
     def __init__(self, created_at, updated_at, name, template_id):
         self.created_at = created_at

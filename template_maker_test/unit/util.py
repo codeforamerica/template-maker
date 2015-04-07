@@ -42,7 +42,7 @@ def insert_new_placeholder(section_id=None, template_id=1, full_name='[[BAR||BAZ
     if len(TemplateSection.query.all()) == 0 or section_id is None:
         section = insert_new_section('foo', 'bar')
         section_id = section.id
-    placeholder = create_a_placeholder(section_id, full_name=full_name, display_name=display_name)
+    placeholder = create_a_placeholder(section_id, template_id=template_id, full_name=full_name, display_name=display_name)
     db.session.add(placeholder)
     db.session.commit()
     return placeholder

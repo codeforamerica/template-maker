@@ -53,12 +53,12 @@ def set_document_placeholders(template_id, document_base):
         if _placeholder:
             continue
 
-        _placeholder = DocumentPlaceholder(
+        new_placeholder = DocumentPlaceholder(
             document_id=document_base.id,
             placeholder_id=placeholder.id,
         )
 
-        db.session.add(_placeholder)
+        db.session.add(new_placeholder)
 
     db.session.commit()
 

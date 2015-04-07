@@ -3,11 +3,14 @@ import string
 
 from flask import (
     Blueprint, request, render_template,
-    redirect, url_for, abort, flash
+    redirect, url_for, abort, flash, current_app
 )
 from flask.ext.wtf import Form
+from flask.ext.login import current_user
 from wtforms import TextField, IntegerField, FloatField, validators
 
+from template_maker.users.models import User
+from template_maker.extensions import login_manager
 from template_maker.generator.forms import DatePickerField, DocumentBaseForm
 from template_maker.data import (
     templates as tp, sections as sc,
@@ -22,6 +25,17 @@ blueprint = Blueprint(
     'generator', __name__, url_prefix='/generate',
     template_folder='../templates'
 )
+
+@login_manager.user_loader
+def load_user(userid):
+    return User.get_by_id(int(userid))
+
+# restrict blueprint to only authenticated users
+@blueprint.before_request
+def restrict_access():
+    if current_app.config.get('ENV') != 'test':
+        if not current_user.is_authenticated() or current_user.is_anonymous():
+            return redirect(url_for('users.login'))
 
 @blueprint.route('/')
 def list_templates():
@@ -90,7 +104,7 @@ def create_rivets_bindings(placeholder, section_text):
     Converts a placeholder into a <span> that rivets can grab onto
     '''
     repl_text = '<input id="{placeholder_display_name}" placeholder="{placeholder_name}"'.format(
-        placeholder_name=strip_tags(placeholder.display_name),
+        placeholder_name=placeholder.display_name,
         placeholder_display_name=placeholder.display_name
     ) + \
     ' name="{placeholder_name}"'.format(placeholder_name=placeholder.display_name) + \
@@ -124,7 +138,7 @@ def edit_document_sections(document_id, section_id=None):
 
     sections = sc.get_template_sections(template_base)
     current_section = sc.get_single_section(section_id, template_base.id)
-    placeholders = dm.get_document_placeholders(current_section.id)
+    placeholders = dm.get_document_placeholders(document_base.id)
 
     class F(Form):
         pass
@@ -155,7 +169,7 @@ def edit_document_sections(document_id, section_id=None):
     for field in form.__iter__():
         # set the rv_data_input value on the form field as well as on the placeholder
         setattr(field, 'rv_data_input', 'template.placeholder_' + '_'.join(strip_tags(field.name).split()))
-        setattr(field, 'label', strip_tags(field.name))
+        setattr(field, 'label', field.name)
 
     return render_template('generator/build-document.html',
         document=document_base, template=template_base,

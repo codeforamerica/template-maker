@@ -1,7 +1,10 @@
 from template_maker.generator.models import DocumentBase, DocumentPlaceholder
 from template_maker.generator.views import create_rivets_bindings
 from template_maker.data.documents import get_document_placeholders
-from template_maker_test.unit.util import insert_new_template, insert_new_document, create_document_with_placeholders
+from template_maker_test.unit.util import (
+    insert_new_template, insert_new_document, create_document_with_placeholders,
+    insert_new_placeholder, insert_placeholder_type
+)
 from template_maker_test.unit.test_base import BaseTestCase
 
 class TestGenerator(BaseTestCase):
@@ -37,7 +40,17 @@ class TestGenerator(BaseTestCase):
         self.assertEquals(response.location, 'http://localhost/generate/edit')
 
     def test_new_document(self):
+        insert_placeholder_type()
+        # insert a bunch of templates
+        insert_new_template(published=True)
+        insert_new_template(published=True)
+        insert_new_template(published=True)
         template = insert_new_template(published=True)
+        insert_new_template(published=True)
+        # insert some placeholders
+        insert_new_placeholder(template_id=template.id)
+        insert_new_placeholder(template_id=template.id)
+
 
         url = '/generate/new/from-template-' + str(template.id)
         new = self.client.get(url)
@@ -48,6 +61,7 @@ class TestGenerator(BaseTestCase):
         ))
 
         self.assertEquals(len(DocumentBase.query.all()), 1)
+        self.assertEquals(len(DocumentPlaceholder.query.all()), 2)
         self.assertEquals(post.status_code, 302)
         self.assertEquals(post.location, 'http://localhost/generate/1/edit')
 
@@ -59,14 +73,14 @@ class TestGenerator(BaseTestCase):
 
         self.assertEquals(
             create_rivets_bindings(placeholder, section_text),
-            'foo bar foobar <input id="[[BAZ]]" placeholder="BAZ" name="[[BAZ]]" class="template-placeholder" rv-value="template.placeholder_BAZ"value="None">'
+            'foo bar foobar <input id="[[BAZ]]" placeholder="[[BAZ]]" name="[[BAZ]]" class="template-placeholder" rv-value="template.placeholder_BAZ"value="None">'
         )
 
         # assert that datepickers are added with the proper type
         placeholder.type = 2
         self.assertEquals(
             create_rivets_bindings(placeholder, section_text),
-            'foo bar foobar <input id="[[BAZ]]" placeholder="BAZ" name="[[BAZ]]" class="template-placeholder datepicker" rv-value="template.placeholder_BAZ"value="None">'
+            'foo bar foobar <input id="[[BAZ]]" placeholder="[[BAZ]]" name="[[BAZ]]" class="template-placeholder datepicker" rv-value="template.placeholder_BAZ"value="None">'
         )
 
     def test_edit_document_sections(self):
@@ -89,3 +103,9 @@ class TestGenerator(BaseTestCase):
         self.assert_flashes('Changes successfully saved!', expected_category='alert-success')
         self.assertEquals(post.status_code, 302)
         self.assertEquals(post.location, 'http://localhost/generate/1/edit/1')
+
+    def test_delete_template_cascade(self):
+        template = insert_new_template(published=True)
+        insert_new_document(template.id, name='test')
+        self.client.get('/build/1/edit?method=DELETE')
+        self.assertEquals(len(DocumentBase.query.all()), 0)

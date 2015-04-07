@@ -1,6 +1,6 @@
 from flask import Flask
 
-from template_maker.settings import DevConfig
+from template_maker.settings import DevConfig, ProdConfig
 from template_maker.assets import assets
 from template_maker.builder import views as b_views
 from template_maker.generator import views as g_views

@@ -1,8 +1,10 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<button class="btn btn-primary" id="signin">Login</button>
-<button class="btn btn-primary" id="signout">Logout</button>
+<div class="full-height-container container">
+  <button class="btn btn-primary" id="signin">Login</button>
+  <button class="btn btn-primary" id="signout">Logout</button>
+</div>
 
 {% endblock %}
 
@@ -20,8 +22,8 @@ navigator.id.watch({
       type: 'POST',
       url: '{{ url_for("users.auth") }}', // This is a URL on your website.
       data: {assertion: assertion},
-      success: function(res, status, xhr) { 
-        window.location.href = res; 
+      success: function(res, status, xhr) {
+        window.location.href = res;
       },
       error: function(xhr, status, err) {
         alert("Login failure: " + err);
@@ -45,7 +47,7 @@ navigator.id.watch({
 var signinLink = $('#signin');
 if (signinLink) {
   signinLink.on('click', function() {
-    navigator.id.request(); 
+    navigator.id.request();
   });
 }
 

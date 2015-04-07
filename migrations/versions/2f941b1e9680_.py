@@ -21,8 +21,8 @@ def upgrade():
     sa.Column('document_id', sa.Integer(), nullable=False),
     sa.Column('placeholder_id', sa.Integer(), nullable=False),
     sa.Column('value', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['document_id'], ['document_base.id'], ),
-    sa.ForeignKeyConstraint(['placeholder_id'], ['template_placeholders.id'], ),
+    sa.ForeignKeyConstraint(['document_id'], ['document_base.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['placeholder_id'], ['template_placeholders.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     ### end Alembic commands ###
