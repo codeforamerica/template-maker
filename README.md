@@ -14,7 +14,7 @@ The template-maker is currently a prototype in pre-alpha. We are still both test
 | Feature | Status |
 |---------|--------|
 | Write templates from scratch | Alpha Deployed |
-| Generate documents from a pre-written template | Designing initial prototype |
+| Generate documents from a pre-written template | Alpha Deployed |
 | Write and manage boilerplate sections | Designing initial prototype |
 | Searchable library of sections | Designing initial prototype |
 
